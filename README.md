@@ -1,5 +1,9 @@
 # SubZir для OBS
 
+SubZir reads English subtitles from your PS5 capture card feed and displays the Ukrainian translation in your OBS scene. Select the subtitle area once and the app follows each new line automatically. It runs offline on your Windows PC using the bundled QuickMT model.
+
+[Download for Windows 10/11 x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)
+
 SubZir читає англійські субтитри з вибраної області гри й показує український переклад у сцені OBS. Після першого налаштування переклад працює автоматично й локально на CPU.
 
 **[Завантажити для Windows x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)**
