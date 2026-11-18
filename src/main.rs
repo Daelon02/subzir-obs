@@ -1,4 +1,6 @@
+mod dialogue;
 mod stability;
+use dialogue::DialogueHistory;
 use serde_json::{json, Value};
 use stability::Stabilizer;
 use std::{
@@ -302,6 +304,7 @@ enum Stage {
 }
 struct Line {
     stage: Stage,
+    context: String,
     start: Instant,
     text: String,
     ocr_ms: f64,
@@ -309,7 +312,11 @@ struct Line {
 fn ms(t: Instant) -> f64 {
     t.elapsed().as_secs_f64() * 1000.0
 }
-fn capture(tx: mpsc::Sender<Result<Line>>, speculate: bool) -> Result<()> {
+fn capture(
+    tx: mpsc::Sender<Result<Line>>,
+    speculate: bool,
+    mut history: Option<DialogueHistory>,
+) -> Result<()> {
     let ocr = engine()?;
     let device = setting("SUB_DEVICE")?;
     let roi = setting("SUB_CROP")?;
@@ -413,8 +420,16 @@ fn capture(tx: mpsc::Sender<Result<Line>>, speculate: bool) -> Result<()> {
                     .map(|s| (Stage::Draft, s.to_owned()))
             });
         if let Some((stage, text)) = event {
+            let context = history.as_mut().map_or_else(String::new, |history| {
+                let context = history.previous(start);
+                if stage == Stage::Confirmed {
+                    history.confirm(&text, start);
+                }
+                context
+            });
             let line = Line {
                 stage,
+                context,
                 start,
                 text,
                 ocr_ms: ms(start),
@@ -430,8 +445,12 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
     let check_obs = env::var("SUB_ACK").is_ok_and(|v| v == "1");
     let (tx, rx) = mpsc::channel();
     let speculate = worker.hy_server.is_some() && env::var("SUB_EARLY").as_deref() != Ok("0");
+    let history = worker
+        .hy_server
+        .as_ref()
+        .map(|_| DialogueHistory::default());
     thread::spawn(move || {
-        if let Err(e) = capture(tx.clone(), speculate) {
+        if let Err(e) = capture(tx.clone(), speculate, history) {
             let _ = tx.send(Err(e));
         }
     });
@@ -476,10 +495,8 @@ fn live_context(
     check_obs: bool,
 ) -> Result<()> {
     use std::collections::VecDeque;
-    const CONTEXT_TTL: Duration = Duration::from_secs(8);
     let mut queued: VecDeque<Line> = VecDeque::new();
     let mut draft: Option<(String, String, String)> = None;
-    let mut previous: Option<(String, Instant)> = None;
     loop {
         let line = match queued.pop_front() {
             Some(line) => line,
@@ -487,14 +504,11 @@ fn live_context(
                 .recv()
                 .map_err(|_| AppError::Config("Capture ended".into()))??,
         };
-        let context = previous
-            .as_ref()
-            .filter(|(_, t)| line.start.saturating_duration_since(*t) <= CONTEXT_TTL)
-            .map_or("", |(text, _)| text.as_str());
+        let context = line.context;
         let start = Instant::now();
         let cached = draft
             .take()
-            .filter(|(en, prior, _)| en == &line.text && prior == context);
+            .filter(|(en, prior, _)| en == &line.text && prior == &context);
         let reused = cached.is_some();
         let text = match cached {
             Some((_, _, translation)) => translation,
@@ -521,7 +535,7 @@ fn live_context(
             queued.push_back(next);
         }
         if line.stage == Stage::Draft {
-            draft = Some((line.text, context.to_owned(), text));
+            draft = Some((line.text, context, text));
             continue;
         }
         if queued.iter().any(|next| next.stage == Stage::Confirmed) {
@@ -535,11 +549,8 @@ fn live_context(
         println!(
             "{}",
             json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,
-            "reused_draft":reused,"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
+            "reused_draft":reused,"context_lines":context.lines().count(),"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
         );
-        if !line.text.is_empty() {
-            previous = Some((line.text, line.start));
-        }
     }
 }
 fn latest(rx: &Receiver<Result<Line>>) -> Result<Option<Line>> {
@@ -548,6 +559,7 @@ fn latest(rx: &Receiver<Result<Line>>) -> Result<Option<Line>> {
 fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> {
     let ocr = engine()?;
     let cases = fs::read_to_string(root.join("lines.txt"))?;
+    let mut history = DialogueHistory::default();
     let check_obs = env::var("SUB_ACK").is_ok_and(|s| s == "1");
     for (i, expected) in cases.lines().enumerate() {
         let pixels = fs::read(root.join(format!("{i}.gray")))?;
@@ -563,6 +575,11 @@ fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> 
         let tr = Instant::now();
         let uk = if en.is_empty() {
             String::new()
+        } else if worker.hy_server.is_some() {
+            let context = history.previous(start);
+            let translated = worker.request(&json!({"text":en,"previous":context}))?;
+            history.confirm(&en, start);
+            translated
         } else {
             worker.translate(&en)?
         };

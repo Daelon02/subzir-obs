@@ -1,10 +1,11 @@
 """Translate using the llama.cpp instance owned by the Rust engine."""
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, ProxyHandler, build_opener
 
 def main():
@@ -29,13 +30,8 @@ def main():
             raise RuntimeError(f"{label} failed to start. Check the CUDA runtime, weights and GPU memory.")
         time.sleep(0.15)
 
-    def translate(text, previous):
-        if previous:
-            prompt = (f"Translate the following English video game subtitle into natural {language}. "
-                      f"Previous line for context: “{previous}”. Translate only this line:\n\n{text}")
-        else:
-            prompt = f"Translate the following segment into {language}, without additional explanation.\n\n{text}"
-        payload = {"messages":[{"role":"user","content":prompt}],"temperature":0,
+    def complete(messages):
+        payload = {"messages":messages,"temperature":0,
                    "max_tokens":128,"stream":False,"cache_prompt":True}
         request = Request(endpoint + "/v1/chat/completions", data=json.dumps(payload).encode(), headers=auth)
         with client.open(request,timeout=45) as res:
@@ -44,6 +40,25 @@ def main():
         if not result or choice["finish_reason"] == "length":
             raise ValueError(f"{label} did not finish the subtitle")
         return result
+
+    def translate(text, previous):
+        current = {"role":"user","content":f"Translate the following segment into {language}, without additional explanation.\n\n{text}"}
+        if previous:
+            earlier = " ".join(previous.splitlines())
+            conversation = [{"role":"user","content":f"Previous dialogue: {earlier}"},
+                            {"role":"assistant","content":"OK."}, current]
+            try:
+                result = complete(conversation)
+                # Some models repeat a background sentence or question in the caption.
+                # Retry the current line alone rather than trimming away dialogue.
+                if sentence_count(result) <= sentence_count(text) and "\n" not in result:
+                    return result
+            except HTTPError as error:
+                if error.code != 400:
+                    raise
+            except ValueError:
+                pass
+        return complete([current])
 
     translate("Ready.", "")
     print(json.dumps({"model":label,"target":language,"device":"CUDA"}),flush=True)
@@ -62,6 +77,10 @@ def main():
                     raise
                 result = None
         print(json.dumps(result,ensure_ascii=False),flush=True)
+
+def sentence_count(text):
+    return max(1, sum(bool(part.strip()) for part in re.split(r"[.!?…。！？؟]+", text)))
+
 
 if __name__ == "__main__":
     main()
