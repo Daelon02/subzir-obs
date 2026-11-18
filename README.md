@@ -4,7 +4,7 @@ Translate English subtitles from a PS5 or another capture-card source and show t
 
 **[Download SubZir for Windows x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)** · [Українською](#перший-запуск) · [PS5 benchmark](docs/benchmarks/PS5-EN.md)
 
-![God of War Ragnarök on PS5 with Ukrainian text in the OBS scene](docs/images/god-of-war-obs.jpg)
+![Atreus tells Kratos about Sindri in God of War Ragnarök, with the English line above its Ukrainian translation in OBS](docs/images/god-of-war-obs.jpg)
 
 ## First launch
 
