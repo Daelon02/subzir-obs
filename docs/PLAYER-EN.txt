@@ -1,0 +1,43 @@
+SUBZIR FOR OBS • Windows 10/11 x64
+
+1. Extract the entire ZIP to Documents. Open SubZir.exe. Click Language and
+   select your interface language and subtitle language separately. The game
+   must display English subtitles. Both translation models are included.
+
+2. Connect your PS5 to HDMI IN on the capture card and the card to your PC.
+   In your game scene in OBS, add the card as a Video Capture Device.
+   Turn on English subtitles in the game. If the PS5 picture is black,
+   check the HDMI input and Settings → System → HDMI → Enable HDCP on PS5.
+
+3. Click Connect OBS in SubZir. In OBS, open Tools → Scripts → +, paste
+   the copied path and open PS5-Subtitles.lua. Click the button in the
+   script settings to add subtitles to this scene. The new text source is
+   called “SubZir · Subtitles”. Existing scenes can keep “PS5 UA · QuickMT”.
+
+4. Click Test translation. A translation of “Open the gate.” appears in
+   the OBS scene for four seconds. This step works without a console.
+
+5. Open the settings beside Start Virtual Camera in OBS. Choose Source
+   as the Output Type and select the capture card. Start Virtual Camera.
+   When dialogue appears, click Select subtitle area in SubZir, draw a
+   box around the original English text with room for two lines and save.
+
+6. Click Start translation. Move the text source in OBS to position the
+   translation. On your next launch, start the virtual camera and click
+   Start translation. The subtitle area and both languages are saved.
+   Change the output language at any time. The next new line uses it.
+
+Troubleshooting
+• Empty preview or OBS logo: check that the virtual camera is running
+  and outputs the capture card source.
+• The app shows text but the scene does not: move the subtitle source
+  above the video source and enable its eye icon. Repeat the demo.
+• Partial words or flicker: give the box space for two lines, increase
+  the game's subtitle font size and enable a subtitle background.
+• Missing English OCR: in Windows Settings → Time & language, add
+  English (United States) with its basic language features.
+• Missing MSVCP140 or VCRUNTIME140 DLL: extract the complete ZIP and
+  install Microsoft's Visual C++ Redistributable x64.
+• After a launch failure, look in runtime/diagnostics.txt for details.
+• If a language shows missing glyphs, install its supplemental Windows
+  fonts and select a font supporting that script in the OBS text source.

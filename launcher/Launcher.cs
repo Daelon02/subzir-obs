@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
@@ -15,40 +15,70 @@ class Launcher : Form {
     static readonly UTF8Encoding Utf8 = new UTF8Encoding(false);
     readonly Button connect = new Button(), demo = new Button(), select = new Button(), play = new Button();
     readonly Label status = new Label(), line = new Label();
+    readonly Button language = new Button();
+    readonly Dictionary<Control,Msg> captions = new Dictionary<Control,Msg>();
+    Msg statusMessage;
+    string statusDetail = "";
+    void Caption(Control control, Msg key) {
+        captions[control] = key;
+        control.Text = Ui.Get(key);
+    }
+    void SetStatus(Msg key, string detail = "") {
+        statusMessage = key;
+        statusDetail = detail;
+        status.Text = Ui.Get(key) + detail;
+    }
+    void RefreshLanguage() {
+        Text = "SubZir — " + Ui.Get(Msg.Window);
+        language.Text = Ui.Get(Msg.Language) + (Ui.Language == "en" ? "" : " / Language");
+        language.AccessibleName = Ui.Get(Msg.ChooseLanguages);
+        RightToLeft = Ui.IsRtl ? RightToLeft.Yes : RightToLeft.No;
+        RightToLeftLayout = Ui.IsRtl;
+        foreach (var item in captions) item.Key.Text = Ui.Get(item.Value);
+        SetStatus(statusMessage, statusDetail);
+    }
     Process running;
     bool busy, closing;
     string roi;
     static readonly string CropFile = Path.Combine(Data,"area.txt");
     public Launcher() {
-        Text="Субтитри PS5"; Font=new Font("Segoe UI",10); ClientSize=new Size(650,476);
+        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,505);
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
         BackColor=Color.White;
-        Label title=LabelAt("Українські субтитри",24,18,590,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
-        LabelAt("Англійський текст із гри на PS5 → український текст у сцені OBS",26,69,605,30);
-        ButtonAt(connect,"1. Під’єднати OBS",26,116,208);connect.Click+=delegate { HelpOBS(); };
-        LabelAt("Один раз додайте скрипт до сцени з грою.",250,124,374,31);
-        ButtonAt(demo,"2. Перевірити переклад",26,173,208);demo.Click+=async delegate {await Start(false);};
-        LabelAt("Пробна фраза працює навіть без консолі.",250,181,376,32);
-        ButtonAt(select,"3. Виділити субтитри",26,230,208);select.Click+=async delegate {await Choose();};
-        LabelAt("Обведіть англійський текст на кадрі з гри.",250,238,376,30);
-        ButtonAt(play,"Почати переклад",26,289,251);play.BackColor=Color.FromArgb(23,78,103);play.ForeColor=Color.White;
+        Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
+        LabelAt(Msg.Subtitle,26,68,655,41);
+        ButtonAt(connect,Msg.Connect,26,116,208);connect.Click+=delegate { HelpOBS(); };
+        LabelAt(Msg.ConnectHint,250,114,436,55);
+        ButtonAt(demo,Msg.Test,26,173,208);demo.Click+=async delegate {await Start(false);};
+        LabelAt(Msg.TestHint,250,174,436,52);
+        ButtonAt(select,Msg.SelectArea,26,230,208);select.Click+=async delegate {await Choose();};
+        LabelAt(Msg.SelectHint,250,231,436,52);
+        ButtonAt(play,Msg.Start,26,289,251);play.BackColor=Color.FromArgb(23,78,103);play.ForeColor=Color.White;
         play.Click+=async delegate {if(running!=null)StopOwned();else await Start(true);};
-        Button guide=new Button(); ButtonAt(guide,"Відкрити інструкцію",352,289,270);
-        guide.Click+=delegate {Process.Start("notepad.exe",Quote(Path.Combine(Root,"README.txt")));};
-        status.SetBounds(26,351,596,48);status.ForeColor=Color.FromArgb(35,69,83);Controls.Add(status);
-        line.SetBounds(26,404,596,60);line.Font=new Font(Font.FontFamily,12,FontStyle.Bold);Controls.Add(line);
+        Button guide=new Button(); ButtonAt(guide,Msg.Guide,352,289,270);
+        guide.Click+=delegate {if (Ui.Language != "en" && Ui.Language != "uk") { MessageBox.Show(this,Ui.Get(Msg.GuideBody),Ui.Get(Msg.Guide)); return; } Process.Start("notepad.exe",Quote(Path.Combine(Root,Ui.Language == "uk" ? "README.txt" : "README.en.txt")));};
+        status.SetBounds(26,350,652,55);status.ForeColor=Color.FromArgb(35,69,83);Controls.Add(status);
+        line.SetBounds(26,409,652,78);line.Font=new Font(Font.FontFamily,12,FontStyle.Bold);Controls.Add(line);
+        language.SetBounds(482,21,200,38);
+        language.Click += delegate {
+            try { using(var dialog = new LanguageDialog()) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode); RefreshLanguage(); } } }
+            catch (IOException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
+            catch (UnauthorizedAccessException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
+        };
+        Controls.Add(language);
         Directory.CreateDirectory(Data);
         roi=File.Exists(CropFile)?File.ReadAllText(CropFile).Trim():null;
         if(roi!=null && !System.Text.RegularExpressions.Regex.IsMatch(roi,@"^\d+:\d+:\d+:\d+$"))roi=null;
-        status.Text=roi==null?"Почніть із під’єднання OBS.":"Область субтитрів збережено. Увімкніть віртуальну камеру OBS.";
+        SetStatus(roi==null?Msg.ConnectFirst:Msg.AreaReady);
+        RefreshLanguage();
         FormClosing+=delegate {closing=true;StopOwned();};
     }
-    Label LabelAt(string text,int x,int y,int w,int h){var l=new Label{Text=text};l.SetBounds(x,y,w,h);Controls.Add(l);return l;}
-    void ButtonAt(Button b,string text,int x,int y,int w){b.Text=text;b.SetBounds(x,y,w,42);b.FlatStyle=FlatStyle.Flat;Controls.Add(b);}
+    Label LabelAt(Msg text,int x,int y,int w,int h){var l=new Label{AutoEllipsis=true};Caption(l,text);l.SetBounds(x,y,w,h);Controls.Add(l);return l;}
+    void ButtonAt(Button b,Msg text,int x,int y,int w){Caption(b,text);b.SetBounds(x,y,w,42);b.AutoEllipsis=true;b.FlatStyle=FlatStyle.Flat;Controls.Add(b);}
     void HelpOBS(){
         try {Clipboard.SetText(Lua);}
         catch {Process.Start("explorer.exe","/select,"+Quote(Lua));}
-        MessageBox.Show(this,"В OBS виберіть сцену, де граєте. Відкрийте «Інструменти → Скрипти», натисніть «+» і вставте шлях до файлу (Ctrl+V). Натисніть «Відкрити».\n\nПраворуч натисніть «Додати субтитри до поточної сцени». Поверніться сюди й перевірте переклад.\n\nФайл також є в папці OBS поруч із програмою.","Під’єднання до OBS",MessageBoxButtons.OK,MessageBoxIcon.Information);
+        MessageBox.Show(this,Ui.Get(Msg.Help),Ui.Get(Msg.ConnectTitle),MessageBoxButtons.OK,MessageBoxIcon.Information);
     }
     static string Quote(string path){return "\""+path+"\"";}
     ProcessStartInfo Info(string exe,string args){
@@ -67,12 +97,12 @@ class Launcher : Form {
         if(p!=null && !p.HasExited){
             using(var killer=Process.Start(new ProcessStartInfo(Path.Combine(Environment.SystemDirectory,"taskkill.exe"),"/PID "+p.Id+" /T /F"){UseShellExecute=false,CreateNoWindow=true})){killer.WaitForExit(4000);}
         }
-        if(p!=null){File.WriteAllText(Path.Combine(Data,"caption.txt"),"stop-"+DateTime.UtcNow.Ticks+"\n",Utf8);line.Text="";status.Text="Переклад зупинено.";}
+        if(p!=null){File.WriteAllText(Path.Combine(Data,"caption.txt"),"stop-"+DateTime.UtcNow.Ticks+"\n",Utf8);line.Text="";SetStatus(Msg.Stopped);}
     }
     async Task Start(bool live){
         if(busy)return;
         if(live && roi==null){await Choose();if(roi==null || busy || closing)return;}
-        Lock(true);line.Text="";status.Text=live?"Завантаження перекладача…":"Розпізнаю тестову фразу й перевіряю зв’язок з OBS…";
+        Lock(true);line.Text="";SetStatus(live?Msg.Loading:Msg.Checking);
         var err=new StringBuilder();bool got=false;
         try{
             using(var p=new Process{StartInfo=Info(Path.Combine(App,"subtitle-rs.exe"),live?"live":"demo")}){
@@ -80,59 +110,59 @@ class Launcher : Form {
                     BeginInvoke((Action)(()=>{if(closing || running!=p)return;try{
                         var row=new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(message);
                         line.Text=Convert.ToString(row["uk"]);got=true;
-                        if(live)status.Text="Переклад увімкнено.";
-                        else status.Text=Convert.ToBoolean(row["obs"])?"OBS підтвердив отримання фрази. Перевірте її розташування на екрані.":"Переклад готовий, але OBS його не підтвердив. Виберіть сцену гри й повторіть крок 1.";
-                    }catch(Exception ex){status.Text="Не вдалося прочитати відповідь: "+ex.Message;}}));};
+                        if(live)SetStatus(Msg.Active);
+                        else SetStatus(Convert.ToBoolean(row["obs"])?Msg.TestSuccess:Msg.TestNoAck);
+                    }catch(Exception ex){SetStatus(Msg.ResponseError,ex.Message);}}));};
                 p.ErrorDataReceived+=(o,e)=>{if(e.Data==null)return;lock(err){if(err.Length<16000)err.AppendLine(e.Data);}
-                    if(live && e.Data.StartsWith("Worker ") && !closing)BeginInvoke((Action)(()=>{if(running==p)status.Text="Очікую англійські субтитри з віртуальної камери OBS…";}));};
-                p.Start();running=p;p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){play.Text="Зупинити переклад";play.Enabled=true;}
+                    if(live && e.Data.StartsWith("Worker ") && !closing)BeginInvoke((Action)(()=>{if(running==p)SetStatus(Msg.Waiting);}));};
+                p.Start();running=p;p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
                 await Task.Run(()=>p.WaitForExit());
                 if(closing)return;
-                if(p.ExitCode!=0 && !(live && status.Text=="Переклад зупинено.")){
+                if(p.ExitCode!=0 && !(live && statusMessage==Msg.Stopped)){
                     File.WriteAllText(Path.Combine(Data,"diagnostics.txt"),err.ToString(),Utf8);
                     string msg=err.ToString();
-                    status.Text=msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?"Додайте розпізнавання англійського тексту Windows. Порядок дій є в інструкції.":live?"Перевірте віртуальну камеру й повторно виділіть область субтитрів.":"Тест не завершився. Відкрийте розділ «Якщо щось не працює» в інструкції.";
-                }else if(!got && !live){status.Text="Не отримано тестової фрази. Повторіть перевірку.";}
+                    SetStatus(msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
+                }else if(!got && !live){SetStatus(Msg.TestEmpty);}
                 running=null;
             }
-        }catch(Exception ex){if(!closing)status.Text="Не вдалося запустити переклад. "+ex.Message;}
-        finally{running=null;if(!closing){Lock(false);play.Text="Почати переклад";}}
+        }catch(Exception ex){if(!closing)SetStatus(Msg.StartError,ex.Message);}
+        finally{running=null;if(!closing){Lock(false);Caption(play,Msg.Start);}}
     }
     async Task Choose(){
-        if(busy)return;Lock(true);status.Text="Отримую кадр з віртуальної камери OBS…";
+        if(busy)return;Lock(true);SetStatus(Msg.GettingFrame);
         string path=Path.Combine(Data,"preview-"+Guid.NewGuid().ToString("N")+".bmp");
         try{
             using(var p=new Process{StartInfo=Info(Path.Combine(App,"bin","ffmpeg.exe"),"-nostdin -hide_banner -loglevel error -f dshow -i \"video=OBS Virtual Camera\" -frames:v 1 -threads:v 1 "+Quote(path))}){
                 p.Start();running=p;p.BeginOutputReadLine();p.BeginErrorReadLine();
                 if(!await Task.Run(()=>p.WaitForExit(12000))){p.Kill();p.WaitForExit();}
                 running=null;if(closing)return;
-                if(!File.Exists(path)||p.ExitCode!=0){status.Text="Немає кадру. В OBS натисніть «Запустити віртуальну камеру», потім повторіть крок 3.";return;}
+                if(!File.Exists(path)||p.ExitCode!=0){SetStatus(Msg.NoFrame);return;}
             }
             using(var img=new Bitmap(path))using(var picker=new Picker(img)){
-                if(picker.ShowDialog(this)!=DialogResult.OK){status.Text="Вибір скасовано.";return;}
+                if(picker.ShowDialog(this)!=DialogResult.OK){SetStatus(Msg.Cancelled);return;}
                 Rectangle a=picker.Area;roi=String.Format("{0}:{1}:{2}:{3}",a.Width,a.Height,a.X,a.Y);
-                File.WriteAllText(CropFile,roi,Utf8);status.Text="Область збережено. Натисніть «Почати переклад».";
+                File.WriteAllText(CropFile,roi,Utf8);SetStatus(Msg.Saved);
             }
-        }catch(Exception ex){if(!closing)status.Text="Не вдалося отримати кадр. "+ex.Message;}
+        }catch(Exception ex){if(!closing)SetStatus(Msg.FrameError,ex.Message);}
         finally{running=null;try{File.Delete(path);}catch(IOException){} if(!closing)Lock(false);}
     }
     [STAThread]static void Main(){Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);
         bool first;using(var gate=new System.Threading.Mutex(true,"Local\\PS5QuickMTLauncher",out first)){
-        if(!first){MessageBox.Show("Програму вже відкрито.");return;}
-        try{Application.Run(new Launcher());}catch(Exception e){MessageBox.Show("Розпакуйте ZIP у папку Документи та повторіть запуск.\n"+e.Message,"Субтитри PS5");}}}
+        if(!first){MessageBox.Show(Ui.Get(Msg.AlreadyOpen));return;}
+        try{Application.Run(new Launcher());}catch(Exception e){MessageBox.Show(Ui.Get(Msg.LaunchError)+e.Message,Ui.Get(Msg.Window));}}}
 }
 
 class Picker:Form {
     public Rectangle Area; readonly PictureBox picture; Point anchor;Rectangle box; bool drawing;
     public Picker(Bitmap image){
-        Text="Обведіть мишею місце для одного або двох рядків субтитрів";
+        Text=Ui.Get(Msg.Picker);
         StartPosition=FormStartPosition.CenterParent; FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;MinimizeBox=false;
         var screen=Screen.FromPoint(Cursor.Position).WorkingArea;
         double scale=Math.Min(1,Math.Min((screen.Width-80.0)/image.Width,(screen.Height-170.0)/image.Height));
         int w=(int)(image.Width*scale), h=(int)(image.Height*scale);
         ClientSize=new Size(w,h+55);picture=new PictureBox{Image=image,SizeMode=PictureBoxSizeMode.StretchImage,Cursor=Cursors.Cross,Size=new Size(w,h)};Controls.Add(picture);
-        var save=new Button{Text="Зберегти область",Left=w-162,Top=h+9,Width=150,Height=35,Enabled=false,DialogResult=DialogResult.OK};Controls.Add(save);
-        var cancel=new Button{Text="Скасувати",Left=12,Top=h+9,Width=110,Height=35,DialogResult=DialogResult.Cancel};Controls.Add(cancel);CancelButton=cancel;AcceptButton=save;
+        var save=new Button{Text=Ui.Get(Msg.Save),Left=w-162,Top=h+9,Width=150,Height=35,Enabled=false,DialogResult=DialogResult.OK};Controls.Add(save);
+        var cancel=new Button{Text=Ui.Get(Msg.Cancel),Left=12,Top=h+9,Width=110,Height=35,DialogResult=DialogResult.Cancel};Controls.Add(cancel);CancelButton=cancel;AcceptButton=save;
         picture.MouseDown+=(s,e)=>{if(e.Button!=MouseButtons.Left)return;anchor=e.Location;drawing=true;picture.Capture=true;save.Enabled=false;box=Rectangle.Empty;picture.Invalidate();};
         picture.MouseMove+=(s,e)=>{if(!drawing)return;int x=Math.Max(0,Math.Min(w,e.X)),y=Math.Max(0,Math.Min(h,e.Y));
             box=Rectangle.FromLTRB(Math.Min(anchor.X,x),Math.Min(anchor.Y,y),Math.Max(anchor.X,x),Math.Max(anchor.Y,y));picture.Invalidate();};

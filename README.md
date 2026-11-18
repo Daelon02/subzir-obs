@@ -1,71 +1,54 @@
-# SubZir для OBS
+# SubZir for OBS
 
-[English setup guide](#first-launch) · [Інструкція українською](#перший-запуск)
+Translate English subtitles from a PS5 or another capture-card source and show them in OBS. Select the game's subtitle area once. SubZir reads new lines automatically and clears the overlay when the text disappears.
 
-SubZir reads subtitles from a selected area of your capture card feed and displays each translated line in your OBS scene. Translation runs offline on your Windows PC. The v0.1.0 download uses English text recognition in Windows and includes a QuickMT model for English-to-Ukrainian translation.
+**[Download SubZir for Windows x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)** · [Українською](#перший-запуск) · [PS5 benchmark](docs/benchmarks/PS5-EN.md)
 
-[Download for Windows 10/11 x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)
+![God of War Ragnarök on PS5 with Ukrainian text in the OBS scene](docs/images/god-of-war-obs.jpg)
 
 ## First launch
 
-You need OBS Studio and Windows 10/11 x64 with English text recognition installed. The ZIP includes the translation model. The launcher uses Ukrainian button labels, shown below so you can find them on screen.
+1. Extract the entire ZIP to Documents and open **SubZir.exe**. Click **Language** to choose the **interface language** and **subtitle language** independently. Both lists have 100 languages. English subtitle output shows the original recognized line.
+2. In OBS, add your capture card as a **Video Capture Device** in your game scene. Enable **English subtitles** in the game.
+3. Click **1. Connect OBS** in SubZir. In OBS, open **Tools → Scripts → +**, paste the copied path and open the Lua file. Click the button in its settings to add subtitles to the scene.
+4. Click **2. Test translation**. A translation of “Open the gate.” appears in OBS for four seconds. You can try this before connecting the console.
+5. In OBS, open the settings beside **Start Virtual Camera**. Select **Source** and your capture card, then start the camera.
+6. When dialogue appears, click **3. Select subtitle area**. Draw a box around the English text, leave room for two lines and save. Click **Start translation**. To switch the output while playing, use **Language**. The next new line uses your selection.
 
-1. Extract the entire ZIP to a folder, then open **Субтитри PS5.exe**.
-2. In OBS, select the scene you use for the game and add your capture card as a **Video Capture Device**. Turn on English subtitles in the game.
-3. In SubZir, click **1. Під’єднати OBS** (Connect OBS) to copy the script path. In OBS, open **Tools → Scripts**, click **+**, and paste the path into the file picker. In the script settings, click **Додати субтитри до поточної сцени** (Add subtitles to the current scene).
-4. Click **2. Перевірити переклад** (Test translation) in SubZir. You should see **Відчиніть ворота.** (“Open the gate.”) in your OBS scene. You can run this test before connecting the PS5.
-5. In OBS, click the gear next to **Start Virtual Camera**, set **Output Type** to **Source**, and choose your capture card. Start the virtual camera.
-6. When English dialogue appears, click **3. Виділити субтитри** (Select subtitle area). Drag a box around the English text, leaving room for two lines. Click **Зберегти область** (Save area), then **Почати переклад** (Start translation). Next time, start the virtual camera and click **Почати переклад** to reuse the saved area.
+Requires Windows 10/11 x64, Windows English OCR and OBS Studio. Both models run locally on the CPU. English and Ukrainian have edited interface text. The other localizations are machine-assisted and their quality varies. Some scripts require supplemental Windows fonts. [Player guide and troubleshooting](docs/PLAYER-EN.txt) · [Supported languages](launcher/languages.json)
 
-## For developers
-
-The Rust engine in `src/` reads English subtitle text with Windows OCR. When running the engine directly, `SUB_WORKER` selects the Python translation worker. A compatible worker can return text in a different target language. The Windows launcher selects the bundled QuickMT English-to-Ukrainian worker, which uses CTranslate2 on the CPU. The C# WinForms launcher controls the session, and the Lua script displays the translation in OBS.
-
-To build the engine on Windows, install the Rust MSVC toolchain and Visual Studio C++ Build Tools. From the repository root, run:
-
-```powershell
-cargo build --release --locked
-```
-
-To try changes in the full app, extract the Windows release into a test folder. Pass the folder containing **Субтитри PS5.exe** to the build script:
-
-```powershell
-.\scripts\build.ps1 -BundleDirectory '.\PS5-Subtitles'
-```
-
-The script rebuilds the engine and launcher, copies the updated scripts into the test folder, and uses the Python runtime, FFmpeg, and model from the release. To check the result, open the rebuilt launcher and run the translation test in step 4.
-
-## Українською
-
-SubZir зчитує субтитри з вибраної області відео з карти захоплення й показує переклад кожної репліки у сцені OBS. Переклад працює локально на ПК. Збірка v0.1.0 використовує розпізнавання англійського тексту у Windows і містить модель QuickMT для перекладу з англійської на українську.
-
-**[Завантажити для Windows x64](https://github.com/Daelon02/subzir-obs/releases/latest/download/PS5-Subtitles-Windows-x64.zip)**
+![SubZir launcher in English](docs/images/launcher-en.png)
 
 ## Перший запуск
 
-1. Розпакуйте весь архів і відкрийте **Субтитри PS5.exe**.
-2. В OBS додайте карту захоплення як джерело. У грі увімкніть англійські субтитри.
-3. У програмі натисніть **1. Під’єднати OBS**. В OBS відкрийте **Інструменти → Скрипти**, додайте файл **PS5-Subtitles.lua** і натисніть **Додати субтитри до поточної сцени**.
-4. Натисніть **2. Перевірити переклад**. У сцені OBS має з’явитися «Відчиніть ворота.». Ця перевірка працює і без консолі.
-5. У налаштуваннях віртуальної камери OBS виберіть вихід **Джерело** та свою карту захоплення. Запустіть віртуальну камеру.
-6. Коли на екрані є діалог, натисніть **3. Виділити субтитри**, обведіть місце для одного або двох рядків і збережіть область. Натисніть **Почати переклад**.
+SubZir зчитує англійські субтитри з карти захоплення й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
-Потрібні Windows 10/11 x64, компонент Windows для розпізнавання англійського тексту та OBS Studio. Перекладач і модель QuickMT EN→UK вже є в архіві. [Повна інструкція та вирішення проблем](docs/PLAYER-UA.txt)
+1. Розпакуйте весь ZIP у «Документи» й відкрийте **SubZir.exe**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
+2. В OBS додайте карту захоплення до ігрової сцени. У грі ввімкніть англійські субтитри.
+3. У SubZir натисніть **1. Під’єднати OBS**. В OBS відкрийте **Інструменти → Скрипти → +**, вставте скопійований шлях і відкрийте файл. Натисніть кнопку додавання субтитрів у налаштуваннях скрипту.
+4. Натисніть **2. Перевірити переклад**. На чотири секунди у сцені з’явиться переклад «Open the gate.» вибраною мовою. Для цього тесту консоль можна під’єднати пізніше.
+5. У налаштуваннях віртуальної камери OBS виберіть вихід **Джерело** та карту захоплення. Запустіть віртуальну камеру.
+6. Коли з’явиться репліка, натисніть **3. Виділити субтитри**, обведіть область для двох рядків і збережіть її. Натисніть **Почати переклад**. Після перемикання мови наступна нова репліка з’явиться вибраною мовою.
 
-## Для розробників
+Потрібні Windows 10/11 x64, компонент розпізнавання англійського тексту й OBS Studio. Для української комплект містить QuickMT, для інших перекладів — M2M100. Англійський режим показує розпізнаний оригінал. [Інструкція для гравця](docs/PLAYER-UA.txt) · [Заміри на підключеній PS5](docs/benchmarks/PS5-UK.md)
 
-Рушій у `src/` використовує Windows OCR. Переклад виконує локальний Python-процес із CTranslate2 та QuickMT, графічний інтерфейс написаний на C# WinForms, а текст у сцені оновлює Lua-скрипт OBS.
+![Український інтерфейс SubZir](docs/images/launcher-uk.png)
 
-Щоб зібрати рушій на Windows із Rust MSVC та Visual Studio C++ Build Tools, виконайте `cargo build --release --locked`. Для перевірки змін у повному застосунку розпакуйте реліз у тестову папку та виконайте в PowerShell з кореня репозиторію:
+![Українське меню з польськими субтитрами у вікні вибору мов](docs/images/languages.png)
+
+## For developers / Для розробників
+
+Rust runs the capture, OCR, stability filter and overlay timing. The WinForms launcher writes both language choices to `runtime/languages.json`. The Python worker checks the target on each new input. It reuses the loaded CTranslate2 model across lines. The OBS Lua script updates a text source. Set `SUB_TARGET` to a code from `launcher/languages.json` to override the subtitle language when running the worker directly.
+
+On Windows, install Rust MSVC and Visual Studio C++ Build Tools. Extract the **v0.2.0** Windows bundle to a test directory to supply embedded Python, FFmpeg and both model directories. From the repository root run the following commands.
 
 ```powershell
+cargo build --release --locked
 .\scripts\build.ps1 -BundleDirectory '.\PS5-Subtitles'
 ```
 
-Скрипт збирає рушій та інтерфейс і оновлює їх разом зі скриптами в указаній копії. Вбудовані Python, FFmpeg та модель бере з розпакованого комплекту. [Сторонні компоненти](docs/COMPONENTS.txt)
+Для перевірки змін розпакуйте комплект v0.2.0, виконайте наведені команди й запустіть **SubZir.exe** у тестовій папці. Натисніть **Перевірити переклад**. Локалізації містяться в `launcher/locales`. Перелік кодів відповідає мовним токенам моделі. [Вимірювання та дані](docs/benchmarks/PS5-UK.md) · [Model and runtime notices](docs/COMPONENTS.txt)
 
 ## License / Ліцензія
 
-Daelon02 licenses the original SubZir code and documentation under the MIT License. You may copy, modify, and redistribute them, including commercially. Include the Daelon02 copyright notice and the license text in all copies or substantial portions. Bundled third-party components retain their own licenses. [MIT License](LICENSE) · [Third-party notices](docs/COMPONENTS.txt)
-
-Оригінальний код і документацію SubZir можна копіювати, змінювати й поширювати, зокрема комерційно. У кожній копії або суттєвій частині зберігайте повідомлення про авторство Daelon02 та текст ліцензії MIT. Для сторонніх компонентів діють їхні власні ліцензії.
+Daelon02 licenses original SubZir code and documentation under MIT. You may copy, modify and redistribute them, including commercially. Keep the copyright notice and license text in copies or substantial portions. Сторонні компоненти поширюються за власними ліцензіями. [MIT](LICENSE) · [Third-party notices](docs/COMPONENTS.txt)

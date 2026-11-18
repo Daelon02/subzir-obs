@@ -1,0 +1,184 @@
+use std::time::{Duration, Instant};
+
+const MATCH_PENDING: f32 = 0.76;
+const MATCH_DISPLAY: f32 = 0.60;
+const CLEAR_AFTER: Duration = Duration::from_millis(380);
+const NOISY_TIMEOUT: Duration = Duration::from_millis(1400);
+const EXACT_REPLACEMENT_FRAMES: u8 = 4;
+
+struct Reading {
+    text: String,
+    key: String,
+    pairs: Vec<[u8; 2]>,
+}
+
+impl Reading {
+    fn new(text: &str) -> Self {
+        let key: String = text
+            .chars()
+            .filter(char::is_ascii_alphanumeric)
+            .map(|c| c.to_ascii_lowercase())
+            .collect();
+        let mut pairs: Vec<_> = key.as_bytes().windows(2).map(|p| [p[0], p[1]]).collect();
+        pairs.sort_unstable();
+        Self {
+            text: text.to_owned(),
+            key,
+            pairs,
+        }
+    }
+
+    fn similarity(&self, other: &Self) -> f32 {
+        if self.key == other.key {
+            return 1.0;
+        }
+        let (mut a, mut b, mut shared) = (0, 0, 0);
+        while a < self.pairs.len() && b < other.pairs.len() {
+            match self.pairs[a].cmp(&other.pairs[b]) {
+                std::cmp::Ordering::Less => a += 1,
+                std::cmp::Ordering::Greater => b += 1,
+                std::cmp::Ordering::Equal => {
+                    shared += 1;
+                    a += 1;
+                    b += 1;
+                }
+            }
+        }
+        2.0 * shared as f32 / (self.pairs.len() + other.pairs.len()).max(1) as f32
+    }
+
+    fn score(&self) -> i32 {
+        // Prefer complete phrases over fragments when two observations agree.
+        let punctuation = i32::from(self.text.ends_with(['.', '?', '!']));
+        let intact = self
+            .text
+            .split_whitespace()
+            .filter(|w| {
+                w.chars()
+                    .all(|c| c.is_ascii_alphabetic() || ".,!?:’'-".contains(c))
+            })
+            .count();
+        (2 * intact as i32) + 3 * punctuation
+    }
+}
+
+struct Candidate {
+    best: Reading,
+    previous_key: String,
+    exact: u8,
+    hits: u8,
+}
+
+#[derive(Default)]
+pub struct Stabilizer {
+    shown: Option<Reading>,
+    pending: Option<Candidate>,
+    last_seen: Option<Instant>,
+}
+
+impl Stabilizer {
+    pub fn observe(&mut self, text: &str, now: Instant) -> Option<String> {
+        let reading = Reading::new(text);
+        if reading.key.is_empty() {
+            self.pending = None;
+            return self.expire(now, CLEAR_AFTER);
+        }
+        let resembles_shown = self
+            .shown
+            .as_ref()
+            .is_some_and(|s| s.similarity(&reading) >= MATCH_DISPLAY);
+        if resembles_shown {
+            self.last_seen = Some(now);
+            if self.shown.as_ref().is_some_and(|s| s.key == reading.key) {
+                self.pending = None;
+                return None;
+            }
+        }
+
+        let candidate = match self.pending.as_mut() {
+            Some(p) if p.best.similarity(&reading) >= MATCH_PENDING => {
+                p.hits = p.hits.saturating_add(1);
+                p.exact = if p.previous_key == reading.key {
+                    p.exact.saturating_add(1)
+                } else {
+                    1
+                };
+                p.previous_key.clone_from(&reading.key);
+                if p.exact >= EXACT_REPLACEMENT_FRAMES || reading.score() > p.best.score() {
+                    p.best = reading;
+                }
+                p
+            }
+            _ => self.pending.insert(Candidate {
+                previous_key: reading.key.clone(),
+                best: reading,
+                hits: 1,
+                exact: 1,
+            }),
+        };
+        if candidate.hits >= 2 && (!resembles_shown || candidate.exact >= EXACT_REPLACEMENT_FRAMES)
+        {
+            let stable = self.pending.take()?.best;
+            let update = stable.text.clone();
+            self.shown = Some(stable);
+            self.last_seen = Some(now);
+            return Some(update);
+        }
+        self.expire(now, NOISY_TIMEOUT)
+    }
+
+    fn expire(&mut self, now: Instant, timeout: Duration) -> Option<String> {
+        if self
+            .last_seen
+            .is_some_and(|t| now.duration_since(t) >= timeout)
+        {
+            self.last_seen = None;
+            self.shown.take().map(|_| String::new())
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn holds_a_misread_and_clears_on_sustained_silence() {
+        let mut s = Stabilizer::default();
+        let t = Instant::now();
+        let mut read = |text: &str, ms| s.observe(text, t + Duration::from_millis(ms));
+        assert_eq!(read("Keep moving!", 0), None);
+        assert_eq!(read("Keep moving!", 100).as_deref(), Some("Keep moving!"));
+        assert_eq!(read("Keop movlng!", 200), None);
+        assert_eq!(read("", 300), None);
+        assert_eq!(read("Keep moving!", 400), None);
+        assert_eq!(read("", 900).as_deref(), Some(""));
+        assert_eq!(read("", 1000), None);
+    }
+    #[test]
+    fn similar_successive_lines_can_replace_each_other() {
+        let mut s = Stabilizer::default();
+        let t = Instant::now();
+        for i in 0..2 {
+            s.observe(
+                "Please turn left at the next corner!",
+                t + Duration::from_millis(100 * i),
+            );
+        }
+        for i in 2..5 {
+            s.observe(
+                "Please turn right at the next corner!",
+                t + Duration::from_millis(100 * i),
+            );
+        }
+        assert_eq!(
+            s.observe(
+                "Please turn right at the next corner!",
+                t + Duration::from_millis(500)
+            )
+            .as_deref(),
+            Some("Please turn right at the next corner!")
+        );
+    }
+}

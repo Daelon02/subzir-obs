@@ -1,0 +1,61 @@
+target,case,expected,en,translation,ocr_ms,translation_ms,publish_ms,obs_tick_ms
+uk,0,C'mon!,C'mon!,Ну ж бо!,10.316,0.2799,11.596,44.4127
+uk,1,"C'mon, let's go!","C'mon, let's go!",Ну ж бо! Ходімо!,4.4614,16.8739,22.8429,61.084199999999996
+uk,2,"C'mon, man!","C'mon, man!","Та ну, друже!",1.546,0.12320000000000002,2.576,29.1678
+uk,3,We're gonna need a boat.,We're gonna need a boat.,Нам потрібен човен.,2.2845,18.7386,22.3337,40.1231
+uk,4,No sweat.,No sweat.,Без проблем.,1.4651,0.1266,2.7561,28.238300000000002
+uk,5,Open the gate.,Open the gate.,Відчиніть ворота.,1.9126,18.1299,21.2486,50.4029
+uk,6,We're outta time!,We're outta time!,Час спливає!,1.7895,21.310599999999997,24.5413,60.5257
+uk,7,We gotta move!,We gotta move!,Треба рухатися!,1.7063,14.8209,17.796400000000002,45.509800000000006
+uk,8,A piece of cake fell on the floor.,A piece of cake fell on the floor.,Шматок торта впав на підлогу.,3.1905,24.7942,29.263,62.6616
+uk,9,We're cooked!,We're cooked!,Нам кінець!,1.7305000000000001,0.1305,3.0466,27.124
+uk,10,The cops are on our tail!,The cops are on our tail!,Копи у нас на хвості!,2.0072,24.016099999999998,27.3545,61.711099999999995
+uk,11,"Nice ride, bro!","Nice ride, bro!","Класна тачка, брате!",1.5326,0.1641,2.6944,28.1046
+uk,12,Are you good at cards?,Are you good at cards?,Ви добре розбираєтеся в картах?,2.0941,24.5516,28.5464,62.385000000000005
+uk,13,"Lucia: Oh, c’mon!","Lucia: Oh, c'mon!",Люсія: Та ну!,1.5839,17.0252,19.669,44.8968
+uk,14,There's no cap on that bottle.,There's no cap on that bottle.,На пляшці немає кришки.,2.2726,25.8661,29.567800000000002,63.2569
+uk,15,I'm down to my last dollar.,I'm down to my last dollar.,Я опустився до останнього долара.,2.4175,26.0576,29.593700000000002,61.9071
+uk,16,Imma call you tomorrow.,Imma call you tomorrow.,Я подзвоню тобі завтра.,1.997,22.0827,25.3489,62.1815
+uk,17,That ride is sick!,That ride is sick!,Оце крута тачка!,1.6933,0.148,2.9918,27.2439
+uk,18,I got you a new backpack.,I got you a new backpack.,Я приніс тобі новий рюкзак.,2.0246,22.636699999999998,25.9374,62.110899999999994
+uk,19,Your ride just arrived at the motel.,Your ride just arrived at the motel.,Твоя машина щойно приїхала в мотель.,2.4163,24.7803,28.468799999999998,61.5226
+pl,0,C'mon!,C'mon!,C’mona jest!,9.1905,135.5817,146.3237,180.824
+pl,1,"C'mon, let's go!","C'mon, let's go!","Mikołaj, idźmy z nami!",4.5278,219.5922,225.66330000000002,250.2743
+pl,2,"C'mon, man!","C'mon, man!","C’mon, człowiek",2.0829,188.5292,191.7221,216.81130000000002
+pl,3,We're gonna need a boat.,We're gonna need a boat.,Będziemy potrzebować łodzi,2.958,190.1254,194.5723,232.3023
+pl,4,No sweat.,No sweat.,Nie ma potu.,1.9158,132.7605,136.0316,166.2501
+pl,5,Open the gate.,Open the gate.,Otwórzcie drzwi,2.3714,132.7449,136.2115,168.03779999999998
+pl,6,We're outta time!,We're outta time!,Jesteśmy na czas!,2.8297,135.6307,139.5,165.1298
+pl,7,We gotta move!,We gotta move!,Chcemy się poruszać!,1.7812999999999999,149.4182,152.4739,183.286
+pl,8,A piece of cake fell on the floor.,A piece of cake fell on the floor.,Na podłodze spadł kawałek ciasta.,3.6825,289.8539,295.0571,332.8883
+pl,9,We're cooked!,We're cooked!,Jesteśmy gotowani!,2.2556999999999996,150.0666,153.7944,183.7803
+pl,10,The cops are on our tail!,The cops are on our tail!,Policjanci są na naszych plecach!,2.3348,202.3601,206.0127,232.8406
+pl,11,"Nice ride, bro!","Nice ride, bro!",Świetna wycieczka bracie!,1.9828,202.0262,205.23749999999998,232.7611
+pl,12,Are you good at cards?,Are you good at cards?,Jesteś dobry w kartach?,2.7737,166.5992,170.9138,199.74790000000002
+pl,13,"Lucia: Oh, c’mon!","Lucia: Oh, c'mon!",Ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo!,2.0928999999999998,369.88919999999996,373.44129999999996,416.1297
+pl,14,There's no cap on that bottle.,There's no cap on that bottle.,Na tej butelce nie ma żadnych szuflad.,3.1113,271.6754,276.1187,300.5436
+pl,15,I'm down to my last dollar.,I'm down to my last dollar.,Zaczęłam chodzić do ostatniego dolara.,2.8514,262.14140000000003,266.6454,299.35040000000004
+pl,16,Imma call you tomorrow.,Imma call you tomorrow.,Imma zadzwoni do Ciebie jutro.,2.5723,221.7675,225.9008,250.4364
+pl,17,That ride is sick!,That ride is sick!,Ta podróż jest chorą!,2.1628,165.72619999999998,169.3424,199.4021
+pl,18,I got you a new backpack.,I got you a new backpack.,Mamy dla Ciebie nowy pudełko.,2.5000999999999998,241.6884,245.6777,283.0272
+pl,19,Your ride just arrived at the motel.,Your ride just arrived at the motel.,Twoja podróż właśnie dotarła do motelu.,3.316,257.9248,262.816,300.4835
+fr,0,C'mon!,C'mon!,C’est mon !,9.4992,122.6245,133.23409999999998,159.94140000000002
+fr,1,"C'mon, let's go!","C'mon, let's go!","C’mon, on va !",3.7417000000000002,174.5748,179.54049999999998,215.9767
+fr,2,"C'mon, man!","C'mon, man!","C’mon, c’est un homme !",1.7645,190.3335,193.2516,217.44920000000002
+fr,3,We're gonna need a boat.,We're gonna need a boat.,Nous aurons besoin d’un bateau.,2.0877,195.57659999999998,198.8422,232.3299
+fr,4,No sweat.,No sweat.,Pas de sweat.,1.7828,115.0531,118.1599,150.31140000000002
+fr,5,Open the gate.,Open the gate.,Ouvrez la porte.,2.0412999999999997,132.56019999999998,136.0384,165.8685
+fr,6,We're outta time!,We're outta time!,Nous sommes hors du temps !,1.728,149.98839999999998,152.7985,178.37339999999998
+fr,7,We gotta move!,We gotta move!,Nous devons nous déplacer !,2.0055,154.2364,157.4572,189.9199
+fr,8,A piece of cake fell on the floor.,A piece of cake fell on the floor.,Un morceau de gâteau tombe sur le sol.,3.0423,285.05429999999996,289.2974,316.2939
+fr,9,We're cooked!,We're cooked!,Nous sommes cuits !,1.7656,151.88479999999998,154.8727,181.5187
+fr,10,The cops are on our tail!,The cops are on our tail!,Les policiers sont sur notre dos !,2.8229,189.32070000000002,193.4029,215.61069999999998
+fr,11,"Nice ride, bro!","Nice ride, bro!",Bonne route mon frère !,1.727,187.1056,190.1781,218.8418
+fr,12,Are you good at cards?,Are you good at cards?,Vous êtes bon sur les cartes ?,2.0431999999999997,185.56220000000002,188.8158,215.7295
+fr,13,"Lucia: Oh, c’mon!","Lucia: Oh, c'mon!",Et c’est c’mon !,1.9949999999999999,204.31109999999998,207.4888,232.81650000000002
+fr,14,There's no cap on that bottle.,There's no cap on that bottle.,Il n'y a pas de cap sur cette bouteille.,2.9015,324.5248,328.6286,366.34090000000003
+fr,15,I'm down to my last dollar.,I'm down to my last dollar.,J’ai fini par mon dernier dollar.,2.5311,240.5043,244.32829999999998,283.2121
+fr,16,Imma call you tomorrow.,Imma call you tomorrow.,Imma vous appelle demain.,2.4635,179.4794,183.167,215.77669999999998
+fr,17,That ride is sick!,That ride is sick!,Cette course est malade !,1.7409999999999999,164.184,167.1207,200.8297
+fr,18,I got you a new backpack.,I got you a new backpack.,J’ai reçu un nouveau backpack.,2.4757,236.9064,240.7243,265.9797
+fr,19,Your ride just arrived at the motel.,Your ride just arrived at the motel.,Votre voyage vient d’arriver au motel.,3.1857,280.308,284.5487,316.5926

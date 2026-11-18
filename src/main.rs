@@ -1,4 +1,6 @@
+mod stability;
 use serde_json::{json, Value};
+use stability::Stabilizer;
 use std::{
     env, fs,
     io::{self, BufRead, BufReader, Read, Write},
@@ -186,9 +188,10 @@ fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
     if dims.len() != 4 || dims[0] == 0 || dims[1] == 0 {
         return Err(AppError::Config("Invalid crop".into()));
     }
-    // Sample on source timestamps. Allow a small margin for jitter at 30/60 Hz.
+    // Sample at about 10 Hz before scaling. Keep the original for dim or coloured text.
+    // Expand the bright red channel: white strokes stand out against blue snow.
     let filter = format!(
-        r"select=isnan(prev_selected_t)+gte(t-prev_selected_t\,0.030),crop={roi},scale={WIDTH}:{HEIGHT},format=gray"
+        r"select=isnan(prev_selected_t)+gte(t-prev_selected_t\,0.095),crop={roi},split[raw][color];[raw]scale={WIDTH}:{HEIGHT},format=gray[gray];[color]format=gbrp,extractplanes=r,lut=y=clip((val-165)*5\,0\,255),scale={WIDTH}:{HEIGHT},format=gray[bright];[gray][bright]vstack"
     );
     let mut child = OwnedChild(
         Command::new("ffmpeg")
@@ -196,6 +199,8 @@ fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
                 "-nostdin",
                 "-loglevel",
                 "error",
+                "-rtbufsize",
+                "48M",
                 "-f",
                 "dshow",
                 "-i",
@@ -216,33 +221,48 @@ fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
             .spawn()?,
     );
     let mut frames = pipe(child.0.stdout.take())?;
-    let mut pixels = vec![0; FRAME_BYTES];
-    let mut previous = String::new();
-    let mut last_pixels = Vec::new();
+    let mut pixels = vec![0; FRAME_BYTES * 2];
+    let mut last_frame = Vec::new();
+    let mut cleaned = vec![0; FRAME_BYTES];
+    let mut reading = String::new();
+    let mut held = false;
+    let mut stable = Stabilizer::default();
     loop {
         frames.read_exact(&mut pixels)?;
         let start = Instant::now();
-        if pixels == last_pixels {
-            continue;
+        let (gray, bright) = pixels.split_at(FRAME_BYTES);
+        // Reuse OCR on a held frame, but still advance confirmation and expiry.
+        let unchanged = pixels == last_frame;
+        if !unchanged || !held {
+            let previous = last_frame.get(FRAME_BYTES..).unwrap_or(bright);
+            for ((out, &current), &prior) in cleaned.iter_mut().zip(bright).zip(previous) {
+                *out = current.min(prior);
+            }
+            reading = recognize(&ocr, &cleaned)?;
+            if reading.trim().is_empty() && !unchanged {
+                reading = recognize(&ocr, bright)?;
+            }
+            if reading.trim().is_empty() {
+                reading = recognize(&ocr, gray)?;
+            }
+            last_frame.clone_from(&pixels);
+            held = unchanged;
         }
-        last_pixels.clone_from(&pixels);
-        let text = recognize(&ocr, &pixels)?;
-        if text != previous {
-            previous.clone_from(&text);
-            if tx
-                .send(Ok(Line {
-                    start,
-                    text,
-                    ocr_ms: ms(start),
-                }))
-                .is_err()
-            {
+        if let Some(text) = stable.observe(&reading, start) {
+            let line = Line {
+                start,
+                text,
+                ocr_ms: ms(start),
+            };
+            if tx.send(Ok(line)).is_err() {
                 return Ok(());
             }
         }
     }
 }
+
 fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
+    let check_obs = env::var("SUB_ACK").is_ok_and(|v| v == "1");
     let (tx, rx) = mpsc::channel();
     thread::spawn(move || {
         if let Err(e) = capture(tx.clone()) {
@@ -269,11 +289,13 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
         }
         let translation_ms = ms(translate_start);
         let publish_start = Instant::now();
-        out.publish(&text)?;
+        let id = out.publish(&text)?;
         let write_ms = ms(publish_start);
+        let publish_ms = ms(line.start);
+        let obs_tick_ms = (check_obs && out.acknowledgement(&id)).then(|| ms(line.start));
         println!(
             "{}",
-            json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,"write_ms":write_ms,"publish_ms":ms(line.start)})
+            json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":obs_tick_ms})
         );
     }
 }

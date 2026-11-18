@@ -1,13 +1,31 @@
 obs = obslua
-local title = "PS5 UA · QuickMT"
+local title = "SubZir · Subtitles"
+local legacy = "PS5 UA · QuickMT"
+local function source_title()
+    local src = obs.obs_get_source_by_name(legacy)
+    if src then obs.obs_source_release(src); return legacy end
+    return title
+end
+local function message(key, fallback)
+    local prefs = obs.obs_data_create_from_json_file(script_path() .. "../runtime/languages.json")
+    local code = prefs and obs.obs_data_get_string(prefs, "ui") or ""
+    if prefs then obs.obs_data_release(prefs) end
+    if not code:match("^[a-z][a-z][a-z]?$") then code = (obs.obs_get_locale() or "en"):sub(1,2):lower() end
+    local data = obs.obs_data_create_from_json_file(script_path() .. "../app/locales/" .. code .. ".json")
+    if not data then return fallback end
+    local value = obs.obs_data_get_string(data, key)
+    obs.obs_data_release(data)
+    return value ~= "" and value or fallback
+end
 local folder = script_path() .. "../runtime/"
 local last, pending = nil, nil
 
 function script_description()
-    return "Виберіть у OBS сцену з грою, потім натисніть кнопку нижче. Після цього поверніться до програми перекладу."
+    return message("ConnectHint", "Add the script to your game scene once.")
 end
 
 local function add_text()
+    local title = source_title()
     local current = obs.obs_frontend_get_current_scene()
     if not current then return false end
     local scene = obs.obs_scene_from_source(current)
@@ -46,7 +64,7 @@ local function add_text()
 end
 function script_properties()
     local props = obs.obs_properties_create()
-    obs.obs_properties_add_button(props, "add", "Додати субтитри до поточної сцени", add_text)
+    obs.obs_properties_add_button(props, "add", message("AddScene", "Add subtitles to the current scene"), add_text)
     return props
 end
 
@@ -86,7 +104,7 @@ function script_tick(seconds)
     if ok==0 then return end
     local id,text=ffi.string(buf,size[0]):match("^([^\n]+)\n(.*)$")
     if not id or id==last then return end
-    local src=obs.obs_get_source_by_name(title)
+    local src=obs.obs_get_source_by_name(source_title())
     if not src then return end
     local cfg=obs.obs_data_create()
     obs.obs_data_set_string(cfg,"text",text)

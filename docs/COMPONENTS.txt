@@ -6,3 +6,11 @@ Windows embedded Python 3.12.10, Python Software Foundation: ../python/LICENSE.t
 https://www.python.org/downloads/release/python-31210/
 Third-party Python component notices are in the corresponding .dist-info directories in ../python/.
 FFmpeg Windows essentials build by gyan.dev: see ffmpeg-license.txt and ffmpeg-origin.txt.
+
+M2M100 418M. Copyright Facebook, Inc. and its affiliates. MIT.
+Upstream: https://huggingface.co/facebook/m2m100_418M
+CTranslate2 INT8 conversion distributed unchanged:
+https://huggingface.co/jncraton/m2m100_418M-ct2-int8/tree/7c1b2620a4e58dacecbd8bf89cfd6da7eb9eb7b0
+See ../m2m100/README.md and m2m100-LICENSE.txt.
+Language display names derived from Unicode CLDR via Babel (Unicode License v3).
+See unicode-LICENSE.txt. Interface translations include machine-assisted Google Translate text and editorial revisions. The application reads bundled locale files offline.
