@@ -1,0 +1,8 @@
+QuickMT EN-UK weights and tokenizers by quickmt. Distributed without changes.
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Source: https://huggingface.co/quickmt/quickmt-en-uk/tree/a73137905668a904476c3458f7556b8139fd92fc
+Model card: ../quickmt-en-uk/README.md
+Windows embedded Python 3.12.10, Python Software Foundation: ../python/LICENSE.txt
+https://www.python.org/downloads/release/python-31210/
+Third-party Python component notices are in the corresponding .dist-info directories in ../python/.
+FFmpeg Windows essentials build by gyan.dev: see ffmpeg-license.txt and ffmpeg-origin.txt.
