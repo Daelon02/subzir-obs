@@ -18,6 +18,7 @@ try {
     Copy-Item worker/worker.py "$bundle/app/"
     Copy-Item obs/PS5-Subtitles.lua "$bundle/OBS/"
     Copy-Item docs/PLAYER-UA.txt "$bundle/README.txt"
+    Copy-Item LICENSE "$bundle/LICENSE"
     Copy-Item demo/* "$bundle/app/demo/"
     Copy-Item src/main.rs "$bundle/app/source/src/"
     Copy-Item Cargo.toml,Cargo.lock,launcher/Launcher.cs "$bundle/app/source/"
