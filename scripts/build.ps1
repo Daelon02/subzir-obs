@@ -19,12 +19,17 @@ try {
     Copy-Item obs/PS5-Subtitles.lua "$bundle/OBS/"
     Copy-Item docs/PLAYER-UA.txt "$bundle/README.txt"
     Copy-Item docs/PLAYER-EN.txt "$bundle/README.en.txt"
+    Copy-Item docs/START-HERE.txt "$bundle/"
     Copy-Item launcher/languages.json "$bundle/app/"
     Copy-Item launcher/locales "$bundle/app/" -Recurse -Force
     Copy-Item docs/COMPONENTS.txt,docs/m2m100-LICENSE.txt,docs/unicode-LICENSE.txt "$bundle/app/licenses/"
     Copy-Item docs/benchmarks "$bundle/" -Recurse -Force
     Copy-Item LICENSE "$bundle/LICENSE"
-    Copy-Item demo/* "$bundle/app/demo/"
+    Copy-Item demo/0.gray,demo/lines.txt "$bundle/app/demo/"
+    Copy-Item demo/frames20 "$bundle/benchmarks/" -Recurse -Force
+    Copy-Item scripts/run20.py "$bundle/benchmarks/"
+    Copy-Item scripts/Test-20.cmd "$bundle/"
+    New-Item -ItemType Directory -Path "$bundle/app/models" -Force | Out-Null
     Copy-Item src/*.rs "$bundle/app/source/src/"
     Copy-Item Cargo.toml,Cargo.lock,launcher/*.cs "$bundle/app/source/"
 } finally {

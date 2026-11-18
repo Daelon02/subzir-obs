@@ -19,6 +19,23 @@ static class Ui {
     public static string Target { get; private set; }
     public static string Model { get; private set; }
     static readonly Dictionary<string,string> HyLanguages;
+    const string CustomPrefix = "gguf:";
+    static readonly string CustomDirectory = Path.Combine(Root,"app","models");
+    public static bool IsGpuModel(string model) {
+        return model=="hy" || (model!=null && model.StartsWith(CustomPrefix,StringComparison.Ordinal));
+    }
+    public static IEnumerable<KeyValuePair<string,string>> CustomModels(string target) {
+        if(!HyLanguages.ContainsKey(target) || !File.Exists(Path.Combine(Root,"app","hy-runtime","llama-server.exe")))
+            yield break;
+        string[] paths;
+        try { paths=Directory.GetFiles(CustomDirectory,"*.gguf"); }
+        catch(IOException) { yield break; }
+        catch(UnauthorizedAccessException) { yield break; }
+        foreach(string path in paths.OrderBy(p=>p,StringComparer.OrdinalIgnoreCase)) {
+            if(String.Equals(Path.GetExtension(path),".gguf",StringComparison.OrdinalIgnoreCase))
+                yield return new KeyValuePair<string,string>(CustomPrefix+Path.GetFileName(path),Path.GetFileName(path)+" (GPU)");
+        }
+    }
     public static bool Allows(string model,string target) {
         switch(model) {
             case "auto": return true;
@@ -27,7 +44,7 @@ static class Ui {
             case "hy": return HyLanguages.ContainsKey(target) &&
                 File.Exists(Path.Combine(Root,"app","hy-runtime","llama-server.exe")) &&
                 File.Exists(Path.Combine(Root,"app","hy-runtime","Hy-MT2-1.8B-Q6_K.gguf"));
-            default: return false;
+            default: return IsGpuModel(model) && CustomModels(target).Any(pair=>pair.Key==model);
         }
     }
     public static bool IsRtl { get { return new[]{"ar","fa","he","ps","sd","ur","yi"}.Contains(Language); } }

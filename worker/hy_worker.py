@@ -12,6 +12,8 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     languages = json.loads(Path(__file__).with_name("hy-languages.json").read_text("utf8"))
     language = languages[os.environ["SUB_TARGET"]]
+    model = os.environ.get("SUB_MODEL","hy").removeprefix("gguf:")
+    label = "Hy-MT2-1.8B Q6_K" if model == "hy" else model
     endpoint = os.environ["SUB_HY_URL"]
     auth = {"Authorization": "Bearer " + os.environ["SUB_HY_KEY"], "Content-Type": "application/json"}
     client = build_opener(ProxyHandler({}))
@@ -24,7 +26,7 @@ def main():
         except (URLError, TimeoutError):
             pass
         if time.monotonic() >= deadline:
-            raise RuntimeError("Hy-MT2 failed to start. Check the CUDA runtime, weights and GPU memory.")
+            raise RuntimeError(f"{label} failed to start. Check the CUDA runtime, weights and GPU memory.")
         time.sleep(0.15)
 
     def translate(text, previous):
@@ -40,11 +42,11 @@ def main():
             choice = json.load(res)["choices"][0]
         result = choice["message"]["content"].strip()
         if not result or choice["finish_reason"] == "length":
-            raise ValueError("Hy-MT2 did not finish the subtitle")
+            raise ValueError(f"{label} did not finish the subtitle")
         return result
 
     translate("Ready.", "")
-    print(json.dumps({"model":"Hy-MT2-1.8B Q6_K","target":language,"device":"CUDA"}),flush=True)
+    print(json.dumps({"model":label,"target":language,"device":"CUDA"}),flush=True)
     previous, last = "", 0
     for line in sys.stdin:
         obj = json.loads(line)

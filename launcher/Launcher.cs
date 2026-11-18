@@ -48,6 +48,7 @@ class Launcher : Form {
                 if(Ui.Allows(code,Ui.Target)) options.Add(code,code=="auto"?Ui.Get(Msg.Automatic):
                     code=="hy"?"Hy-MT2 1.8B Q6_K (GPU)":code=="quickmt"?"QuickMT EN → UK (CPU)":"M2M100 (CPU)");
             }
+            foreach(var entry in Ui.CustomModels(Ui.Target)) options.Add(entry.Key,entry.Value);
             models.DataSource=new BindingSource(options,null);
             models.SelectedValue=Ui.Model;
             models.AccessibleName=Ui.Get(Msg.Model);
@@ -151,7 +152,7 @@ class Launcher : Form {
                 if(p.ExitCode!=0 && !(live && statusMessage==Msg.Stopped)){
                     File.WriteAllText(Path.Combine(Data,"diagnostics.txt"),err.ToString(),Utf8);
                     string msg=err.ToString();
-                    bool modelFailure=Ui.Model=="hy" && (msg.Contains("hy_worker.py") || msg.Contains("Hy-MT2 server:") || msg.Contains("Hy-MT2 runtime:") || msg.Contains("Translation worker stopped"));
+                    bool modelFailure=Ui.IsGpuModel(Ui.Model) && (msg.Contains("hy_worker.py") || msg.Contains("Hy-MT2 server:") || msg.Contains("Hy-MT2 runtime:") || msg.Contains("Translation worker stopped"));
                     SetStatus(modelFailure?Msg.ModelError:msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
                 }else if(!got && !live){SetStatus(Msg.TestEmpty);}
                 running=null;

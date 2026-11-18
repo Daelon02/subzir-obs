@@ -53,8 +53,28 @@ impl Drop for OwnedChild {
     }
 }
 const HY_WEIGHTS: &str = "Hy-MT2-1.8B-Q6_K.gguf";
+const CUSTOM_PREFIX: &str = "gguf:";
 
-fn start_hy(app: &Path) -> Result<(OwnedChild, String, String)> {
+fn gguf_path(app: &Path, model: &str) -> Result<PathBuf> {
+    if model == "hy" {
+        return Ok(app.join("hy-runtime").join(HY_WEIGHTS));
+    }
+    let name = model.strip_prefix(CUSTOM_PREFIX).unwrap_or_default();
+    let file = Path::new(name);
+    if file.file_name().and_then(|s| s.to_str()) != Some(name)
+        || name.contains([':', '/', '\\'])
+        || !file
+            .extension()
+            .is_some_and(|e| e.eq_ignore_ascii_case("gguf"))
+    {
+        return Err(AppError::Config(
+            "Select a GGUF file inside app/models".into(),
+        ));
+    }
+    Ok(app.join("models").join(file))
+}
+
+fn start_hy(app: &Path, model: &str) -> Result<(OwnedChild, String, String)> {
     use std::net::{Ipv4Addr, TcpListener};
     let address = TcpListener::bind((Ipv4Addr::LOCALHOST, 0))?.local_addr()?;
     let key = CryptographicBuffer::EncodeToHexString(&CryptographicBuffer::GenerateRandom(32)?)?
@@ -63,10 +83,7 @@ fn start_hy(app: &Path) -> Result<(OwnedChild, String, String)> {
         .join("hy-runtime")
         .canonicalize()
         .map_err(|e| AppError::Config(format!("Hy-MT2 runtime: {e}")))?;
-    let weights = runtime.join(HY_WEIGHTS);
-    if !weights.is_file() {
-        return Err(AppError::Config(format!("Missing {}", weights.display())));
-    }
+    let weights = gguf_path(app, model)?.canonicalize()?;
     let server = Command::new(runtime.join("llama-server.exe"))
         .current_dir(&runtime)
         .arg("--model")
@@ -106,11 +123,12 @@ impl Translator {
         let path = PathBuf::from(setting("SUB_WORKER")?);
         let mut command = Command::new(setting("SUB_PYTHON")?);
         command.arg("-u");
-        let hy_server = if env::var("SUB_MODEL").as_deref() == Ok("hy") {
+        let model = env::var("SUB_MODEL").unwrap_or_default();
+        let hy_server = if model == "hy" || model.starts_with(CUSTOM_PREFIX) {
             let app = path
                 .parent()
                 .ok_or_else(|| AppError::Config("Missing app directory".into()))?;
-            let (server, url, key) = start_hy(app)?;
+            let (server, url, key) = start_hy(app, &model)?;
             command
                 .arg(app.join("hy_worker.py"))
                 .env("SUB_HY_URL", url)
