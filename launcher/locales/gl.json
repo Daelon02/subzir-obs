@@ -45,5 +45,13 @@
   "ChooseLanguages": "Escolle idiomas",
   "SettingsError": "Non se puido gardar a configuración do idioma.",
   "GuideBody": "Activa os subtítulos en inglés no teu xogo. Conecte a tarxeta de captura en OBS. Engade o guión de subtítulos á escena do xogo. Establece a saída da cámara virtual na fonte da tarxeta de captura e inicia a cámara virtual. En SubZir, selecciona a área de subtítulos e comeza a tradución.",
-  "AddScene": "Engade subtítulos á escena actual"
+  "AddScene": "Engade subtítulos á escena actual",
+  "Model": "Modelo de tradución",
+  "Automatic": "Automático",
+  "Appearance": "Aparición de subtítulos",
+  "Font": "Cor da fonte e do texto",
+  "Background": "Cor de fondo",
+  "Opacity": "Opacidade do fondo (%)",
+  "Outline": "Esquema do texto",
+  "ModelError": "O modelo de tradución non puido completar a solicitude. Consulte runtime/diagnostics.txt."
 }

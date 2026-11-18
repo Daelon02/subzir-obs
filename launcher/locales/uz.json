@@ -45,5 +45,13 @@
   "ChooseLanguages": "Tillarni tanlang",
   "SettingsError": "Til sozlamalarini saqlab bo‘lmadi.",
   "GuideBody": "O'yiningizda inglizcha subtitrlarni yoqing. Suratga olish kartasini OBS-ga ulang. O'yin sahnasiga subtitr skriptini qo'shing. Virtual kamera chiqishini suratga olish kartasi manbasiga o'rnating va virtual kamerani ishga tushiring. SubZir-da subtitr maydonini tanlang va tarjimani boshlang.",
-  "AddScene": "Joriy sahnaga subtitrlar qo'shing"
+  "AddScene": "Joriy sahnaga subtitrlar qo'shing",
+  "Model": "Tarjima modeli",
+  "Automatic": "Avtomatik",
+  "Appearance": "Subtitr ko'rinishi",
+  "Font": "Shrift va matn rangi",
+  "Background": "Fon rangi",
+  "Opacity": "Fon shaffofligi (%)",
+  "Outline": "Matn konturi",
+  "ModelError": "Tarjima modeli so‘rovni bajara olmadi. Runtime/diagnostics.txt-ga qarang."
 }

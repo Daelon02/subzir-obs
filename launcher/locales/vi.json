@@ -45,5 +45,13 @@
   "ChooseLanguages": "Chọn ngôn ngữ",
   "SettingsError": "Không thể lưu cài đặt ngôn ngữ.",
   "GuideBody": "Bật phụ đề tiếng Anh trong trò chơi của bạn. Kết nối thẻ chụp trong OBS. Thêm kịch bản phụ đề vào cảnh trò chơi. Đặt đầu ra của camera ảo thành nguồn thẻ chụp và khởi động camera ảo. Trong SubZir, chọn vùng phụ đề và bắt đầu dịch.",
-  "AddScene": "Thêm phụ đề vào cảnh hiện tại"
+  "AddScene": "Thêm phụ đề vào cảnh hiện tại",
+  "Model": "Mô hình dịch thuật",
+  "Automatic": "tự động",
+  "Appearance": "Xuất hiện phụ đề",
+  "Font": "Phông chữ và màu văn bản",
+  "Background": "Màu nền",
+  "Opacity": "Độ mờ nền (%)",
+  "Outline": "dàn ý văn bản",
+  "ModelError": "Mô hình dịch không thể hoàn thành yêu cầu. Xem thời gian chạy/chẩn đoán.txt."
 }

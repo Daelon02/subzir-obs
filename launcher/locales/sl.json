@@ -45,5 +45,13 @@
   "ChooseLanguages": "Izberite jezike",
   "SettingsError": "Jezikovnih nastavitev ni bilo mogoče shraniti.",
   "GuideBody": "Omogočite angleške podnapise v svoji igri. Povežite kartico za zajem v OBS. Dodajte skript podnapisov v sceno igre. Nastavite izhod navidezne kamere na vir kartice za zajem in zaženite navidezno kamero. V SubZirju izberite območje podnapisov in začnite prevod.",
-  "AddScene": "Dodajte podnapise trenutnemu prizoru"
+  "AddScene": "Dodajte podnapise trenutnemu prizoru",
+  "Model": "Model prevajanja",
+  "Automatic": "Samodejno",
+  "Appearance": "Videz podnapisov",
+  "Font": "Barva pisave in besedila",
+  "Background": "Barva ozadja",
+  "Opacity": "Motnost ozadja (%)",
+  "Outline": "Oris besedila",
+  "ModelError": "Model prevajanja ni mogel dokončati zahteve. Glejte runtime/diagnostics.txt."
 }

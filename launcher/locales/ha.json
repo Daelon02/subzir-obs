@@ -45,5 +45,13 @@
   "ChooseLanguages": "Zaɓi harsuna",
   "SettingsError": "An kasa ajiye saitunan harshe.",
   "GuideBody": "Kunna fassarar Turanci a cikin wasanku. Haɗa katin ɗaukar hoto a cikin OBS. Ƙara rubutun subtitle zuwa wurin wasan. Saita fitowar kyamarar kama-da-wane zuwa tushen katin kama kuma fara kyamarar kama-da-wane. A cikin SubZir, zaɓi yankin subtitle kuma fara fassara.",
-  "AddScene": "Ƙara subtitles zuwa yanayin halin yanzu"
+  "AddScene": "Ƙara subtitles zuwa yanayin halin yanzu",
+  "Model": "Samfurin fassarar",
+  "Automatic": "Na atomatik",
+  "Appearance": "Siffar taken magana",
+  "Font": "Launin rubutu da rubutu",
+  "Background": "Kalar bango",
+  "Opacity": "Gashin bayan fage (%)",
+  "Outline": "Tsarin rubutu",
+  "ModelError": "Samfurin fassarar ya kasa cika buƙatar. Dubi runtime/diagnostics.txt."
 }

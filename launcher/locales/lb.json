@@ -45,5 +45,13 @@
   "ChooseLanguages": "Wielt Sproochen",
   "SettingsError": "Konnt d'Sproochastellunge net späicheren.",
   "GuideBody": "Aktivéiert Englesch Ënnertitelen an Ärem Spill. Connect der Capture Kaart an OBS. Füügt den Ënnertitelskript an d'Spillzeen. Setzt d'virtuell Kameraausgang op d'Capture Card Quell an start déi virtuell Kamera. Am SubZir, wielt den Ënnertitelberäich a fänkt d'Iwwersetzung un.",
-  "AddScene": "Füügt Ënnertitelen un déi aktuell Szen"
+  "AddScene": "Füügt Ënnertitelen un déi aktuell Szen",
+  "Model": "Iwwersetzung Modell",
+  "Automatic": "Automatesch",
+  "Appearance": "Ënnertitel Erscheinung",
+  "Font": "Schrëft an Text Faarf",
+  "Background": "Hannergrondfaarf",
+  "Opacity": "Hannergrond Opazitéit (%)",
+  "Outline": "Text Kontur",
+  "ModelError": "Den Iwwersetzungsmodell konnt d'Ufro net fäerdeg maachen. Gesinn runtime/diagnostics.txt."
 }

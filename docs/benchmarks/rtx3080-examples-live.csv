@@ -1,0 +1,13 @@
+model,case,source,ocr,translation,frame_to_obs_ms
+short-quick,0,Hey!,Hey!,Гей!,150.73
+short-quick,1,The bombs're away and I'm touchin' down hot.,The bombs're away and I'm touchin' down hot.,"Бомби відійшли, і я приземляюся.",184.07
+short-quick,2,This is a stick-up!,This is a stick-up!,Це стікер!,152.02
+short-quick,3,You always stick up for him.,You always stick up for him.,Ти завжди його підтримуєш.,174.6
+short-quick,4,Hey!,Hey!,Гей!,152.0
+short-quick,5,Hey,Hey,Гей,165.08
+short-hy,0,Hey!,Hey!,Гей!,129.49
+short-hy,1,The bombs're away and I'm touchin' down hot.,The bombs're away and I'm touchin' down hot.,"Бомби вже вбік, і я зараз купаюся.",150.57
+short-hy,2,This is a stick-up!,This is a stick-up!,Це жахливо!,136.22
+short-hy,3,You always stick up for him.,You always stick up for him.,Ти завжди захищаєш його.,131.58
+short-hy,4,Hey!,Hey!,Гей!,140.34
+short-hy,5,Hey,Hey,Ей!,137.5

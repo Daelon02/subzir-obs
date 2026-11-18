@@ -45,5 +45,13 @@
   "ChooseLanguages": "Chwazi lang",
   "SettingsError": "Pa t 'kapab sove paramèt lang yo.",
   "GuideBody": "Pèmèt sous-titres angle nan jwèt ou a. Konekte kat kaptire a nan OBS. Ajoute script nan sous-titre nan sèn nan jwèt. Mete pwodiksyon kamera vityèl la nan sous kat kaptire a epi kòmanse kamera vityèl la. Nan SubZir, chwazi zòn nan soustit epi kòmanse tradiksyon.",
-  "AddScene": "Ajoute sous-titres nan sèn aktyèl la"
+  "AddScene": "Ajoute sous-titres nan sèn aktyèl la",
+  "Model": "Modèl tradiksyon",
+  "Automatic": "Otomatik",
+  "Appearance": "Aparans sous-titre",
+  "Font": "Polis ak koulè tèks",
+  "Background": "Koulè background",
+  "Opacity": "Opakite background (%)",
+  "Outline": "Deskripsyon tèks la",
+  "ModelError": "Modèl tradiksyon an pa t 'kapab ranpli demann lan. Gade runtime/diagnostics.txt."
 }

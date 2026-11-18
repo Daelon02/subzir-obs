@@ -45,5 +45,13 @@
   "ChooseLanguages": "Londa ennimi",
   "SettingsError": "Teyasobodde kutereka nteekateeka za lulimi.",
   "GuideBody": "Ssobozesa ebigambo by'Olungereza mu muzannyo gwo. Gatta kaadi y'okukwata mu OBS. Yongera script y'omutwe omutono mu kifo ky'omuzannyo. Teeka ekifulumizibwa kwa kkamera ey’omubiri (virtual camera output) ku nsibuko ya kaadi y’okukwata era otandike kkamera ey’omubiri (virtual camera). Mu SubZir, londa ekitundu ky'omutwe omutono era otandike okuvvuunula.",
-  "AddScene": "Yongera ebigambo ebitonotono ku kifo ekiriwo kati"
+  "AddScene": "Yongera ebigambo ebitonotono ku kifo ekiriwo kati",
+  "Model": "Omuze gw’okuvvuunula",
+  "Automatic": "Otomatiki",
+  "Appearance": "Okulabika mu subtitle",
+  "Font": "Langi y’empandiika n’ebiwandiiko",
+  "Background": "Langi y’emabega",
+  "Opacity": "Obutangaavu bw’emabega (%) .",
+  "Outline": "Ensengeka y’ekiwandiiko",
+  "ModelError": "Enkola y’okuvvuunula teyasobodde kumaliriza kusaba. Laba runtime/diagnostics.txt."
 }

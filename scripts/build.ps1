@@ -12,10 +12,10 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Cannot locate Cargo build output.' }
     $target = ($metadata | ConvertFrom-Json).target_directory
     $csc = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
-    & $csc /nologo /target:winexe /platform:x64 /optimize+ /codepage:65001 /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll "/out:$bundle/SubZir.exe" /resource:launcher\locales\en.json,SubZir.English.json launcher\Launcher.cs launcher\Ui.cs launcher\LanguageDialog.cs
+    & $csc /nologo /target:winexe /platform:x64 /optimize+ /codepage:65001 /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll "/out:$bundle/SubZir.exe" /resource:launcher\locales\en.json,SubZir.English.json launcher\Launcher.cs launcher\Ui.cs launcher\LanguageDialog.cs launcher\SubtitleStyle.cs
     if ($LASTEXITCODE -ne 0) { throw 'Launcher build failed.' }
     Copy-Item -LiteralPath (Join-Path $target 'release/subtitle-rs.exe') -Destination "$bundle/app/"
-    Copy-Item worker/worker.py "$bundle/app/"
+    Copy-Item worker/worker.py,worker/hy_worker.py,worker/hy-languages.json "$bundle/app/"
     Copy-Item obs/PS5-Subtitles.lua "$bundle/OBS/"
     Copy-Item docs/PLAYER-UA.txt "$bundle/README.txt"
     Copy-Item docs/PLAYER-EN.txt "$bundle/README.en.txt"

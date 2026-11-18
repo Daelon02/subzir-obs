@@ -45,5 +45,13 @@
   "ChooseLanguages": "Dibab yezhoù",
   "SettingsError": "N'haller ket enrollañ arventennoù ar yezh.",
   "GuideBody": "Gweredekaat istitloù e saozneg en ho c'hoari. Kennaskañ ar gartenn dapout en OBS. Ouzhpennit ar skript istitloù d'ar skeudenn c'hoari. Lakaat disoc'h ar c'hamera virtuel war ar font kartenn dapout ha loc'hañ ar c'hamera virtuel. E SubZir, diuzit an dachenn istitloù ha krogit gant an droidigezh.",
-  "AddScene": "Ouzhpennañ istitloù d'ar skeudenn bremanel"
+  "AddScene": "Ouzhpennañ istitloù d'ar skeudenn bremanel",
+  "Model": "Skouer troidigezh",
+  "Automatic": "Emgefreek",
+  "Appearance": "Gwel an istitloù",
+  "Font": "Liv ar font hag an destenn",
+  "Background": "Liv an drekleur",
+  "Opacity": "Teñvalded an drekleur (%)",
+  "Outline": "Tresadenn an destenn",
+  "ModelError": "N'hall ket ar patrom treiñ klokaat ar goulenn. Gwelet runtime/diagnostics.txt."
 }

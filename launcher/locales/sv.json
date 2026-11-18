@@ -45,5 +45,13 @@
   "ChooseLanguages": "Välj språk",
   "SettingsError": "Det gick inte att spara språkinställningarna.",
   "GuideBody": "Aktivera engelska undertexter i ditt spel. Anslut fångstkortet i OBS. Lägg till undertextmanuset till spelscenen. Ställ in den virtuella kamerautgången till källan för inspelningskort och starta den virtuella kameran. I SubZir, välj undertextområdet och börja översätta.",
-  "AddScene": "Lägg till undertexter till den aktuella scenen"
+  "AddScene": "Lägg till undertexter till den aktuella scenen",
+  "Model": "Översättningsmodell",
+  "Automatic": "Automatisk",
+  "Appearance": "Undertextens utseende",
+  "Font": "Teckensnitt och textfärg",
+  "Background": "Bakgrundsfärg",
+  "Opacity": "Bakgrundsopacitet (%)",
+  "Outline": "Textkontur",
+  "ModelError": "Översättningsmodellen kunde inte slutföra begäran. Se runtime/diagnostics.txt."
 }

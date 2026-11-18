@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pilien dagiti pagsasao",
   "SettingsError": "Saan a mai-save dagiti setting ti pagsasao.",
   "GuideBody": "Pagbalinem dagiti Ingles a subtitle iti ay-ayammo. Ikonektar ti capture card iti OBS. Inayon ti subtitle script iti eksena ti ay-ayam. Itakderan ti virtual camera output iti capture card source ken rugian ti virtual camera. Iti SubZir, pilien ti lugar ti subtitulo ken rugian ti panagipatarus.",
-  "AddScene": "Manginayon kadagiti subtitle iti agdama nga eksena"
+  "AddScene": "Manginayon kadagiti subtitle iti agdama nga eksena",
+  "Model": "Modelo ti panagipatarus",
+  "Automatic": "Automatiko nga",
+  "Appearance": "Panagparang ti subtitulo",
+  "Font": "Kolor ti letra ken teksto",
+  "Background": "Kolor ti likudan",
+  "Opacity": "Opacity ti likudan (%) .",
+  "Outline": "Balabala ti teksto",
+  "ModelError": "Saan a makompleto ti modelo ti panagipatarus ti kiddaw. Kitaen ti oras ti panagtaray/diagnostics.txt."
 }

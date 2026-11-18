@@ -45,5 +45,13 @@
   "ChooseLanguages": "Zgjidhni gjuhët",
   "SettingsError": "Cilësimet e gjuhës nuk mund të ruheshin.",
   "GuideBody": "Aktivizo titrat në anglisht në lojën tënde. Lidhni kartën e kapjes në OBS. Shtoni skenarin e titrave në skenën e lojës. Vendosni daljen e kamerës virtuale në burimin e kartës së kapjes dhe nisni kamerën virtuale. Në SubZir, zgjidhni zonën e titrave dhe filloni përkthimin.",
-  "AddScene": "Shtoni titrat në skenën aktuale"
+  "AddScene": "Shtoni titrat në skenën aktuale",
+  "Model": "Modeli i përkthimit",
+  "Automatic": "Automatik",
+  "Appearance": "Pamja e titrave",
+  "Font": "Ngjyra e shkronjave dhe tekstit",
+  "Background": "Ngjyra e sfondit",
+  "Opacity": "Opaciteti i sfondit (%)",
+  "Outline": "Skica e tekstit",
+  "ModelError": "Modeli i përkthimit nuk mund ta plotësonte kërkesën. Shiko ekzekutimin/diagnostics.txt."
 }

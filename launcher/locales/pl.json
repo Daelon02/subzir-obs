@@ -45,5 +45,13 @@
   "ChooseLanguages": "Wybierz języki",
   "SettingsError": "Nie można zapisać ustawień języka.",
   "GuideBody": "Włącz angielskie napisy w swojej grze. Podłącz kartę przechwytującą w OBS. Dodaj skrypt napisów do sceny gry. Ustaw wyjście kamery wirtualnej na źródło karty przechwytującej i uruchom kamerę wirtualną. W SubZir wybierz obszar napisów i rozpocznij tłumaczenie.",
-  "AddScene": "Dodaj napisy do bieżącej sceny"
+  "AddScene": "Dodaj napisy do bieżącej sceny",
+  "Model": "Model tłumaczenia",
+  "Automatic": "Automatyczny",
+  "Appearance": "Wygląd napisów",
+  "Font": "Kolor czcionki i tekstu",
+  "Background": "Kolor tła",
+  "Opacity": "Nieprzezroczystość tła (%)",
+  "Outline": "Zarys tekstu",
+  "ModelError": "Model tłumaczenia nie mógł zrealizować żądania. Zobacz plik runtime/diagnostics.txt."
 }

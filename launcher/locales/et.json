@@ -45,5 +45,13 @@
   "ChooseLanguages": "Valige keeled",
   "SettingsError": "Keeleseadeid ei saanud salvestada.",
   "GuideBody": "Lubage oma mängus ingliskeelsed subtiitrid. Ühendage jäädvustamiskaart OBS-is. Lisage mängustseenile subtiitrite skript. Set the virtual camera output to the capture card source and start the virtual camera. In SubZir, select the subtitle area and start translation.",
-  "AddScene": "Lisage praegusele stseenile subtiitrid"
+  "AddScene": "Lisage praegusele stseenile subtiitrid",
+  "Model": "Tõlkemudel",
+  "Automatic": "Automaatne",
+  "Appearance": "Subtiitrite välimus",
+  "Font": "Fondi ja teksti värv",
+  "Background": "Taustavärv",
+  "Opacity": "Tausta läbipaistmatus (%)",
+  "Outline": "Teksti kontuur",
+  "ModelError": "Tõlkemudel ei saanud taotlust lõpule viia. Vaadake faili runtime/diagnostics.txt."
 }

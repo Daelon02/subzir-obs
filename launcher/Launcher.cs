@@ -35,14 +35,30 @@ class Launcher : Form {
         RightToLeft = Ui.IsRtl ? RightToLeft.Yes : RightToLeft.No;
         RightToLeftLayout = Ui.IsRtl;
         foreach (var item in captions) item.Key.Text = Ui.Get(item.Value);
+        RefreshModels();
         SetStatus(statusMessage, statusDetail);
+    }
+    readonly ComboBox models = new ComboBox();
+    bool refreshingModels;
+    void RefreshModels() {
+        refreshingModels=true;
+        try {
+            var options=new Dictionary<string,string>();
+            foreach(string code in new[]{"auto","quickmt","m2m100","hy"}) {
+                if(Ui.Allows(code,Ui.Target)) options.Add(code,code=="auto"?Ui.Get(Msg.Automatic):
+                    code=="hy"?"Hy-MT2 1.8B Q6_K (GPU)":code=="quickmt"?"QuickMT EN → UK (CPU)":"M2M100 (CPU)");
+            }
+            models.DataSource=new BindingSource(options,null);
+            models.SelectedValue=Ui.Model;
+            models.AccessibleName=Ui.Get(Msg.Model);
+        } finally {refreshingModels=false;}
     }
     Process running;
     bool busy, closing;
     string roi;
     static readonly string CropFile = Path.Combine(Data,"area.txt");
     public Launcher() {
-        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,505);
+        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,567);
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
         BackColor=Color.White;
         Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
@@ -59,9 +75,21 @@ class Launcher : Form {
         guide.Click+=delegate {if (Ui.Language != "en" && Ui.Language != "uk") { MessageBox.Show(this,Ui.Get(Msg.GuideBody),Ui.Get(Msg.Guide)); return; } Process.Start("notepad.exe",Quote(Path.Combine(Root,Ui.Language == "uk" ? "README.txt" : "README.en.txt")));};
         status.SetBounds(26,350,652,55);status.ForeColor=Color.FromArgb(35,69,83);Controls.Add(status);
         line.SetBounds(26,409,652,78);line.Font=new Font(Font.FontFamily,12,FontStyle.Bold);Controls.Add(line);
+        LabelAt(Msg.Model,26,499,126,29);
+        models.DropDownStyle=ComboBoxStyle.DropDownList;
+        models.SetBounds(154,496,270,36); models.DisplayMember="Value"; models.ValueMember="Key";
+        Controls.Add(models);
+        models.SelectionChangeCommitted+=delegate {
+            if(refreshingModels)return;
+            try {Ui.Save(Ui.Language,Ui.Target,(string)models.SelectedValue);}
+            catch(Exception ex) {RefreshModels();MessageBox.Show(this,ex.Message,Ui.Get(Msg.Model));}
+        };
+        var appearance=new Button();
+        ButtonAt(appearance,Msg.Appearance,444,490,238);
+        appearance.Click+=delegate {using(var dialog=new StyleDialog())dialog.ShowDialog(this);};
         language.SetBounds(482,21,200,38);
         language.Click += delegate {
-            try { using(var dialog = new LanguageDialog()) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode); RefreshLanguage(); } } }
+            try { using(var dialog = new LanguageDialog(busy && Ui.Model!="auto")) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
             catch (IOException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
             catch (UnauthorizedAccessException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
         };
@@ -88,10 +116,12 @@ class Launcher : Form {
         s.EnvironmentVariables["SUB_PYTHON"]=Path.Combine(App,"python","python.exe");
         s.EnvironmentVariables["SUB_DEVICE"]="OBS Virtual Camera";s.EnvironmentVariables["SUB_DEMO"]=Path.Combine(App,"demo");
         s.EnvironmentVariables["SUB_QUICK_DEVICE"]="cpu";s.EnvironmentVariables["SUB_BEAM"]="3";
+        s.EnvironmentVariables["SUB_MODEL"]=Ui.Model;
+        if(Ui.Model!="auto")s.EnvironmentVariables["SUB_TARGET"]=Ui.Target;
         if(roi!=null)s.EnvironmentVariables["SUB_CROP"]=roi;
         return s;
     }
-    void Lock(bool val){busy=val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
+    void Lock(bool val){busy=val;models.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
     void StopOwned(){
         Process p=running;
         if(p!=null && !p.HasExited){
@@ -113,7 +143,7 @@ class Launcher : Form {
                         if(live)SetStatus(Msg.Active);
                         else SetStatus(Convert.ToBoolean(row["obs"])?Msg.TestSuccess:Msg.TestNoAck);
                     }catch(Exception ex){SetStatus(Msg.ResponseError,ex.Message);}}));};
-                p.ErrorDataReceived+=(o,e)=>{if(e.Data==null)return;lock(err){if(err.Length<16000)err.AppendLine(e.Data);}
+                p.ErrorDataReceived+=(o,e)=>{if(e.Data==null)return;lock(err){err.AppendLine(e.Data);if(err.Length>32000)err.Remove(0,err.Length-16000);}
                     if(live && e.Data.StartsWith("Worker ") && !closing)BeginInvoke((Action)(()=>{if(running==p)SetStatus(Msg.Waiting);}));};
                 p.Start();running=p;p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
                 await Task.Run(()=>p.WaitForExit());
@@ -121,7 +151,8 @@ class Launcher : Form {
                 if(p.ExitCode!=0 && !(live && statusMessage==Msg.Stopped)){
                     File.WriteAllText(Path.Combine(Data,"diagnostics.txt"),err.ToString(),Utf8);
                     string msg=err.ToString();
-                    SetStatus(msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
+                    bool modelFailure=Ui.Model=="hy" && (msg.Contains("hy_worker.py") || msg.Contains("Hy-MT2 server:") || msg.Contains("Hy-MT2 runtime:") || msg.Contains("Translation worker stopped"));
+                    SetStatus(modelFailure?Msg.ModelError:msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
                 }else if(!got && !live){SetStatus(Msg.TestEmpty);}
                 running=null;
             }

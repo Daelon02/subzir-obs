@@ -19,6 +19,7 @@ local function message(key, fallback)
 end
 local folder = script_path() .. "../runtime/"
 local last, pending = nil, nil
+local applied_style, style_elapsed = nil, 0
 
 function script_description()
     return message("ConnectHint", "Add the script to your game scene once.")
@@ -59,7 +60,7 @@ local function add_text()
         end
     end
     obs.obs_source_release(current)
-    last = nil
+    last, applied_style = nil, nil
     return false
 end
 function script_properties()
@@ -88,7 +89,42 @@ local caption, ack = wide(folder.."caption.txt"), wide(folder.."ack.txt")
 local bad=ffi.cast("void*", -1)
 local buf=ffi.new("char[32768]")
 local size=ffi.new("unsigned long[1]")
+local style_file = wide(folder.."subtitle-style.json")
+local function update_style()
+    local h=ffi.C.CreateFileW(style_file,2147483648,7,nil,3,128,nil)
+    if h==bad then return end
+    local ok=ffi.C.ReadFile(h,buf,32768,size,nil)
+    ffi.C.CloseHandle(h)
+    if ok==0 then return end
+    local raw=ffi.string(buf,size[0])
+    if raw==applied_style then return end
+    local src=obs.obs_get_source_by_name(source_title())
+    if not src then return end
+    local settings=obs.obs_data_create_from_json(raw)
+    if settings then
+        local font, cfg=obs.obs_data_create(), obs.obs_data_create()
+        obs.obs_data_set_string(font,"face",obs.obs_data_get_string(settings,"face"))
+        obs.obs_data_set_int(font,"size",math.max(8,math.min(250,obs.obs_data_get_int(settings,"size"))))
+        obs.obs_data_set_int(font,"flags",obs.obs_data_get_int(settings,"flags"))
+        obs.obs_data_set_obj(cfg,"font",font)
+        obs.obs_data_set_int(cfg,"color",obs.obs_data_get_int(settings,"color"))
+        obs.obs_data_set_int(cfg,"bk_color",obs.obs_data_get_int(settings,"background"))
+        obs.obs_data_set_int(cfg,"bk_opacity",math.max(0,math.min(100,obs.obs_data_get_int(settings,"opacity"))))
+        obs.obs_data_set_bool(cfg,"outline",obs.obs_data_get_bool(settings,"outline"))
+        obs.obs_source_update(src,cfg)
+        obs.obs_data_release(font)
+        obs.obs_data_release(cfg)
+        obs.obs_data_release(settings)
+        applied_style=raw
+    end
+    obs.obs_source_release(src)
+end
 function script_tick(seconds)
+    style_elapsed=style_elapsed+seconds
+    if style_elapsed>=0.4 then
+        style_elapsed=0
+        update_style()
+    end
     if pending then
         local h=ffi.C.CreateFileW(ack,1073741824,7,nil,2,128,nil)
         if h~=bad then

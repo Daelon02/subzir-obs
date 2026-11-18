@@ -45,5 +45,13 @@
   "ChooseLanguages": "Họrọ asụsụ",
   "SettingsError": "Enweghị ike ichekwa ntọala asụsụ.",
   "GuideBody": "Kwado ndepụta okwu Bekee na egwuregwu gị. Jikọọ kaadị nwude na OBS. Tinye ederede ndepụta okwu na mpaghara egwuregwu ahụ. Tọọ mmepụta igwefoto mebere na isi iyi kaadị weghara wee malite igwefoto mebere. Na SubZir, họrọ mpaghara ndepụta okwu wee malite ntụgharị asụsụ.",
-  "AddScene": "Tinye ndepụta okwu na ọnọdụ dị ugbu a"
+  "AddScene": "Tinye ndepụta okwu na ọnọdụ dị ugbu a",
+  "Model": "Ụdị ntụgharị asụsụ",
+  "Automatic": "Akpaaka",
+  "Appearance": "Ọdịdị ndepụta okwu",
+  "Font": "Ụdị mkpụrụedemede na agba ederede",
+  "Background": "Agba ndabere",
+  "Opacity": "Opedị ndabere ndabere (%)",
+  "Outline": "Ndepụta ederede",
+  "ModelError": "Ụdị ntụgharị asụsụ ahụ enweghị ike imezu arịrịọ ahụ. Hụ oge ịgba ọsọ/diagnostics.txt."
 }

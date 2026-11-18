@@ -45,5 +45,13 @@
   "ChooseLanguages": "Veldu tungumál",
   "SettingsError": "Ekki tókst að vista tungumálastillingarnar.",
   "GuideBody": "Virkjaðu enskan texta í leiknum þínum. Tengdu tökukortið í OBS. Bættu textahandritinu við leiksviðið. Stilltu sýndarmyndavélarúttakið á upptökukortið og ræstu sýndarmyndavélina. Í SubZir skaltu velja textasvæðið og hefja þýðingu.",
-  "AddScene": "Bættu texta við núverandi atriði"
+  "AddScene": "Bættu texta við núverandi atriði",
+  "Model": "Þýðingarlíkan",
+  "Automatic": "Sjálfvirk",
+  "Appearance": "Útlit texta",
+  "Font": "Letur- og textalitur",
+  "Background": "Bakgrunnslitur",
+  "Opacity": "Ógegnsæi í bakgrunni (%)",
+  "Outline": "Útlínur texta",
+  "ModelError": "Þýðingarlíkanið gat ekki klárað beiðnina. Sjá runtime/diagnostics.txt."
 }

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Tannal làkk yi",
   "SettingsError": "Mënul denc jekkal làkk yi.",
   "GuideBody": "Aktiwiseel sous-titre angale ci sa jeu. Keppal kàrtu kaptër bi ci OBS. Yokk script sous-titre bi ci scene jeu bi. Regl génnug kamera virtuel bi ci source kart capture bi nga tàmbali kamera virtuel bi. Ci SubZir, tannal barabu sous-titre bi nga tàmbali tekki.",
-  "AddScene": "Yokk ay sous-titre ci seen bi fi nekk"
+  "AddScene": "Yokk ay sous-titre ci seen bi fi nekk",
+  "Model": "Royuwaayu tekki làkk",
+  "Automatic": "otomatik",
+  "Appearance": "melokaanu sous-titre",
+  "Font": "Font ak melo mbind",
+  "Background": "Kulòoru ginaaw",
+  "Opacity": "Opasite ci ginaaw (%)",
+  "Outline": "Text bi",
+  "ModelError": "Royuwaayu tekki làkk bi mënu ci matt laaj bi. Xoolal waxtu doxal/seet.txt."
 }

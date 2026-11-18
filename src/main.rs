@@ -52,17 +52,76 @@ impl Drop for OwnedChild {
         let _ = self.0.wait();
     }
 }
+const HY_WEIGHTS: &str = "Hy-MT2-1.8B-Q6_K.gguf";
+
+fn start_hy(app: &Path) -> Result<(OwnedChild, String, String)> {
+    use std::net::{Ipv4Addr, TcpListener};
+    let address = TcpListener::bind((Ipv4Addr::LOCALHOST, 0))?.local_addr()?;
+    let key = CryptographicBuffer::EncodeToHexString(&CryptographicBuffer::GenerateRandom(32)?)?
+        .to_string();
+    let runtime = app
+        .join("hy-runtime")
+        .canonicalize()
+        .map_err(|e| AppError::Config(format!("Hy-MT2 runtime: {e}")))?;
+    let weights = runtime.join(HY_WEIGHTS);
+    if !weights.is_file() {
+        return Err(AppError::Config(format!("Missing {}", weights.display())));
+    }
+    let server = Command::new(runtime.join("llama-server.exe"))
+        .current_dir(&runtime)
+        .arg("--model")
+        .arg(weights)
+        .args([
+            "--host",
+            &address.ip().to_string(),
+            "--port",
+            &address.port().to_string(),
+            "--api-key",
+            &key,
+            "--device",
+            "CUDA0",
+            "-ngl",
+            "99",
+            "-c",
+            "1024",
+            "-np",
+            "1",
+            "--no-webui",
+            "--no-warmup",
+        ])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .spawn()
+        .map_err(|e| AppError::Config(format!("Hy-MT2 server: {e}")))?;
+    Ok((OwnedChild(server), format!("http://{address}"), key))
+}
 struct Translator {
     _process: OwnedChild,
+    hy_server: Option<OwnedChild>,
     input: ChildStdin,
     output: BufReader<ChildStdout>,
 }
 impl Translator {
     fn start() -> Result<Self> {
+        let path = PathBuf::from(setting("SUB_WORKER")?);
+        let mut command = Command::new(setting("SUB_PYTHON")?);
+        command.arg("-u");
+        let hy_server = if env::var("SUB_MODEL").as_deref() == Ok("hy") {
+            let app = path
+                .parent()
+                .ok_or_else(|| AppError::Config("Missing app directory".into()))?;
+            let (server, url, key) = start_hy(app)?;
+            command
+                .arg(app.join("hy_worker.py"))
+                .env("SUB_HY_URL", url)
+                .env("SUB_HY_KEY", key);
+            Some(server)
+        } else {
+            command.arg(path);
+            None
+        };
         let mut p = OwnedChild(
-            Command::new(setting("SUB_PYTHON")?)
-                .arg("-u")
-                .arg(setting("SUB_WORKER")?)
+            command
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .spawn()?,
@@ -71,6 +130,7 @@ impl Translator {
         let output = BufReader::new(pipe(p.0.stdout.take())?);
         let mut worker = Self {
             _process: p,
+            hy_server,
             input,
             output,
         };
@@ -86,14 +146,20 @@ impl Translator {
         Ok(serde_json::from_str(&s)?)
     }
     fn translate(&mut self, s: &str) -> Result<String> {
-        serde_json::to_writer(&mut self.input, s)?;
-        writeln!(self.input)?;
-        self.input.flush()?;
-        self.line()?
+        self.request(&json!(s))
+    }
+    fn request(&mut self, message: &Value) -> Result<String> {
+        self.exchange(message)?
             .as_str()
             .filter(|s| !s.is_empty())
             .map(str::to_owned)
             .ok_or_else(|| AppError::Config("Empty translation".into()))
+    }
+    fn exchange(&mut self, message: &Value) -> Result<Value> {
+        serde_json::to_writer(&mut self.input, message)?;
+        writeln!(self.input)?;
+        self.input.flush()?;
+        self.line()
     }
 }
 fn engine() -> Result<OcrEngine> {
@@ -115,6 +181,49 @@ fn recognize(engine: &OcrEngine, pixels: &[u8]) -> Result<String> {
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" "))
+}
+
+// Small isolated words can fall below the OCR detector's size threshold.
+// Retry a compact bright region only after the ordinary passes returned no text.
+fn short_line_bitmap(pixels: &[u8]) -> Option<Vec<u8>> {
+    const STROKE: u8 = 96;
+    const MAX_WIDTH: usize = 180;
+    const MAX_HEIGHT: usize = 56;
+    const MARGIN: usize = 12;
+    let stride = WIDTH as usize;
+    let (mut left, mut right, mut top, mut bottom) = (stride, 0, HEIGHT as usize, 0);
+    for (y, row) in pixels.chunks_exact(stride).enumerate() {
+        if let Some(first) = row.iter().position(|&p| p > STROKE) {
+            left = left.min(first);
+            right = right.max(row.iter().rposition(|&p| p > STROKE)?);
+            top = top.min(y);
+            bottom = y;
+            if right - left >= MAX_WIDTH || bottom - top >= MAX_HEIGHT {
+                return None;
+            }
+        }
+    }
+    if right <= left || bottom <= top || bottom - top < 4 {
+        return None;
+    }
+    let mut enlarged = vec![0; FRAME_BYTES];
+    for y in top..=bottom {
+        let start = (MARGIN + (y - top) * 2) * stride + MARGIN;
+        for (i, &value) in pixels[y * stride + left..=y * stride + right]
+            .iter()
+            .enumerate()
+        {
+            enlarged[start + i * 2..start + i * 2 + 2].fill(value);
+        }
+        enlarged.copy_within(start..start + 2 * (right - left + 1), start + stride);
+    }
+    Some(enlarged)
+}
+fn retry_short(engine: &OcrEngine, pixels: &[u8]) -> Result<String> {
+    match short_line_bitmap(pixels) {
+        Some(enlarged) => recognize(engine, &enlarged),
+        None => Ok(String::new()),
+    }
 }
 struct Overlay {
     dir: PathBuf,
@@ -168,7 +277,13 @@ impl Overlay {
         false
     }
 }
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Stage {
+    Draft,
+    Confirmed,
+}
 struct Line {
+    stage: Stage,
     start: Instant,
     text: String,
     ocr_ms: f64,
@@ -176,7 +291,7 @@ struct Line {
 fn ms(t: Instant) -> f64 {
     t.elapsed().as_secs_f64() * 1000.0
 }
-fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
+fn capture(tx: mpsc::Sender<Result<Line>>, speculate: bool) -> Result<()> {
     let ocr = engine()?;
     let device = setting("SUB_DEVICE")?;
     let roi = setting("SUB_CROP")?;
@@ -245,11 +360,43 @@ fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
             if reading.trim().is_empty() {
                 reading = recognize(&ocr, gray)?;
             }
+            // The high-contrast mask can split a letter in a short word. On
+            // isolated text prefer the original strokes, then the enlarged crop.
+            if reading.len() <= 8 && !reading.contains(' ') {
+                if let Some(enlarged) = short_line_bitmap(gray) {
+                    let original = if reading.is_empty() {
+                        String::new() // The normal gray pass just returned empty.
+                    } else {
+                        recognize(&ocr, gray)?
+                    };
+                    let candidate = if original.is_empty() {
+                        recognize(&ocr, &enlarged)?
+                    } else {
+                        original
+                    };
+                    if !candidate.is_empty() {
+                        reading = candidate;
+                    }
+                }
+                if reading.is_empty() {
+                    reading = retry_short(&ocr, bright)?;
+                }
+            }
             last_frame.clone_from(&pixels);
             held = unchanged;
         }
-        if let Some(text) = stable.observe(&reading, start) {
+        let event = stable
+            .observe(&reading, start)
+            .map(|text| (Stage::Confirmed, text))
+            .or_else(|| {
+                stable
+                    .first_candidate()
+                    .filter(|_| speculate)
+                    .map(|s| (Stage::Draft, s.to_owned()))
+            });
+        if let Some((stage, text)) = event {
             let line = Line {
+                stage,
                 start,
                 text,
                 ocr_ms: ms(start),
@@ -264,11 +411,15 @@ fn capture(tx: mpsc::Sender<Result<Line>>) -> Result<()> {
 fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
     let check_obs = env::var("SUB_ACK").is_ok_and(|v| v == "1");
     let (tx, rx) = mpsc::channel();
+    let speculate = worker.hy_server.is_some() && env::var("SUB_EARLY").as_deref() != Ok("0");
     thread::spawn(move || {
-        if let Err(e) = capture(tx.clone()) {
+        if let Err(e) = capture(tx.clone(), speculate) {
             let _ = tx.send(Err(e));
         }
     });
+    if worker.hy_server.is_some() {
+        return live_context(worker, out, rx, check_obs);
+    }
     let mut pending = None;
     loop {
         let line = match pending.take() {
@@ -299,6 +450,80 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
         );
     }
 }
+// A draft may use idle GPU time, but only the stabilizer can authorize publication.
+fn live_context(
+    worker: &mut Translator,
+    out: &mut Overlay,
+    rx: Receiver<Result<Line>>,
+    check_obs: bool,
+) -> Result<()> {
+    use std::collections::VecDeque;
+    const CONTEXT_TTL: Duration = Duration::from_secs(8);
+    let mut queued: VecDeque<Line> = VecDeque::new();
+    let mut draft: Option<(String, String, String)> = None;
+    let mut previous: Option<(String, Instant)> = None;
+    loop {
+        let line = match queued.pop_front() {
+            Some(line) => line,
+            None => rx
+                .recv()
+                .map_err(|_| AppError::Config("Capture ended".into()))??,
+        };
+        let context = previous
+            .as_ref()
+            .filter(|(_, t)| line.start.saturating_duration_since(*t) <= CONTEXT_TTL)
+            .map_or("", |(text, _)| text.as_str());
+        let start = Instant::now();
+        let cached = draft
+            .take()
+            .filter(|(en, prior, _)| en == &line.text && prior == context);
+        let reused = cached.is_some();
+        let text = match cached {
+            Some((_, _, translation)) => translation,
+            None if line.text.is_empty() => String::new(),
+            None if line.stage == Stage::Draft => {
+                let reply =
+                    worker.exchange(&json!({"text":line.text,"previous":context,"draft":true}))?;
+                if reply.is_null() {
+                    continue;
+                }
+                serde_json::from_value(reply)?
+            }
+            None => worker.request(&json!({"text":line.text,"previous":context}))?,
+        };
+        let translation_ms = ms(start);
+        // Coalesce obsolete work, preserving the newest confirmation and any draft after it.
+        for item in rx.try_iter() {
+            let next = item?;
+            if next.stage == Stage::Confirmed {
+                queued.clear();
+            } else if queued.back().is_some_and(|v| v.stage == Stage::Draft) {
+                queued.pop_back();
+            }
+            queued.push_back(next);
+        }
+        if line.stage == Stage::Draft {
+            draft = Some((line.text, context.to_owned(), text));
+            continue;
+        }
+        if queued.iter().any(|next| next.stage == Stage::Confirmed) {
+            continue;
+        }
+        let write = Instant::now();
+        let id = out.publish(&text)?;
+        let write_ms = ms(write);
+        let publish_ms = ms(line.start);
+        let ack = (check_obs && out.acknowledgement(&id)).then(|| ms(line.start));
+        println!(
+            "{}",
+            json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,
+            "reused_draft":reused,"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
+        );
+        if !line.text.is_empty() {
+            previous = Some((line.text, line.start));
+        }
+    }
+}
 fn latest(rx: &Receiver<Result<Line>>) -> Result<Option<Line>> {
     rx.try_iter().last().transpose()
 }
@@ -312,7 +537,10 @@ fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> 
             return Err(AppError::Config("Fixture size mismatch".into()));
         }
         let start = Instant::now();
-        let en = recognize(&ocr, &pixels)?;
+        let mut en = recognize(&ocr, &pixels)?;
+        if en.is_empty() {
+            en = retry_short(&ocr, &pixels)?;
+        }
         let ocr_ms = ms(start);
         let tr = Instant::now();
         let uk = if en.is_empty() {

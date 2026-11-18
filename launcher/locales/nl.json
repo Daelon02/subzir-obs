@@ -45,5 +45,13 @@
   "ChooseLanguages": "Kies talen",
   "SettingsError": "Kan de taalinstellingen niet opslaan.",
   "GuideBody": "Schakel Engelse ondertitels in je game in. Sluit de capture-kaart aan in OBS. Voeg het ondertitelscript toe aan de spelscène. Stel de virtuele camera-uitgang in op de opnamekaartbron en start de virtuele camera. Selecteer in SubZir het ondertitelgebied en start de vertaling.",
-  "AddScene": "Voeg ondertitels toe aan de huidige scène"
+  "AddScene": "Voeg ondertitels toe aan de huidige scène",
+  "Model": "Vertaalmodel",
+  "Automatic": "Automatisch",
+  "Appearance": "Ondertiteling",
+  "Font": "Lettertype en tekstkleur",
+  "Background": "Achtergrondkleur",
+  "Opacity": "Achtergronddekking (%)",
+  "Outline": "Tekstoverzicht",
+  "ModelError": "Het vertaalmodel kon het verzoek niet voltooien. Zie runtime/diagnostics.txt."
 }

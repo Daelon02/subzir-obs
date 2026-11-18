@@ -45,5 +45,13 @@
   "ChooseLanguages": "Dilleri seçin",
   "SettingsError": "Dil ayarları kaydedilemedi.",
   "GuideBody": "Oyununuzda İngilizce altyazıları etkinleştirin. Yakalama kartını OBS'ye bağlayın. Altyazı komut dosyasını oyun sahnesine ekleyin. Sanal kamera çıkışını yakalama kartı kaynağına ayarlayın ve sanal kamerayı başlatın. SubZir'de altyazı alanını seçin ve çeviriyi başlatın.",
-  "AddScene": "Geçerli sahneye altyazı ekleyin"
+  "AddScene": "Geçerli sahneye altyazı ekleyin",
+  "Model": "Çeviri modeli",
+  "Automatic": "Otomatik",
+  "Appearance": "Altyazı görünümü",
+  "Font": "Yazı tipi ve metin rengi",
+  "Background": "Arka plan rengi",
+  "Opacity": "Arka plan opaklığı (%)",
+  "Outline": "Metin taslağı",
+  "ModelError": "Çeviri modeli isteği tamamlayamadı. Runtime/diagnostics.txt dosyasına bakın."
 }

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Válasszon nyelveket",
   "SettingsError": "Nem sikerült menteni a nyelvi beállításokat.",
   "GuideBody": "Engedélyezze az angol feliratot a játékban. Csatlakoztassa a rögzítőkártyát az OBS-hez. Adja hozzá a felirat szkriptet a játék jelenetéhez. Állítsa a virtuális kamera kimenetét a rögzítőkártya forrására, és indítsa el a virtuális kamerát. A SubZirben válassza ki a feliratterületet, és indítsa el a fordítást.",
-  "AddScene": "Felirat hozzáadása az aktuális jelenethez"
+  "AddScene": "Felirat hozzáadása az aktuális jelenethez",
+  "Model": "Fordítási modell",
+  "Automatic": "Automatikus",
+  "Appearance": "Felirat megjelenése",
+  "Font": "Betűtípus és szöveg színe",
+  "Background": "Háttérszín",
+  "Opacity": "Háttér átlátszatlansága (%)",
+  "Outline": "Szöveg vázlata",
+  "ModelError": "A fordítási modell nem tudta teljesíteni a kérést. Lásd a runtime/diagnostics.txt fájlt."
 }

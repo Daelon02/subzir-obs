@@ -45,5 +45,13 @@
   "ChooseLanguages": "Kies talen",
   "SettingsError": "Koe de taalynstellingen net bewarje.",
   "GuideBody": "Ynskeakelje Ingelske ûndertiteling yn jo spultsje. Ferbine de capture card yn OBS. Foegje it ûndertitelskript ta oan it spultsje sêne. Stel de útfier fan 'e firtuele kamera yn op' e capture card boarne en start de firtuele kamera. Selektearje yn SubZir it ûndertitelgebiet en begjin oersetting.",
-  "AddScene": "Foegje ûndertitels ta oan it hjoeddeistige sêne"
+  "AddScene": "Foegje ûndertitels ta oan it hjoeddeistige sêne",
+  "Model": "Oersetmodel",
+  "Automatic": "Automatysk",
+  "Appearance": "Subtitle ferskining",
+  "Font": "Lettertype en tekstkleur",
+  "Background": "Eftergrûn kleur",
+  "Opacity": "Eftergrûndekking (%)",
+  "Outline": "Tekstoersjoch",
+  "ModelError": "It oersetmodel koe it fersyk net foltôgje. Sjoch runtime/diagnostics.txt."
 }

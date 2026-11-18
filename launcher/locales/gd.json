@@ -45,5 +45,13 @@
   "ChooseLanguages": "Tagh cànanan",
   "SettingsError": "Cha b' urrainn dhuinn na roghainnean cànain a shàbhaladh.",
   "GuideBody": "Dèan comas air fo-thiotalan Beurla sa gheama agad. Ceangail a’ chairt glacaidh ann an OBS. Cuir an sgriobt fo-thiotal ri sealladh a’ gheama. Suidhich toradh a ’chamara brìgheil gu stòr a’ chairt glacaidh agus tòisich air a ’chamara brìgheil. Ann an SubZir, tagh an raon fo-thiotal agus tòisich air eadar-theangachadh.",
-  "AddScene": "Cuir fo-thiotalan ris an t-sealladh làithreach"
+  "AddScene": "Cuir fo-thiotalan ris an t-sealladh làithreach",
+  "Model": "Modail eadar-theangachaidh",
+  "Automatic": "fèin-ghluasadach",
+  "Appearance": "Cumadh fo-thiotal",
+  "Font": "Dath cruth-clò agus teacsa",
+  "Background": "Dath cùl-fhiosrachaidh",
+  "Opacity": "Cùl-fhiosrachadh neo-sheasmhach (%)",
+  "Outline": "Geàrr-chunntas teacsa",
+  "ModelError": "Cha b' urrainn don mhodail eadar-theangachaidh an t-iarrtas a choileanadh. Faic runtime/diagnostics.txt."
 }

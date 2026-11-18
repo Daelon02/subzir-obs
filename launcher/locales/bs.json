@@ -45,5 +45,13 @@
   "ChooseLanguages": "Odaberite jezike",
   "SettingsError": "Nije moguće sačuvati postavke jezika.",
   "GuideBody": "Omogućite titlove na engleskom u svojoj igrici. Povežite karticu za snimanje u OBS. Dodajte skriptu titla sceni igre. Postavite izlaz virtuelne kamere na izvor kartice za snimanje i pokrenite virtuelnu kameru. U SubZir-u odaberite područje titlova i započnite prijevod.",
-  "AddScene": "Dodajte titlove trenutnoj sceni"
+  "AddScene": "Dodajte titlove trenutnoj sceni",
+  "Model": "Model prevođenja",
+  "Automatic": "Automatski",
+  "Appearance": "Izgled titla",
+  "Font": "Boja fonta i teksta",
+  "Background": "Boja pozadine",
+  "Opacity": "Prozirnost pozadine (%)",
+  "Outline": "Okvir teksta",
+  "ModelError": "Model prijevoda nije mogao dovršiti zahtjev. Pogledajte runtime/diagnostics.txt."
 }

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Khetha izilimi",
   "SettingsError": "Ayikwazanga ukulondoloza izilungiselelo zolimi.",
   "GuideBody": "Nika amandla imibhalo engezansi yesiNgisi kugeyimu yakho. Xhuma ikhadi lokuthwebula ku-OBS. Engeza umbhalo ongezansi esigcawini somdlalo. Setha okukhiphayo kwekhamera ebonakalayo emthonjeni wekhadi lokuthwebula bese uqala ikhamera ebonakalayo. Ku-SubZir, khetha indawo yemibhalo engezansi bese uqala ukuhumusha.",
-  "AddScene": "Engeza imibhalo engezansi esigcawini samanje"
+  "AddScene": "Engeza imibhalo engezansi esigcawini samanje",
+  "Model": "Imodeli yokuhumusha",
+  "Automatic": "Okuzenzakalelayo",
+  "Appearance": "Ukubonakala kombhalo ongezansi",
+  "Font": "Umbala wefonti nombhalo",
+  "Background": "Umbala wangemuva",
+  "Opacity": "Ukufiphala kwengemuva (%)",
+  "Outline": "Uhlaka lombhalo",
+  "ModelError": "Imodeli yokuhumusha ayikwazanga ukuqedela isicelo. Bona i-runtime/diagnostics.txt."
 }

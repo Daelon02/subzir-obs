@@ -45,5 +45,13 @@
   "ChooseLanguages": "Khetha iilwimi",
   "SettingsError": "Ayikwazanga ukugcina imimiselo yolwimi.",
   "GuideBody": "Nika amandla imibhalo engezantsi yesiNgesi kumdlalo wakho. Qhagamshela ikhadi lokubamba kwi-OBS. Yongeza umbhalo ongezantsi kwindawo yomdlalo. Seta imveliso yekhamera ebonakalayo kumthombo wekhadi lokubanjwa kwaye uqalise ikhamera ebonakalayo. Kwi-SubZir, khetha indawo yemibhalo engezantsi kwaye uqalise ukuguqulela.",
-  "AddScene": "Yongeza izihlokwana kumboniso wangoku"
+  "AddScene": "Yongeza izihlokwana kumboniso wangoku",
+  "Model": "Imodeli yoguqulo",
+  "Automatic": "Iyazenzekela",
+  "Appearance": "Inkangeleko yombhalo ongezantsi",
+  "Font": "Ifonti kunye nombala wombhalo",
+  "Background": "Umbala ongasemva",
+  "Opacity": "Ukungaboni ngasemva (%)",
+  "Outline": "Ulwandlalo lombhalo",
+  "ModelError": "Imodeli yoguqulo ayikwazanga ukugqiba isicelo. Jonga ixesha lokusebenza/diagnostics.txt."
 }

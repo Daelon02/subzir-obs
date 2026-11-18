@@ -45,5 +45,13 @@
   "ChooseLanguages": "Escoyer les llingües",
   "SettingsError": "Nun se pudieron guardar les llingües escoyíes.",
   "GuideBody": "Activa los sotítulos n'inglés nel xuegu. Coneuta la tarxeta de captura n'OBS y amiesta l'script de sotítulos a la escena. Escueyi la tarxeta como fonte de la cámara virtual y entama la cámara. En SubZir, escueyi la zona de sotítulos y entama la traducción.",
-  "AddScene": "Amestar sotítulos a la escena actual"
+  "AddScene": "Amestar sotítulos a la escena actual",
+  "Model": "Modelu de traducción",
+  "Automatic": "Automático",
+  "Appearance": "Aspeutu de los sotítulos",
+  "Font": "Fonte y color del testu",
+  "Background": "Color de fondu",
+  "Opacity": "Opacidá del fondu (%)",
+  "Outline": "Contornu del testu",
+  "ModelError": "El modelu nun pudo completar la traducción. Consulta runtime/diagnostics.txt."
 }

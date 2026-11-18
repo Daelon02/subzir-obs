@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pona minoko",
   "SettingsError": "Ekoki te kobomba ba paramètres ya monoko.",
   "GuideBody": "Activer ba sous-titres ya Anglais na jeu na yo. Bokanga carte ya capture na OBS. Bakisa script ya sous-titre na scène ya jeu. Botia sortie ya caméra virtuelle na source ya carte ya capture pe banda caméra virtuelle. Na SubZir, pona esika ya sous-titre mpe banda kobongola.",
-  "AddScene": "Bakisa ba sous-titres na scène oyo ozali kosala"
+  "AddScene": "Bakisa ba sous-titres na scène oyo ozali kosala",
+  "Model": "Modèle ya bobongoli",
+  "Automatic": "Automatique ya kosala",
+  "Appearance": "Emonani ya sous-titre",
+  "Font": "Langi ya makomi mpe ya makomi",
+  "Background": "Color ya fond",
+  "Opacity": "Opacité ya fond (%) .",
+  "Outline": "Plan ya makomi",
+  "ModelError": "Modèle ya libongoli ekokaki te kosilisa bosenga. Tala tango ya kosala/diagnostics.txt."
 }

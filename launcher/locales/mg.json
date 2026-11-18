@@ -45,5 +45,13 @@
   "ChooseLanguages": "Mifidiana fiteny",
   "SettingsError": "Tsy afaka mitahiry ny firafitry ny fiteny.",
   "GuideBody": "Alefaso ny dikanteny anglisy amin'ny lalaonao. Ampifandraiso amin'ny OBS ny karatra fisamborana. Ampio ny sora-baventy amin'ny sehatry ny lalao. Apetraho amin'ny loharanon'ny karatra fisamborana ny fakan-tsary virtoaly ary atombohy ny fakantsary virtoaly. Ao amin'ny SubZir, safidio ny faritra misy lohateny ary atombohy ny fandikana.",
-  "AddScene": "Ampio dikanteny amin'ny sehatra ankehitriny"
+  "AddScene": "Ampio dikanteny amin'ny sehatra ankehitriny",
+  "Model": "Modely fandikan-teny",
+  "Automatic": "Automatic",
+  "Appearance": "Fisehoan-dohateny",
+  "Font": "Loko soratra sy endritsoratra",
+  "Background": "Loko ambadika",
+  "Opacity": "Ny tsy fahampian'ny background (%)",
+  "Outline": "Fitsipika an-tsoratra",
+  "ModelError": "Tsy nahavita ny fangatahana ny maodely fandikan-teny. Jereo ny runtime/diagnostics.txt."
 }

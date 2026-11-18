@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pasirinkite kalbas",
   "SettingsError": "Nepavyko išsaugoti kalbos nustatymų.",
   "GuideBody": "Įgalinkite angliškus subtitrus žaidime. Prijunkite fiksavimo kortelę prie OBS. Pridėkite subtitrų scenarijų prie žaidimo scenos. Nustatykite virtualios kameros išvestį į fiksavimo kortelės šaltinį ir paleiskite virtualią kamerą. SubZir pasirinkite subtitrų sritį ir pradėkite vertimą.",
-  "AddScene": "Pridėkite subtitrus prie dabartinės scenos"
+  "AddScene": "Pridėkite subtitrus prie dabartinės scenos",
+  "Model": "Vertimo modelis",
+  "Automatic": "Automatinis",
+  "Appearance": "Subtitrų išvaizda",
+  "Font": "Šrifto ir teksto spalva",
+  "Background": "Fono spalva",
+  "Opacity": "Fono neskaidrumas (%)",
+  "Outline": "Teksto kontūras",
+  "ModelError": "Vertimo modelis negalėjo užbaigti užklausos. Žr. runtime/diagnostics.txt."
 }

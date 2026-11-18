@@ -45,5 +45,13 @@
   "ChooseLanguages": "Kgetha maleme",
   "SettingsError": "Ga se ya kgona go boloka dipeakanyo tša polelo.",
   "GuideBody": "Kgontšha ditlhalošo tša ka fasana tša Seisemane papading ya gago. Hokela karete ya hapa ka OBS. Oketša sengwalwa sa sehlogo sa ka fasana go lefelo la papadi. Beakanya ditšweletšwa tša khamera ya go bonagala go mohlodi wa karata ya go tšea gomme o thome khamera ya go bonagala. Ka go SubZir, kgetha lefelo la thaetlele ya ka fasana gomme o thome phetolelo.",
-  "AddScene": "Oketša dithaetlele tša ka fasana go lefelo la bjale"
+  "AddScene": "Oketša dithaetlele tša ka fasana go lefelo la bjale",
+  "Model": "Mohlala wa phetolelo",
+  "Automatic": "E itiriša",
+  "Appearance": "Ponagalo ya sehlogo se senyenyane",
+  "Font": "Fonte le sengwalwa mmala",
+  "Background": "Mmala wa mokokotlo",
+  "Opacity": "Go se bonagale ga morago (%) .",
+  "Outline": "Thulaganyo ya sengwalwa",
+  "ModelError": "Mohlala wa phetolelo o be o sa kgone go phetha kgopelo. Bona nako ya go sepela/diagnostics.txt."
 }

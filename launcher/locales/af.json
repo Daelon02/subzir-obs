@@ -45,5 +45,13 @@
   "ChooseLanguages": "Kies tale",
   "SettingsError": "Kon nie die taalinstellings stoor nie.",
   "GuideBody": "Aktiveer Engelse onderskrifte in jou speletjie. Koppel die vangkaart in OBS. Voeg die onderskrifskrif by die speltoneel. Stel die virtuele kamera-uitset na die opnamekaartbron en begin die virtuele kamera. Kies die subtitelarea in SubZir en begin met vertaling.",
-  "AddScene": "Voeg onderskrifte by die huidige toneel"
+  "AddScene": "Voeg onderskrifte by die huidige toneel",
+  "Model": "Vertaling model",
+  "Automatic": "Outomatiese",
+  "Appearance": "Onderskrif voorkoms",
+  "Font": "Lettertipe en tekskleur",
+  "Background": "Agtergrond kleur",
+  "Opacity": "Agtergrond ondeursigtigheid (%)",
+  "Outline": "Teks uiteensetting",
+  "ModelError": "Die vertaalmodel kon nie die versoek voltooi nie. Sien runtime/diagnostics.txt."
 }

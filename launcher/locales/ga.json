@@ -45,5 +45,13 @@
   "ChooseLanguages": "Roghnaigh teangacha",
   "SettingsError": "Níorbh fhéidir na socruithe teanga a shábháil.",
   "GuideBody": "Cumasaigh fotheidil Bhéarla i do chluiche. Ceangail an cárta gabhála in OBS. Cuir an script fotheideal leis an radharc cluiche. Socraigh an t-aschur ceamara fíorúil chuig foinse an chárta gabhála agus cuir tús leis an gceamara fíorúil. In SubZir, roghnaigh an limistéar fotheideal agus cuir tús leis an aistriúchán.",
-  "AddScene": "Cuir fotheidil leis an radharc reatha"
+  "AddScene": "Cuir fotheidil leis an radharc reatha",
+  "Model": "Múnla aistriúcháin",
+  "Automatic": "Uathoibríoch",
+  "Appearance": "Cuma fotheideal",
+  "Font": "Dath cló agus téacs",
+  "Background": "Dath an chúlra",
+  "Opacity": "Teimhneacht sa chúlra (%)",
+  "Outline": "Imlíne téacs",
+  "ModelError": "Níorbh fhéidir leis an tsamhail aistriúcháin an t-iarratas a chomhlánú. Féach runtime/diagnostics.txt."
 }

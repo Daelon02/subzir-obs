@@ -45,5 +45,13 @@
   "ChooseLanguages": "Escolha idiomas",
   "SettingsError": "Não foi possível salvar as configurações de idioma.",
   "GuideBody": "Ative legendas em inglês no seu jogo. Conecte a placa de captura no OBS. Adicione o script da legenda à cena do jogo. Defina a saída da câmera virtual para a origem da placa de captura e inicie a câmera virtual. No SubZir, selecione a área de legenda e inicie a tradução.",
-  "AddScene": "Adicione legendas à cena atual"
+  "AddScene": "Adicione legendas à cena atual",
+  "Model": "Modelo de tradução",
+  "Automatic": "Automático",
+  "Appearance": "Aparência da legenda",
+  "Font": "Fonte e cor do texto",
+  "Background": "Cor de fundo",
+  "Opacity": "Opacidade do fundo (%)",
+  "Outline": "Esboço do texto",
+  "ModelError": "O modelo de tradução não conseguiu concluir a solicitação. Consulte runtime/diagnostics.txt."
 }

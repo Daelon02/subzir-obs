@@ -45,5 +45,13 @@
   "ChooseLanguages": "Yan awọn ede",
   "SettingsError": "Ko le fi awọn eto ede pamọ.",
   "GuideBody": "Mu awọn atunkọ Gẹẹsi ṣiṣẹ ninu ere rẹ. So kaadi Yaworan ni OBS. Ṣafikun iwe afọwọkọ atunkọ si ibi ere naa. Ṣeto iṣelọpọ kamẹra foju si orisun kaadi Yaworan ki o bẹrẹ kamẹra foju. Ni SubZir, yan agbegbe atunkọ ki o bẹrẹ itumọ.",
-  "AddScene": "Ṣafikun awọn atunkọ si iṣẹlẹ lọwọlọwọ"
+  "AddScene": "Ṣafikun awọn atunkọ si iṣẹlẹ lọwọlọwọ",
+  "Model": "Awoṣe itumọ",
+  "Automatic": "Laifọwọyi",
+  "Appearance": "irisi atunkọ",
+  "Font": "Font ati awọ ọrọ",
+  "Background": "Awọ abẹlẹ",
+  "Opacity": "Aifoju abẹlẹ (%)",
+  "Outline": "Ila ọrọ",
+  "ModelError": "Awoṣe itumọ ko le pari ibeere naa. Wo asiko asiko/diagnostics.txt."
 }

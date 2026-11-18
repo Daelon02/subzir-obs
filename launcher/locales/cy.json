@@ -45,5 +45,13 @@
   "ChooseLanguages": "Dewiswch ieithoedd",
   "SettingsError": "Methu cadw'r gosodiadau iaith.",
   "GuideBody": "Galluogi isdeitlau Saesneg yn eich gêm. Cysylltwch y cerdyn dal yn OBS. Ychwanegwch y sgript is-deitl i olygfa'r gêm. Gosodwch allbwn y camera rhithwir i ffynhonnell y cerdyn dal a chychwyn y camera rhithwir. Yn SubZir, dewiswch yr ardal is-deitl a dechrau cyfieithu.",
-  "AddScene": "Ychwanegu isdeitlau i'r olygfa gyfredol"
+  "AddScene": "Ychwanegu isdeitlau i'r olygfa gyfredol",
+  "Model": "Model cyfieithu",
+  "Automatic": "Awtomatig",
+  "Appearance": "Ymddangosiad is-deitl",
+  "Font": "Lliw ffont a thestun",
+  "Background": "Lliw cefndir",
+  "Opacity": "Anhryloywder cefndir (%)",
+  "Outline": "Amlinelliad testun",
+  "ModelError": "Ni allai'r model cyfieithu gwblhau'r cais. Gweler runtime/diagnostics.txt."
 }

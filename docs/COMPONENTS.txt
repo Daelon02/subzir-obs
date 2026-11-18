@@ -14,3 +14,10 @@ https://huggingface.co/jncraton/m2m100_418M-ct2-int8/tree/7c1b2620a4e58dacecbd8b
 See ../m2m100/README.md and m2m100-LICENSE.txt.
 Language display names derived from Unicode CLDR via Babel (Unicode License v3).
 See unicode-LICENSE.txt. Interface translations include machine-assisted Google Translate text and editorial revisions. The application reads bundled locale files offline.
+
+Optional GPU test pack
+Tencent Hy-MT2-1.8B-Q6_K.gguf, Apache License 2.0.
+https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF/tree/a0c709d9fac510f2c807aa3af52872340dc37a4a
+llama.cpp b11146, MIT, with LLVM OpenMP and NVIDIA CUDA runtime libraries.
+https://github.com/ggml-org/llama.cpp/releases/tag/b11146
+https://docs.nvidia.com/cuda/eula/

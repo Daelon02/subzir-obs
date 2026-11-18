@@ -45,5 +45,13 @@
   "ChooseLanguages": "Suɓo ɗemɗe",
   "SettingsError": "Waawaa hisnude dottaaɗe ɗemngal ngal.",
   "GuideBody": "Softin binndanɗe Engele e nder pijirlooji maa. Jokkondir e kartal nanngugol e nder OBS. Ɓeydu binndol tiitoonde ndee e dingiral pijirlooji ɗii. Seto yaltinnde kamera wirto to iwdi kartal nanngugol e fuɗɗoraade kamera wirto. E nder SubZir, suɓo nokku ɗo tiitoonde ndee woni ɗoo, puɗɗo-ɗaa firo.",
-  "AddScene": "Ɓeydu heen nate (subtitles) e dingiral jooni ngal"
+  "AddScene": "Ɓeydu heen nate (subtitles) e dingiral jooni ngal",
+  "Model": "Model firo",
+  "Automatic": "Otomatik",
+  "Appearance": "Feññinde tiitoonde",
+  "Font": "Font e kala binndol",
+  "Background": "Nokkuure caggal",
+  "Opacity": "Opasite caggal (%)",
+  "Outline": "Sifaa binndol",
+  "ModelError": "Model firo oo waawaano timminde ɗaɓɓaande ndee. Ƴeew waktu dogdu/diagnostics.txt."
 }

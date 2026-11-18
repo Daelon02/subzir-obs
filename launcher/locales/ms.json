@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pilih bahasa",
   "SettingsError": "Tidak dapat menyimpan tetapan bahasa.",
   "GuideBody": "Dayakan sari kata bahasa Inggeris dalam permainan anda. Sambungkan kad tangkapan dalam OBS. Tambahkan skrip sari kata pada adegan permainan. Tetapkan output kamera maya kepada sumber kad tangkapan dan mulakan kamera maya. Dalam SubZir, pilih kawasan sari kata dan mulakan terjemahan.",
-  "AddScene": "Tambahkan sari kata pada adegan semasa"
+  "AddScene": "Tambahkan sari kata pada adegan semasa",
+  "Model": "Model terjemahan",
+  "Automatic": "Automatik",
+  "Appearance": "Penampilan sari kata",
+  "Font": "Warna fon dan teks",
+  "Background": "Warna latar belakang",
+  "Opacity": "Kelegapan latar belakang (%)",
+  "Outline": "Garis besar teks",
+  "ModelError": "Model terjemahan tidak dapat melengkapkan permintaan. Lihat runtime/diagnostics.txt."
 }

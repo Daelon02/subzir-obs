@@ -45,5 +45,13 @@
   "ChooseLanguages": "Izvēlieties valodas",
   "SettingsError": "Nevarēja saglabāt valodas iestatījumus.",
   "GuideBody": "Iespējojiet savā spēlē subtitrus angļu valodā. Pievienojiet uztveršanas karti OBS. Pievienojiet subtitru skriptu spēles ainai. Iestatiet virtuālās kameras izvadi uz uztveršanas kartes avotu un palaidiet virtuālo kameru. Programmā SubZir atlasiet subtitru apgabalu un sāciet tulkošanu.",
-  "AddScene": "Pievienojiet subtitrus pašreizējai ainai"
+  "AddScene": "Pievienojiet subtitrus pašreizējai ainai",
+  "Model": "Tulkošanas modelis",
+  "Automatic": "Automātiski",
+  "Appearance": "Subtitru izskats",
+  "Font": "Fonta un teksta krāsa",
+  "Background": "Fona krāsa",
+  "Opacity": "Fona necaurredzamība (%)",
+  "Outline": "Teksta kontūra",
+  "ModelError": "Tulkošanas modelis nevarēja pabeigt pieprasījumu. Skatiet runtime/diagnostics.txt."
 }

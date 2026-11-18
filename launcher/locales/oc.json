@@ -45,5 +45,13 @@
   "ChooseLanguages": "Causissètz de lengas",
   "SettingsError": "Impossible d'enregistrar los paramètres de lenga.",
   "GuideBody": "Activar los sostítols en anglés dins vòstre jòc. Connectatz la carta de captura dins OBS. Apondre lo guion de sostítols a la scèna del jòc. Definissètz la sortida de la camèra virtuala sus la font de la carta de captura e aviatz la camèra virtuala. Dins SubZir, seleccionatz l'airal de sostítols e començatz la traduccion.",
-  "AddScene": "Ajustar de sostítols a la scèna actuala"
+  "AddScene": "Ajustar de sostítols a la scèna actuala",
+  "Model": "Modèl de traduccion",
+  "Automatic": "Automatic",
+  "Appearance": "Aparéncia dels sostítols",
+  "Font": "Color de poliça e tèxte",
+  "Background": "Color de rèireplan",
+  "Opacity": "Opacitat de fons (%)",
+  "Outline": "Esbòç de tèxte",
+  "ModelError": "Lo modèl de traduccion a pas pogut completar la demanda. Vejatz runtime/diagnostics.txt."
 }

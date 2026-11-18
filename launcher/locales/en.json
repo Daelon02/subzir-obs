@@ -45,5 +45,13 @@
   "ChooseLanguages": "Choose languages",
   "SettingsError": "Could not save the language settings.",
   "GuideBody": "Enable English subtitles in your game. Connect the capture card in OBS. Add the subtitle script to the game scene. Set the virtual camera output to the capture card source and start the virtual camera. In SubZir, select the subtitle area and start translation.",
-  "AddScene": "Add subtitles to the current scene"
+  "AddScene": "Add subtitles to the current scene",
+  "Model": "Translation model",
+  "Automatic": "Automatic",
+  "Appearance": "Subtitle appearance",
+  "Font": "Font and text color",
+  "Background": "Background color",
+  "Opacity": "Background opacity (%)",
+  "Outline": "Text outline",
+  "ModelError": "The translation model could not complete the request. See runtime/diagnostics.txt."
 }

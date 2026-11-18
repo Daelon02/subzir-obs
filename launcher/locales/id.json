@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pilih bahasa",
   "SettingsError": "Tidak dapat menyimpan pengaturan bahasa.",
   "GuideBody": "Aktifkan subtitle bahasa Inggris di game Anda. Hubungkan kartu pengambilan di OBS. Tambahkan skrip subtitle ke adegan permainan. Atur output kamera virtual ke sumber kartu pengambilan dan mulai kamera virtual. Di SubZir, pilih area subtitle dan mulai terjemahan.",
-  "AddScene": "Tambahkan subtitle ke adegan saat ini"
+  "AddScene": "Tambahkan subtitle ke adegan saat ini",
+  "Model": "Model terjemahan",
+  "Automatic": "Otomatis",
+  "Appearance": "Tampilan subtitle",
+  "Font": "Warna font dan teks",
+  "Background": "Warna latar belakang",
+  "Opacity": "Opasitas latar belakang (%)",
+  "Outline": "Garis besar teks",
+  "ModelError": "Model terjemahan tidak dapat menyelesaikan permintaan. Lihat waktu proses/diagnostics.txt."
 }

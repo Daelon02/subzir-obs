@@ -8,7 +8,7 @@ class LanguageDialog : Form {
     public string InterfaceCode { get { return (string)language.SelectedValue; } }
     public string TargetCode { get { return (string)target.SelectedValue; } }
 
-    public LanguageDialog() {
+    public LanguageDialog(bool lockTarget=false) {
         Font = new Font("Segoe UI",10);
         Text = Ui.Get(Msg.ChooseLanguages);
         StartPosition = FormStartPosition.CenterParent;
@@ -19,6 +19,7 @@ class LanguageDialog : Form {
         RightToLeftLayout = Ui.IsRtl;
         AddList(language,Msg.Interface,Ui.Language,16);
         AddList(target,Msg.Target,Ui.Target,92);
+        target.Enabled=!lockTarget;
         var cancel = new Button {Text=Ui.Get(Msg.Cancel), DialogResult=DialogResult.Cancel};
         var apply = new Button {Text=Ui.Get(Msg.Apply), DialogResult=DialogResult.OK};
         cancel.SetBounds(18,184,214,39); apply.SetBounds(249,184,220,39);

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Choisir des langues",
   "SettingsError": "Impossible d'enregistrer les paramètres de langue.",
   "GuideBody": "Activez les sous-titres anglais dans le jeu. Ajoutez la carte de capture à OBS et le script de sous-titres à la scène. Sélectionnez la carte comme source de la caméra virtuelle, puis démarrez la caméra. Dans SubZir, encadrez les sous-titres et lancez la traduction.",
-  "AddScene": "Ajouter des sous-titres à la scène actuelle"
+  "AddScene": "Ajouter des sous-titres à la scène actuelle",
+  "Model": "Modèle de traduction",
+  "Automatic": "Automatique",
+  "Appearance": "Apparition des sous-titres",
+  "Font": "Couleur de la police et du texte",
+  "Background": "Couleur de fond",
+  "Opacity": "Opacité de l'arrière-plan (%)",
+  "Outline": "Aperçu du texte",
+  "ModelError": "Le modèle de traduction n'a pas pu répondre à la demande. Voir runtime/diagnostics.txt."
 }

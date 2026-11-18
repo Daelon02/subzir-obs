@@ -45,5 +45,13 @@
   "ChooseLanguages": "Dooro luqado",
   "SettingsError": "Ma kaydin kari waayay habaynta luqadda",
   "GuideBody": "Daar qoraal-hoosaadyada Ingiriisiga ciyaartaada. Ku xidh kaadhka qabashada gudaha OBS. Ku dar qoraalka hoosaadka goobta ciyaarta Deji wax soo saarka kamarada farsamada isha kaadhka qabashada oo bilow kamarada farsamada Gudaha SubZir, dooro aagga qoraal-hoosaadka oo billow tarjumaada.",
-  "AddScene": "Ku dar qoraal hoosaadyo goobta hadda taagan"
+  "AddScene": "Ku dar qoraal hoosaadyo goobta hadda taagan",
+  "Model": "Qaabka turjumaada",
+  "Automatic": "Toos ah",
+  "Appearance": "Muuqaalka hoosaadka",
+  "Font": "Farta iyo midabka qoraalka",
+  "Background": "Midabka asalka",
+  "Opacity": "mugdiga asalka ah (%)",
+  "Outline": "dulmar qoraalka",
+  "ModelError": "Qaabka tarjumaada ayaa buuxin kara codsiga Eeg runtime/diagnostics.txt."
 }

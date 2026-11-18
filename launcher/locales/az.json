@@ -45,5 +45,13 @@
   "ChooseLanguages": "Dilləri seçin",
   "SettingsError": "Dil parametrlərini saxlamaq mümkün olmadı.",
   "GuideBody": "Oyununuzda ingiliscə subtitrləri aktivləşdirin. Çəkmə kartını OBS-də birləşdirin. Altyazı skriptini oyun səhnəsinə əlavə edin. Virtual kamera çıxışını çəkmə kartı mənbəyinə təyin edin və virtual kameranı işə salın. SubZir-də altyazı sahəsini seçin və tərcüməyə başlayın.",
-  "AddScene": "Cari səhnəyə subtitrlər əlavə edin"
+  "AddScene": "Cari səhnəyə subtitrlər əlavə edin",
+  "Model": "Tərcümə modeli",
+  "Automatic": "Avtomatik",
+  "Appearance": "Altyazı görünüşü",
+  "Font": "Şrift və mətn rəngi",
+  "Background": "Fon rəngi",
+  "Opacity": "Fon qeyri-şəffaflığı (%)",
+  "Outline": "Mətn kontur",
+  "ModelError": "Tərcümə modeli sorğunu tamamlaya bilmədi. runtime/diagnostics.txt-ə baxın."
 }

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pumili ng mga wika",
   "SettingsError": "Hindi ma-save ang mga setting ng wika.",
   "GuideBody": "Paganahin ang English subtitle sa iyong laro. Ikonekta ang capture card sa OBS. Idagdag ang subtitle script sa eksena ng laro. Itakda ang virtual camera output sa capture card source at simulan ang virtual camera. Sa SubZir, piliin ang lugar ng subtitle at simulan ang pagsasalin.",
-  "AddScene": "Magdagdag ng mga subtitle sa kasalukuyang eksena"
+  "AddScene": "Magdagdag ng mga subtitle sa kasalukuyang eksena",
+  "Model": "Modelo ng pagsasalin",
+  "Automatic": "Awtomatiko",
+  "Appearance": "Subtitle na hitsura",
+  "Font": "Kulay ng font at teksto",
+  "Background": "Kulay ng background",
+  "Opacity": "Opacity ng background (%)",
+  "Outline": "Balangkas ng teksto",
+  "ModelError": "Hindi makumpleto ng modelo ng pagsasalin ang kahilingan. Tingnan ang runtime/diagnostics.txt."
 }

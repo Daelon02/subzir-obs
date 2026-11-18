@@ -45,5 +45,13 @@
   "ChooseLanguages": "选择语言",
   "SettingsError": "无法保存语言设置。",
   "GuideBody": "在游戏中开启英文字幕。在 OBS 中添加采集卡，并将字幕脚本添加到游戏场景。将虚拟摄像头的输出设为采集卡来源，然后启动虚拟摄像头。在 SubZir 中框选字幕区域并开始翻译。",
-  "AddScene": "为当前场景添加字幕"
+  "AddScene": "为当前场景添加字幕",
+  "Model": "翻译模型",
+  "Automatic": "自动",
+  "Appearance": "字幕外观",
+  "Font": "字体和文字颜色",
+  "Background": "背景颜色",
+  "Opacity": "背景不透明度 (%)",
+  "Outline": "文字大纲",
+  "ModelError": "翻译模型无法完成请求。请参阅运行时/diagnostics.txt。"
 }

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pilih basa",
   "SettingsError": "Teu bisa nyimpen setelan basa.",
   "GuideBody": "Aktipkeun terjemahan basa Inggris dina kaulinan Anjeun. Sambungkeun kartu newak dina OBS. Tambahkeun naskah subjudul ka pamandangan kaulinan. Setel kaluaran kaméra virtual ka sumber kartu newak tur mimitian kaméra virtual. Dina SubZir, pilih wewengkon subjudul tur mimitian tarjamah.",
-  "AddScene": "Tambahkeun subjudul kana adegan ayeuna"
+  "AddScene": "Tambahkeun subjudul kana adegan ayeuna",
+  "Model": "Modél tarjamahan",
+  "Automatic": "Otomatis",
+  "Appearance": "Penampilan subjudul",
+  "Font": "Font sareng warna téks",
+  "Background": "Warna latar",
+  "Opacity": "Opacity latar tukang (%)",
+  "Outline": "outline téks",
+  "ModelError": "Modél tarjamahan teu tiasa ngalengkepan pamundut. Tempo runtime/diagnostics.txt."
 }

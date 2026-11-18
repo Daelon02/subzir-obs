@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pilih basa",
   "SettingsError": "Ora bisa nyimpen setelan basa.",
   "GuideBody": "Aktifake subtitle Inggris ing game sampeyan. Sambungake kertu jupuk ing OBS. Tambah script subtitle kanggo pemandangan game. Setel output kamera virtual menyang sumber kertu jupuk lan miwiti kamera virtual. Ing SubZir, pilih area subtitle lan miwiti terjemahan.",
-  "AddScene": "Tambah subtitle menyang pemandangan saiki"
+  "AddScene": "Tambah subtitle menyang pemandangan saiki",
+  "Model": "Model terjemahan",
+  "Automatic": "otomatis",
+  "Appearance": "Penampilan subtitle",
+  "Font": "Warna font lan teks",
+  "Background": "Werna latar mburi",
+  "Opacity": "Opacity latar mburi (%)",
+  "Outline": "Garis teks",
+  "ModelError": "Model terjemahan ora bisa ngrampungake panjaluk kasebut. Waca runtime/diagnostics.txt."
 }

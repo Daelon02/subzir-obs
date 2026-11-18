@@ -77,6 +77,13 @@ pub struct Stabilizer {
 }
 
 impl Stabilizer {
+    pub fn first_candidate(&self) -> Option<&str> {
+        self.pending
+            .as_ref()
+            .filter(|p| p.hits == 1)
+            .map(|p| p.best.text.as_str())
+    }
+
     pub fn observe(&mut self, text: &str, now: Instant) -> Option<String> {
         let reading = Reading::new(text);
         if reading.key.is_empty() {
@@ -143,6 +150,26 @@ impl Stabilizer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn a_single_reading_can_start_translation_but_cannot_publish() {
+        let mut stable = Stabilizer::default();
+        let now = Instant::now();
+        assert_eq!(stable.observe("one", now), None);
+        assert_eq!(stable.first_candidate(), Some("one"));
+        assert_eq!(stable.observe("", now + Duration::from_millis(100)), None);
+        assert_eq!(stable.first_candidate(), None);
+        assert_eq!(
+            stable.observe("two", now + Duration::from_millis(200)),
+            None
+        );
+        assert_eq!(
+            stable
+                .observe("two", now + Duration::from_millis(300))
+                .as_deref(),
+            Some("two")
+        );
+        assert_eq!(stable.first_candidate(), None);
+    }
     #[test]
     fn holds_a_misread_and_clears_on_sustained_silence() {
         let mut s = Stabilizer::default();

@@ -45,5 +45,13 @@
   "ChooseLanguages": "Vyberte jazyky",
   "SettingsError": "Nastavení jazyka nelze uložit.",
   "GuideBody": "Povolte ve své hře anglické titulky. Připojte snímací kartu v OBS. Přidejte skript titulků na herní scénu. Nastavte výstup virtuální kamery na zdroj snímací karty a spusťte virtuální kameru. V SubZir vyberte oblast titulků a spusťte překlad.",
-  "AddScene": "Přidejte titulky k aktuální scéně"
+  "AddScene": "Přidejte titulky k aktuální scéně",
+  "Model": "Překladový model",
+  "Automatic": "Automaticky",
+  "Appearance": "Vzhled titulků",
+  "Font": "Barva písma a textu",
+  "Background": "Barva pozadí",
+  "Opacity": "Neprůhlednost pozadí (%)",
+  "Outline": "Obrys textu",
+  "ModelError": "Model překladu nemohl dokončit požadavek. Viz runtime/diagnostics.txt."
 }

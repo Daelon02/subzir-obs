@@ -41,3 +41,13 @@ Troubleshooting
 • After a launch failure, look in runtime/diagnostics.txt for details.
 • If a language shows missing glyphs, install its supplemental Windows
   fonts and select a font supporting that script in the OBS text source.
+
+MODEL AND SUBTITLE APPEARANCE
+Before starting, open the translation model list. Automatic uses QuickMT for
+Ukrainian. Choose M2M100 to compare or try Hy-MT2 on an NVIDIA GPU when its
+pack is installed and the target language is supported. Stop translation to
+switch models. The launcher remembers your selection.
+Open Subtitle appearance to change the font, size, color, background, opacity
+and outline. Click Apply to see the result in OBS. When switching builds,
+replace the script under Tools → Scripts with OBS/PS5-Subtitles.lua from
+the folder containing the new launcher.

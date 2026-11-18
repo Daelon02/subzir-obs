@@ -45,5 +45,13 @@
   "ChooseLanguages": "Chagua lugha",
   "SettingsError": "Haikuweza kuhifadhi mipangilio ya lugha.",
   "GuideBody": "Washa manukuu ya Kiingereza kwenye mchezo wako. Unganisha kadi ya kunasa kwenye OBS. Ongeza maandishi ya manukuu kwenye eneo la mchezo. Weka pato la kamera pepe kwenye chanzo cha kadi ya kunasa na uanzishe kamera pepe. Katika SubZir, chagua eneo la manukuu na uanze kutafsiri.",
-  "AddScene": "Ongeza manukuu kwenye tukio la sasa"
+  "AddScene": "Ongeza manukuu kwenye tukio la sasa",
+  "Model": "Muundo wa tafsiri",
+  "Automatic": "Otomatiki",
+  "Appearance": "Muonekano wa manukuu",
+  "Font": "Rangi ya herufi na maandishi",
+  "Background": "Rangi ya usuli",
+  "Opacity": "Ufinyu wa mandharinyuma (%)",
+  "Outline": "Muhtasari wa maandishi",
+  "ModelError": "Muundo wa tafsiri haukuweza kukamilisha ombi. Angalia runtime/diagnostics.txt."
 }

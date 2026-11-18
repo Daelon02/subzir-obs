@@ -45,5 +45,13 @@
   "ChooseLanguages": "Khetsa tilwimi",
   "SettingsError": "Ayikhoni kugcina emasethingi elulwimi.",
   "GuideBody": "Nika emandla imibhalo lephansi yesiNgisi emdlalweni wakho. Xhuma ikhadi lokubamba ku OBS. Faka umbhalo wesihloko lesincane esimeni semdlalo. Setha umphumela wekhamera lebonakalako kumtfombo welikhadi lekubamba bese ucala ikhamera lebonakalako. Ku-SubZir, khetsa indzawo yesihloko lesincane bese ucala kuhumusha.",
-  "AddScene": "Ngeta imibhalo lephansi kulendzawo lekhona nyalo"
+  "AddScene": "Ngeta imibhalo lephansi kulendzawo lekhona nyalo",
+  "Model": "Imodeli yekuhumusha",
+  "Automatic": "Kuzenzakalelayo",
+  "Appearance": "Kubukeka kwesihloko lesincane",
+  "Font": "Libala lefonti kanye nembhalo",
+  "Background": "Umbala wangemuva",
+  "Opacity": "Kungabonakali kwemlandvo (%)",
+  "Outline": "Luhlaka lwembhalo",
+  "ModelError": "Imodeli yekuhumusha ayikwatanga kucedza lesicelo. Bona sikhatsi sekugijima/kuhlola.txt."
 }

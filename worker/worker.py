@@ -217,11 +217,17 @@ def main():
         except (FileNotFoundError, ValueError, AttributeError):
             return "uk"
 
+    selected_model = os.environ.get("SUB_MODEL", "auto")
+    if selected_model not in ("auto", "quickmt", "m2m100"):
+        raise ValueError("Unknown translation model")
+
     def render(original, resolved, code):
         nonlocal multi, tokenizer
+        if selected_model == "quickmt" and code != "uk":
+            raise ValueError("QuickMT EN-UK requires Ukrainian output")
         if code == "en":
             return original
-        if code == "uk":
+        if code == "uk" and selected_model != "m2m100":
             return translate(resolved)
         if multi is None:
             directory = app / "m2m100"
@@ -233,7 +239,7 @@ def main():
         return tokenizer.decode(result[0].hypotheses[0][1:]).strip()
 
     render("Ready.", "Ready.", target_language())
-    print(json.dumps({"device": "CPU", "model": "QuickMT / M2M100",
+    print(json.dumps({"device": "CPU", "model": selected_model,
                       "precision": model.compute_type, "beam": beam}), flush=True)
     dialogue = DialogueContext()
     for line in sys.stdin:

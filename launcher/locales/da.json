@@ -45,5 +45,13 @@
   "ChooseLanguages": "Vælg sprog",
   "SettingsError": "Kunne ikke gemme sprogindstillingerne.",
   "GuideBody": "Aktiver engelske undertekster i dit spil. Tilslut capture-kortet i OBS. Tilføj undertekstscriptet til spilscenen. Indstil det virtuelle kameraudgang til optagelseskortkilden, og start det virtuelle kamera. I SubZir skal du vælge undertekstområdet og starte oversættelsen.",
-  "AddScene": "Tilføj undertekster til den aktuelle scene"
+  "AddScene": "Tilføj undertekster til den aktuelle scene",
+  "Model": "Oversættelsesmodel",
+  "Automatic": "Automatisk",
+  "Appearance": "Undertekst udseende",
+  "Font": "Font og tekstfarve",
+  "Background": "Baggrundsfarve",
+  "Opacity": "Baggrundsgennemsigtighed (%)",
+  "Outline": "Tekst omrids",
+  "ModelError": "Oversættelsesmodellen kunne ikke fuldføre anmodningen. Se runtime/diagnostics.txt."
 }

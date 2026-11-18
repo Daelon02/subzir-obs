@@ -19,7 +19,7 @@ Translate English subtitles from a game running on your Windows PC or from a con
 
 **Where will I see the translation while playing on PC?** The game window shows its original subtitles. The OBS scene shows the translated overlay, even with streaming and recording turned off. To see that scene full screen, right-click it in the **Scenes** list, choose **Open Scene Projector** and select a monitor. If you have two monitors, you can keep the game focused on one and the translated view on the other.
 
-Requires Windows 10/11 x64, Windows English OCR and OBS Studio. Both models run locally on the CPU. English and Ukrainian have edited interface text. The other localizations are machine-assisted and their quality varies. Some scripts require supplemental Windows fonts. [Player guide and troubleshooting](docs/PLAYER-EN.txt) · [Supported languages](launcher/languages.json)
+Requires Windows 10/11 x64, Windows English OCR and OBS Studio. The v0.2.0 release includes two local CPU models. English and Ukrainian have edited interface text. The other localizations are machine-assisted and their quality varies. Some scripts require supplemental Windows fonts. [Player guide and troubleshooting](docs/PLAYER-EN.txt) · [Supported languages](launcher/languages.json)
 
 ![SubZir launcher in English](docs/images/launcher-en.png)
 
@@ -46,6 +46,14 @@ SubZir зчитує англійські субтитри з гри на ПК а
 
 ## For developers / Для розробників
 
+### Model and appearance controls in the test build
+
+Open **Translation model** before starting translation. **Automatic** uses QuickMT for Ukrainian and M2M100 for the other translated languages. You can also choose M2M100 for Ukrainian. With the optional CUDA pack installed, supported languages also offer **Hy-MT2 1.8B Q6_K**. Stop translation to change models. **Subtitle appearance** lets you change the font, size, text color, background, opacity and outline while viewing the scene. Load the Lua script from the same folder as the launcher. [RTX 3080 comparison and sample translations](docs/benchmarks/RTX3080-EN.md)
+
+У тестовій збірці відкрийте **Модель перекладу** перед початком гри. В автоматичному режимі для української працює QuickMT. Вручну можна вибрати M2M100 або, за наявності пакета CUDA, Hy-MT2. Щоб змінити модель під час гри, зупиніть переклад. Кнопка **Вигляд субтитрів** дозволяє під час перекладу змінювати шрифт, розмір, колір, тло, непрозорість і контур. Для цього завантажте в OBS скрипт Lua з папки цієї збірки. [Порівняння на RTX 3080 і приклади перекладу](docs/benchmarks/RTX3080-UK.md)
+
+### Build on Windows
+
 Rust runs the capture, OCR, stability filter and overlay timing. The WinForms launcher writes both language choices to `runtime/languages.json`. The Python worker checks the target on each new input. It reuses the loaded CTranslate2 model across lines. The OBS Lua script updates a text source. Set `SUB_TARGET` to a code from `launcher/languages.json` to override the subtitle language when running the worker directly.
 
 On Windows, install Rust MSVC and Visual Studio C++ Build Tools. Extract the **v0.2.0** Windows bundle to a test directory to supply embedded Python, FFmpeg and both model directories. From the repository root run the following commands.
@@ -56,6 +64,8 @@ cargo build --release --locked
 ```
 
 Для перевірки змін розпакуйте комплект v0.2.0, виконайте наведені команди й запустіть **SubZir.exe** у тестовій папці. Натисніть **Перевірити переклад**. Локалізації містяться в `launcher/locales`. Перелік кодів відповідає мовним токенам моделі. [Вимірювання та дані](docs/benchmarks/PS5-UK.md) · [Model and runtime notices](docs/COMPONENTS.txt)
+
+To enable the optional GPU model in a developer build, create `app/hy-runtime` in the extracted bundle. Put `llama-server.exe`, its Windows x64 CUDA 12 DLLs, the matching CUDA runtime DLLs and `Hy-MT2-1.8B-Q6_K.gguf` together in that folder. The tested model has SHA-256 `d98fe604dec1f28f58f80d7d560f7177e584d3b8e5835862687660e5ff97cb40`. Relaunch SubZir and select a supported target language. [llama.cpp b11146 and CUDA libraries](https://github.com/ggml-org/llama.cpp/releases/tag/b11146) · [Pinned model files](https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF/tree/a0c709d9fac510f2c807aa3af52872340dc37a4a)
 
 ## License / Ліцензія
 

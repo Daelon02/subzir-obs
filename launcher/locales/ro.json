@@ -45,5 +45,13 @@
   "ChooseLanguages": "Alegeți limbile",
   "SettingsError": "Nu s-au putut salva setările de limbă.",
   "GuideBody": "Activează subtitrarea în engleză în jocul tău. Conectați cardul de captură în OBS. Adăugați scriptul de subtitrare la scena jocului. Setați ieșirea camerei virtuale la sursa cardului de captură și porniți camera virtuală. În SubZir, selectați zona de subtitrare și începeți traducerea.",
-  "AddScene": "Adăugați subtitrări la scena curentă"
+  "AddScene": "Adăugați subtitrări la scena curentă",
+  "Model": "Model de traducere",
+  "Automatic": "automată",
+  "Appearance": "Apariția subtitrarilor",
+  "Font": "Culoarea fontului și a textului",
+  "Background": "Culoare de fundal",
+  "Opacity": "Opacitatea fundalului (%)",
+  "Outline": "Contur text",
+  "ModelError": "Modelul de traducere nu a putut finaliza solicitarea. Consultați runtime/diagnostics.txt."
 }

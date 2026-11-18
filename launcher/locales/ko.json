@@ -45,5 +45,13 @@
   "ChooseLanguages": "언어 선택",
   "SettingsError": "언어 설정을 저장할 수 없습니다.",
   "GuideBody": "게임에서 영어 자막을 활성화하세요. OBS에 캡쳐카드를 연결합니다. 게임 장면에 자막 스크립트를 추가합니다. 가상 카메라 출력을 캡처 카드 소스로 설정하고 가상 카메라를 시작합니다. SubZir에서 자막 영역을 선택하고 번역을 시작하세요.",
-  "AddScene": "현재 장면에 자막 추가"
+  "AddScene": "현재 장면에 자막 추가",
+  "Model": "번역 모델",
+  "Automatic": "자동",
+  "Appearance": "자막 등장",
+  "Font": "글꼴 및 텍스트 색상",
+  "Background": "배경색",
+  "Opacity": "배경 불투명도(%)",
+  "Outline": "텍스트 개요",
+  "ModelError": "번역 모델이 요청을 완료할 수 없습니다. 런타임/diagnostics.txt를 참조하세요."
 }

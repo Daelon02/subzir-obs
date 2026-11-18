@@ -45,5 +45,13 @@
   "ChooseLanguages": "Tlhopha dipuo",
   "SettingsError": "Ga e kgone go boloka dipeakanyo tsa puo.",
   "GuideBody": "Kgontsha ditlhaloso tsa Seesemane mo motshamekong wa gago. Golaganya karata ya go tshwara mo OBS. Tsenya sekwalwa sa setlhogo se se kwa tlase mo tiragalong ya motshameko. Seta dipholo tsa khamera ya mmatota mo motsweding wa karata ya go tshwara mme o simolole khamera ya mmatota. Mo SubZir, tlhopha lefelo la setlhogwana o bo o simolola thanolo.",
-  "AddScene": "Tsenya ditlhaloso mo tiragalong ya ga jaana"
+  "AddScene": "Tsenya ditlhaloso mo tiragalong ya ga jaana",
+  "Model": "Mmotlolo wa thanolo",
+  "Automatic": "Go itirisa",
+  "Appearance": "Ponagalo ya setlhogo",
+  "Font": "Fonte le mmala wa mafoko",
+  "Background": "Mmala wa lemorago",
+  "Opacity": "Go sa bonale ga lemorago (%)",
+  "Outline": "Tlhaloso ya mokwalo",
+  "ModelError": "Mofuta wa thanolo ga o a kgona go wetsa kopo. Bona nako ya go dira/ditlhatlhobo.txt."
 }

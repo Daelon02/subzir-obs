@@ -45,5 +45,13 @@
   "ChooseLanguages": "Trieu idiomes",
   "SettingsError": "No s'ha pogut desar la configuració d'idioma.",
   "GuideBody": "Activa els subtítols en anglès al teu joc. Connecteu la targeta de captura a OBS. Afegiu el guió de subtítols a l'escena del joc. Configureu la sortida de la càmera virtual a la font de la targeta de captura i inicieu la càmera virtual. A SubZir, seleccioneu l'àrea de subtítols i comenceu la traducció.",
-  "AddScene": "Afegeix subtítols a l'escena actual"
+  "AddScene": "Afegeix subtítols a l'escena actual",
+  "Model": "Model de traducció",
+  "Automatic": "Automàtic",
+  "Appearance": "Aparició de subtítols",
+  "Font": "Color de lletra i text",
+  "Background": "Color de fons",
+  "Opacity": "Opacitat de fons (%)",
+  "Outline": "Esquema de text",
+  "ModelError": "El model de traducció no ha pogut completar la sol·licitud. Vegeu runtime/diagnostics.txt."
 }

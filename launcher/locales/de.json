@@ -45,5 +45,13 @@
   "ChooseLanguages": "Sprachen auswählen",
   "SettingsError": "Die Spracheinstellungen konnten nicht gespeichert werden.",
   "GuideBody": "Aktivieren Sie englische Untertitel in Ihrem Spiel. Schließen Sie die Capture-Karte in OBS an. Fügen Sie das Untertitelskript zur Spielszene hinzu. Stellen Sie den Ausgang der virtuellen Kamera auf die Aufnahmekartenquelle ein und starten Sie die virtuelle Kamera. Wählen Sie in SubZir den Untertitelbereich aus und starten Sie die Übersetzung.",
-  "AddScene": "Fügen Sie der aktuellen Szene Untertitel hinzu"
+  "AddScene": "Fügen Sie der aktuellen Szene Untertitel hinzu",
+  "Model": "Übersetzungsmodell",
+  "Automatic": "Automatisch",
+  "Appearance": "Untertitel-Erscheinung",
+  "Font": "Schriftart und Textfarbe",
+  "Background": "Hintergrundfarbe",
+  "Opacity": "Hintergrundopazität (%)",
+  "Outline": "Textgliederung",
+  "ModelError": "Das Übersetzungsmodell konnte die Anfrage nicht abschließen. Siehe runtime/diagnostics.txt."
 }

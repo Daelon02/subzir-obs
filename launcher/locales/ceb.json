@@ -45,5 +45,13 @@
   "ChooseLanguages": "Pagpili og mga pinulongan",
   "SettingsError": "Dili ma-save ang mga setting sa lengguwahe.",
   "GuideBody": "I-enable ang English nga mga subtitle sa imong dula. Ikonektar ang capture card sa OBS. Idugang ang subtitle nga script sa talan-awon sa dula. Ibutang ang virtual camera nga output sa capture card source ug sugdi ang virtual camera. Sa SubZir, pilia ang subtitle nga lugar ug sugdi ang paghubad.",
-  "AddScene": "Idugang ang mga subtitle sa karon nga talan-awon"
+  "AddScene": "Idugang ang mga subtitle sa karon nga talan-awon",
+  "Model": "Modelo sa paghubad",
+  "Automatic": "Awtomatiko",
+  "Appearance": "Subtitle nga panagway",
+  "Font": "Font ug kolor sa teksto",
+  "Background": "Kolor sa background",
+  "Opacity": "Opacity sa background (%)",
+  "Outline": "Outline sa teksto",
+  "ModelError": "Ang modelo sa paghubad dili makakompleto sa hangyo. Tan-awa ang runtime/diagnostics.txt."
 }
