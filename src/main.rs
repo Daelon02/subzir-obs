@@ -2,7 +2,7 @@ mod dialogue;
 mod legend;
 mod stability;
 mod zones;
-use dialogue::DialogueHistory;
+use dialogue::{Card, DialogueHistory};
 use serde_json::{json, Value};
 use stability::{Observation, Stabilizer};
 use std::{
@@ -28,6 +28,13 @@ use windows::{
 };
 const WIDTH: i32 = 960;
 const HEIGHT: i32 = 144;
+const CAPTURE_FPS: u8 = 15;
+fn capture_fps() -> u8 {
+    match env::var("SUB_CAPTURE_FPS").as_deref() {
+        Ok("10") => 10,
+        _ => CAPTURE_FPS,
+    }
+}
 const FRAME_BYTES: usize = (WIDTH * HEIGHT) as usize;
 const POLL: Duration = Duration::from_millis(2);
 const ACK_LIMIT: Duration = Duration::from_millis(700);
@@ -317,7 +324,7 @@ fn ms(t: Instant) -> f64 {
 fn capture(
     tx: mpsc::Sender<Result<Line>>,
     speculate: bool,
-    mut history: Option<DialogueHistory>,
+    mut history: DialogueHistory,
 ) -> Result<()> {
     let ocr = engine()?;
     let device = setting("SUB_DEVICE")?;
@@ -330,10 +337,11 @@ fn capture(
     if dims.len() != 4 || dims[0] == 0 || dims[1] == 0 {
         return Err(AppError::Config("Invalid crop".into()));
     }
-    // Sample at about 10 Hz before scaling. Keep the original for dim or coloured text.
+    // Sample before scaling. Keep the original for dim or coloured text.
     // Expand the bright red channel: white strokes stand out against blue snow.
     let filter = format!(
-        r"select=isnan(prev_selected_t)+gte(t-prev_selected_t\,0.095),crop={roi},split[raw][color];[raw]scale={WIDTH}:{HEIGHT},format=gray[gray];[color]format=gbrp,extractplanes=r,lut=y=clip((val-165)*5\,0\,255),scale={WIDTH}:{HEIGHT},format=gray[bright];[gray][bright]vstack"
+        r"fps={},crop={roi},split[raw][color];[raw]scale={WIDTH}:{HEIGHT},format=gray[gray];[color]format=gbrp,extractplanes=r,lut=y=clip((val-165)*5\,0\,255),scale={WIDTH}:{HEIGHT},format=gray[bright];[gray][bright]vstack",
+        capture_fps()
     );
     let mut child = OwnedChild(
         Command::new("ffmpeg")
@@ -414,32 +422,24 @@ fn capture(
         }
         let event = match stable.observe(&reading, start) {
             Observation::Held => {
-                if let Some(history) = history.as_mut() {
-                    history.visible(start);
-                }
+                history.visible(start);
                 None
             }
-            Observation::Revised(text) => {
-                if let Some(history) = history.as_mut() {
-                    history.discard_last_version();
-                }
-                Some((Stage::Confirmed, text))
-            }
-            Observation::Confirmed(text) => Some((Stage::Confirmed, text)),
-            Observation::Cleared => Some((Stage::Confirmed, String::new())),
+            Observation::Revised(text) => Some((Stage::Confirmed, Card::Revised, text)),
+            Observation::Confirmed(text) => Some((Stage::Confirmed, Card::New, text)),
+            Observation::Cleared => Some((Stage::Confirmed, Card::New, String::new())),
             Observation::Pending if speculate => stable
                 .first_candidate()
-                .map(|s| (Stage::Draft, s.to_owned())),
+                .map(|s| (Stage::Draft, Card::Draft, s.to_owned())),
             Observation::Pending => None,
         };
-        if let Some((stage, text)) = event {
-            let context = history.as_mut().map_or_else(String::new, |history| {
-                let context = history.previous(start);
-                if stage == Stage::Confirmed {
-                    history.confirm(&text, start);
-                }
-                context
-            });
+        let ready = match event {
+            Some((stage, kind, raw)) => history.present(raw, start, kind).map(|pair| (stage, pair)),
+            None => history
+                .due(&reading, start)
+                .map(|pair| (Stage::Confirmed, pair)),
+        };
+        if let Some((stage, (text, context))) = ready {
             let line = Line {
                 stage,
                 context,
@@ -458,10 +458,7 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
     let check_obs = env::var("SUB_ACK").is_ok_and(|v| v == "1");
     let (tx, rx) = mpsc::channel();
     let speculate = worker.hy_server.is_some() && env::var("SUB_EARLY").as_deref() != Ok("0");
-    let history = worker
-        .hy_server
-        .as_ref()
-        .map(|_| DialogueHistory::default());
+    let history = DialogueHistory::default();
     thread::spawn(move || {
         if let Err(e) = capture(tx.clone(), speculate, history) {
             let _ = tx.send(Err(e));
@@ -586,15 +583,13 @@ fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> 
         }
         let ocr_ms = ms(start);
         let tr = Instant::now();
-        let uk = if en.is_empty() {
+        let (source, context) = history.card(en.to_owned(), start, Card::New);
+        let uk = if source.is_empty() {
             String::new()
         } else if worker.hy_server.is_some() {
-            let context = history.previous(start);
-            let translated = worker.request(&json!({"text":en,"previous":context}))?;
-            history.confirm(&en, start);
-            translated
+            worker.request(&json!({"text":source,"previous":context}))?
         } else {
-            worker.translate(&en)?
+            worker.translate(&source)?
         };
         let translation_ms = ms(tr);
         let id = out.publish(&uk)?;
@@ -606,7 +601,7 @@ fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> 
         };
         println!(
             "{}",
-            json!({"case":i,"expected":expected,"en":en,"uk":uk,"ocr_ms":ocr_ms,"translation_ms":translation_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
+            json!({"case":i,"expected":expected,"en":en,"source":source,"uk":uk,"ocr_ms":ocr_ms,"translation_ms":translation_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
         );
     }
     Ok(())

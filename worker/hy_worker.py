@@ -9,6 +9,27 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, ProxyHandler, build_opener
 
 MIN_ECHO_LENGTH = 8
+SUBJECTLESS_STATEMENT = re.compile(r"(?:wanna|gotta|gonna)\b[^.?!]*\.\s*$", re.I)
+SPEAKER_LINE = re.compile(r"([^\W\d_][\w .’'-]{0,35}):\s+(.+)", re.UNICODE)
+SUBJECT_PERSON = {"she":"third-person feminine singular", "he":"third-person masculine singular",
+                  "we":"first-person plural", "i":"first-person singular", "you":"second person"}
+
+
+def dialogue_source(text):
+    speaker = SPEAKER_LINE.fullmatch(text)
+    body = speaker.group(2) if speaker else text
+    notes = []
+    if speaker:
+        first = re.match(r"[a-z]+", body, re.I)
+        person = SUBJECT_PERSON.get(first.group().lower()) if first else None
+        if person:
+            notes.append(f"Keep the explicit subject and the {person} point of view.")
+        else:
+            notes.append(f"The speaker is {speaker.group(1)}. Translate only their spoken words. "
+                         "Preserve the original point of view, including an implied subject.")
+    if SUBJECTLESS_STATEMENT.fullmatch(body):
+        notes.append("The speaker states their own intention. Use a first-person statement.")
+    return body, " ".join(notes)
 
 
 def words(text):
@@ -32,9 +53,10 @@ def echoes_history(result, text, previous, translations):
 
 
 def retry_dialogue(complete, text, previous, language, known):
+    body, notes = dialogue_source(text)
     prompt = (f"Translate only the final line of game dialogue into natural {language}. "
               "Use the earlier lines to interpret the speaker's meaning. Output only the translation."
-              f"\n\nEarlier lines:\n{previous}\n\nFinal line:\n{text}")
+              f" {notes}\n\nEarlier lines:\n{previous}\n\nFinal line:\n{body}")
     try:
         result = complete([{"role": "user", "content": prompt}])
     except HTTPError as error:
@@ -103,7 +125,9 @@ def main():
                       "For a menu action use a concise button label. Keep instructions clear. "
                       "Output only the translation.\n\n" + text)
             return complete([{"role":"user","content":prompt}])
-        current = {"role":"user","content":f"{instruction}\n\n{text}"}
+        body, notes = dialogue_source(text)
+        voice = " " + notes if notes else ""
+        current = {"role":"user","content":f"{instruction}{voice}\n\n{body}"}
         # Limit comparisons to the context selected by this zone's Rust stabilizer.
         known = recent_by_zone.get(zone, {})
         recent = {line: known[line] for line in previous.splitlines() if line in known}
@@ -112,7 +136,7 @@ def main():
             if concise_dialogue:
                 background = f"Previous dialogue:\n{previous}"
                 prompt = f"Translate only this subtitle into concise, natural {language}. Keep the meaning and tone."
-                contextual_line = {"role": "user", "content": f"{prompt}\n\n{text}"}
+                contextual_line = {"role": "user", "content": f"{prompt}{voice}\n\n{body}"}
             else:
                 background = "Previous dialogue: " + " ".join(previous.splitlines())
                 contextual_line = current

@@ -67,7 +67,7 @@ static class LegendOverlay {
                             using(var fg=new SolidBrush(Color.Gold)){
                                 g.FillRectangle(bg,r);
                                 g.TextRenderingHint=TextRenderingHint.AntiAliasGridFit;
-                                g.DrawString(text,font,fg,new RectangleF(r.X+4,r.Y+1,r.Width-8,r.Height-2),format);
+                                style.DrawText(g,text,font,fg,new RectangleF(r.X+4,r.Y+1,r.Width-8,r.Height-2),format,1);
                             }
                             occupied.Add(r);
                             return r;

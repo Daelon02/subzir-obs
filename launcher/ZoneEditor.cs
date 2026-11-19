@@ -5,12 +5,15 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
+enum CaptionAnchor { Manual, Above, Below }
+
 sealed class Zone {
     public string Name, Text;
     public float X,Y,Width;
     public int Left,Top,W,H;
     public bool Hud;
     public bool Legend;
+    public CaptionAnchor Anchor;
     public float HudOffsetX,HudOffsetY;
     public Zone(){}
     public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f && Math.Abs(HudOffsetX)<=1 && Math.Abs(HudOffsetY)<=1;}
@@ -55,15 +58,21 @@ sealed class Stage : Control {
         using(var ink=new SolidBrush(SubtitleStyle.Decode(style.color))){
             float h=Math.Min(H,(float)Math.Ceiling(g.MeasureString(text,font,(int)(w-2*Pad),fmt).Height)+2*Pad);
             var r=new RectangleF(Math.Min(W-w,z.X*W),Math.Min(H-h,z.Y*H),w,h);
+            if(z.Anchor!=CaptionAnchor.Manual)r.Location=AnchoredPosition(z,r.Size,0);
             if(text.Length==0)return r;
             g.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             g.FillRectangle(back,r);
             var body=new RectangleF(r.X+Pad,r.Y+Pad,w-2*Pad,h-2*Pad);
-            if(style.outline)foreach(var d in new[]{new Point(-2,0),new Point(2,0),new Point(0,-2),new Point(0,2)}){
-                var outline=body;outline.Offset(d.X,d.Y);g.DrawString(text,font,Brushes.Black,outline,fmt);
-            }
-            g.DrawString(text,font,ink,body,fmt);return r;
+            style.DrawText(g,text,font,ink,body,fmt,2);return r;
         }
+    }
+    static PointF AnchoredPosition(Zone z,SizeF size,float gap){
+        float above=z.Top-size.Height-gap,below=z.Top+z.H+gap;
+        bool useAbove=z.Anchor==CaptionAnchor.Above;
+        if(useAbove && above<0 && below+size.Height<=H)useAbove=false;
+        else if(!useAbove && below+size.Height>H && above>=0)useAbove=true;
+        return new PointF(Math.Max(0,Math.Min(W-size.Width,z.Left+(z.W-size.Width)/2+z.HudOffsetX*W)),
+            Math.Max(0,Math.Min(H-size.Height,(useAbove?above:below)+z.HudOffsetY*H)));
     }
     static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style){
         const float px=5,py=1,gap=2;
@@ -81,6 +90,9 @@ sealed class Stage : Control {
             float x=Math.Max(0,Math.Min(W-width,zone.Left+zone.W-width+zone.HudOffsetX*W));
             float y=Math.Max(0,Math.Min(H-height,top+zone.HudOffsetY*H));
             var r=new RectangleF(x,y,width,height);
+            if(zone.Anchor!=CaptionAnchor.Manual){
+                r.Location=AnchoredPosition(zone,r.Size,gap);x=r.X;y=r.Y;
+            }
             if(caption.Length==0)return r;
             var state=g.Save();
             try{
@@ -92,7 +104,7 @@ sealed class Stage : Control {
                     path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(x,r.Bottom-d,d,d,90,90);
                     path.CloseFigure();g.FillPath(back,path);
                 }
-                g.DrawString(caption,font,ink,new RectangleF(x+px,y+py,width-2*px,height-2*py),fmt);
+                style.DrawText(g,caption,font,ink,new RectangleF(x+px,y+py,width-2*px,height-2*py),fmt,1);
             }finally{g.Restore(state);}
             return r;
         }
@@ -147,7 +159,7 @@ sealed class Stage : Control {
         RectangleF r;if(!dragging||!hit.TryGetValue(Selected,out r))return;
         float x=Math.Max(0,Math.Min(W-r.Width,p.X-grab.X));
         float y=Math.Max(0,Math.Min(H-r.Height,p.Y-grab.Y));
-        if(Selected.Hud){
+        if(Selected.Hud || Selected.Anchor!=CaptionAnchor.Manual){
             Selected.HudOffsetX=Math.Max(-1,Math.Min(1,hudOffsets.X+(x-hudOrigin.X)/W));
             Selected.HudOffsetY=Math.Max(-1,Math.Min(1,hudOffsets.Y+(y-hudOrigin.Y)/H));
         }else{Selected.X=x/W;Selected.Y=y/H;}
@@ -205,16 +217,25 @@ sealed class Editor : Form {
         bottom.Controls.Add(hud);
         var legend=new CheckBox{Text=T("Легенда карти · автоматичні пункти","Map legend · automatic entries"),AutoSize=true,Margin=new Padding(8,8,2,0)};
         bottom.Controls.Add(legend);
+        var anchor=new ComboBox{DropDownStyle=ComboBoxStyle.DropDownList,Width=160};
+        anchor.Items.AddRange(new object[]{T("Вільна позиція","Free position"),T("Над оригіналом","Above original"),T("Під оригіналом","Below original")});
+        bottom.Controls.Add(anchor);
+        anchor.SelectedIndexChanged+=delegate{
+            if(syncing || anchor.SelectedIndex<0)return;
+            stage.Selected.Anchor=(CaptionAnchor)anchor.SelectedIndex;
+            stage.Selected.HudOffsetX=stage.Selected.HudOffsetY=0;stage.Invalidate();
+        };
         hud.CheckedChanged+=delegate{if(!syncing){stage.Selected.Hud=hud.Checked;stage.Invalidate();}};
         legend.CheckedChanged+=delegate{if(!syncing){
             stage.Selected.Legend=legend.Checked;
-            hud.Enabled=width.Enabled=!legend.Checked;stage.Invalidate();
+            anchor.Enabled=hud.Enabled=width.Enabled=!legend.Checked;stage.Invalidate();
         }};
         foreach(var z in stage.Zones)zones.Items.Add(z);
         zones.SelectedIndexChanged+=delegate{
             var z=(Zone)zones.SelectedItem;stage.Selected=z;syncing=true;
             sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);hud.Checked=z.Hud;legend.Checked=z.Legend;
-            hud.Enabled=width.Enabled=!z.Legend;syncing=false;stage.Invalidate();
+            anchor.SelectedIndex=Enum.IsDefined(typeof(CaptionAnchor),z.Anchor)?(int)z.Anchor:0;
+            anchor.Enabled=hud.Enabled=width.Enabled=!z.Legend;syncing=false;stage.Invalidate();
         };
         sample.TextChanged+=delegate{if(!syncing){stage.Selected.Text=sample.Text;stage.Invalidate();}};
         width.ValueChanged+=delegate{if(!syncing){stage.Selected.Width=(float)width.Value/100;stage.Invalidate();}};

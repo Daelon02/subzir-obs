@@ -11,7 +11,7 @@ try {
     if ($repo.Scheme -ne 'https' -or ([uri]$LatestUrl).Scheme -ne 'https') {throw 'Set SUBZIR_REPOSITORY_URL and SUBZIR_LATEST_URL to HTTPS addresses.'}
     $channel = Join-Path $scratch 'channel.json'
     @{repository=$RepositoryUrl.TrimEnd('/');latest=$LatestUrl} | ConvertTo-Json | Set-Content $channel -Encoding UTF8
-    $version='0.7.0.0'
+    $version='0.8.0.0'
     $versionFile=Join-Path $scratch 'Version.cs'
     @"
 using System.Reflection;

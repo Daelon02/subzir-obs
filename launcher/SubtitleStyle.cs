@@ -13,6 +13,17 @@ class SubtitleStyle {
     public int background { get; set; }
     public int opacity { get; set; }
     public bool outline { get; set; }
+    public int outline_color { get; set; }
+
+    public void DrawText(Graphics g,string text,Font font,Brush ink,RectangleF body,StringFormat format,int stroke){
+        if(outline)using(var edge=new SolidBrush(Decode(outline_color))){
+            for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){
+                if(x==0 && y==0)continue;
+                var offset=body;offset.Offset(x*stroke,y*stroke);g.DrawString(text,font,edge,offset,format);
+            }
+        }
+        g.DrawString(text,font,ink,body,format);
+    }
 
     static readonly string PathName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"runtime","subtitle-style.json");
     public SubtitleStyle() {
@@ -37,7 +48,7 @@ class SubtitleStyle {
 
 class StyleDialog : Form {
     readonly SubtitleStyle style = SubtitleStyle.Load();
-    readonly Label preview = new Label();
+    readonly Panel preview = new Panel();
     readonly NumericUpDown opacity = new NumericUpDown();
     readonly CheckBox outline = new CheckBox();
     Font previewFont;
@@ -46,8 +57,15 @@ class StyleDialog : Form {
         RightToLeft=Ui.IsRtl?RightToLeft.Yes:RightToLeft.No;RightToLeftLayout=Ui.IsRtl;
         StartPosition=FormStartPosition.CenterParent; FormBorderStyle=FormBorderStyle.FixedDialog;
         MinimizeBox=MaximizeBox=false;ClientSize=new Size(500,295);
-        preview.SetBounds(16,16,468,90);preview.TextAlign=ContentAlignment.MiddleCenter;
-        preview.Text=Ui.Get(Msg.Title);Controls.Add(preview);
+        preview.SetBounds(16,16,468,90);
+        preview.Paint+=delegate(object sender,PaintEventArgs e){
+            using(var fmt=new StringFormat{Alignment=StringAlignment.Center,LineAlignment=StringAlignment.Center})
+            using(var ink=new SolidBrush(SubtitleStyle.Decode(style.color))){
+                e.Graphics.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                style.DrawText(e.Graphics,Ui.Get(Msg.Title),previewFont,ink,preview.ClientRectangle,fmt,2);
+            }
+        };
+        Controls.Add(preview);
         var font=ButtonAt(Msg.Font,16,117,224);
         font.Click+=delegate {
             using(var initial=new Font(style.face,style.size*72f/96f,(FontStyle)style.flags))
@@ -68,7 +86,21 @@ class StyleDialog : Form {
             }
         };
         outline.Text=Ui.Get(Msg.Outline);outline.Checked=style.outline;
-        outline.SetBounds(16,172,224,30);Controls.Add(outline);
+        outline.SetBounds(16,163,224,30);Controls.Add(outline);
+        var edgeColor=new Button{Text=Editor.T("Колір контуру","Outline color"),UseVisualStyleBackColor=false};
+        edgeColor.SetBounds(16,195,224,34);Controls.Add(edgeColor);
+        Action updateSwatch=delegate{
+            var value=SubtitleStyle.Decode(style.outline_color);
+            edgeColor.BackColor=value;edgeColor.ForeColor=value.GetBrightness()<.5f?Color.White:Color.Black;
+            edgeColor.Enabled=style.outline;preview.Invalidate();
+        };
+        outline.CheckedChanged+=delegate{style.outline=outline.Checked;updateSwatch();};
+        edgeColor.Click+=delegate{
+            using(var dialog=new ColorDialog{Color=SubtitleStyle.Decode(style.outline_color),FullOpen=true}){
+                if(dialog.ShowDialog(this)==DialogResult.OK){style.outline_color=SubtitleStyle.Encode(dialog.Color);updateSwatch();}
+            }
+        };
+        updateSwatch();
         var amount=new Label{Text=Ui.Get(Msg.Opacity),AutoEllipsis=true};
         amount.SetBounds(254,163,225,24);Controls.Add(amount);
         opacity.SetBounds(254,190,100,26);opacity.Maximum=100;opacity.Value=style.opacity;
@@ -93,6 +125,7 @@ class StyleDialog : Form {
         int alpha=style.opacity;
         preview.BackColor=Color.FromArgb((bg.R*alpha+96*(100-alpha))/100,
             (bg.G*alpha+96*(100-alpha))/100,(bg.B*alpha+96*(100-alpha))/100);
+        preview.Invalidate();
     }
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing); if(disposing && previewFont!=null)previewFont.Dispose();

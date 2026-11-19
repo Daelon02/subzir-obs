@@ -41,6 +41,8 @@ If the scene contains one visible top-level game, capture-card or video source, 
 
 ![Compact yellow HUD translations above the original English menu labels in God of War Ragnarök](docs/images/god-of-war-hud.jpg)
 
+In v0.8.0, SubZir samples the game at 15 frames per second. For dialogue, select **Above original** in the zone editor. For an objective, select **Below original**. The translation is centered on its reading area. Choose **Outline color** under **Subtitle appearance** to change the text outline in OBS.
+
 ### Install your own translation model
 
 In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed English subtitles, oldest first. Only the current translation appears in OBS. A subtitle stays in context while it is visible. History resets once more than eight seconds have passed since the last confirmed line was seen. If OCR consistently reads a different final period, question mark or exclamation mark for four frames, SubZir updates that line in place.
@@ -85,6 +87,8 @@ The GPU menu is available for the [target languages configured for this backend]
 Якщо в сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS.
 
 ![Меню God of War Ragnarök у кадрі OBS. Над англійським CLOSE видно українську плашку «ЗАКРИТИ», поруч залишається іконка кнопки](docs/images/god-of-war-hud.jpg)
+
+У v0.8.0 SubZir зчитує гру з частотою 15 кадрів/с. У редакторі зон для діалогу виберіть **Над оригіналом**, а для завдання — **Під оригіналом**. Переклад центрується відносно своєї зони. У налаштуваннях вигляду субтитрів кнопка **Колір контуру** змінює колір обведення тексту в OBS.
 
 ### Як встановити власну модель перекладу
 

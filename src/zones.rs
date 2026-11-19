@@ -65,7 +65,12 @@ impl Zone {
             HEIGHT
         }
     }
-    fn observe(&mut self, ocr: &OcrEngine, pixels: &[u8], now: Instant) -> Result<Option<String>> {
+    fn observe(
+        &mut self,
+        ocr: &OcrEngine,
+        pixels: &[u8],
+        now: Instant,
+    ) -> Result<Option<(String, Card)>> {
         if self.previous != pixels {
             let prior = if self.previous.len() == pixels.len() {
                 self.previous.as_slice()
@@ -90,12 +95,9 @@ impl Zone {
             self.previous.extend_from_slice(pixels);
         }
         match self.stable.observe(&self.reading, now) {
-            Observation::Confirmed(text) => Ok(Some(text)),
-            Observation::Revised(text) => {
-                self.history.discard_last_version();
-                Ok(Some(text))
-            }
-            Observation::Cleared => Ok(Some(String::new())),
+            Observation::Confirmed(text) => Ok(Some((text, Card::New))),
+            Observation::Revised(text) => Ok(Some((text, Card::Revised))),
+            Observation::Cleared => Ok(Some((String::new(), Card::New))),
             Observation::Held => {
                 self.history.visible(now);
                 Ok(None)
@@ -105,7 +107,7 @@ impl Zone {
     }
 }
 fn filter(zones: &[Zone]) -> String {
-    let mut graph = format!("fps=10,split={}", zones.len());
+    let mut graph = format!("fps={},split={}", capture_fps(), zones.len());
     for i in 0..zones.len() {
         let _ = write!(graph, "[r{i}]");
     }
@@ -241,16 +243,19 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
                 }
                 continue;
             }
-            let Some(en) = zone.observe(&ocr, pixels, now)? else {
+            let ready = match zone.observe(&ocr, pixels, now)? {
+                Some((raw, _)) if zone.hud => Some((raw, String::new())),
+                Some((raw, kind)) => zone.history.present(raw, now, kind),
+                None => zone.history.due(&zone.reading, now),
+            };
+            let Some((en, previous)) = ready else {
                 continue;
             };
-            let previous = zone.history.previous(now);
             let uk = if en.is_empty() {
                 String::new()
             } else {
                 worker.request(&json!({"zone":i,"text":en,"previous":previous,"hud":zone.hud}))?
             };
-            zone.history.confirm(&en, now);
             captions[i] = json!(uk);
             println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
         }
@@ -274,7 +279,7 @@ mod tests {
         let zones = rows.iter().map(Zone::load).collect::<Result<Vec<_>>>()?;
         let graph = filter(&zones);
         assert!(graph.contains("split=2[r0][r1]"));
-        assert!(graph.starts_with("fps=10,split=2"));
+        assert!(graph.starts_with(&format!("fps={},split=2", capture_fps())));
         assert!(graph.contains("round(iw*769/1280)-round(iw*515/1280)"));
         assert!(graph.contains("round(ih*325/720)-round(ih*220/720)"));
         assert!(graph.contains("exact=1,format=gray,scale=480:144"));

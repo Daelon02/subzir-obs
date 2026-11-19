@@ -6,4 +6,6 @@
 
 4. Click “Add zone” for an objective or a hint and draw its own reading area. For a whole map legend, enable “Map legend · automatic entries” and draw one box around all the labels and their buttons. Each detected entry gets its own translation. For a single menu item, select “HUD above original” and draw around just the text. Leave HUD off for regular dialogue. Select an existing entry in the “Zone” list to adjust it.
 
+Choose “Above original” for dialogue and “Below original” for an objective. The translation is centered on its own reading area. Choose “Outline color” in the subtitle appearance settings to change the outline in OBS.
+
 5. Click “Save zones”, then “Start translation”. All zones share one input frame and appear on one transparent layer in OBS. Their positions are saved for the next launch. You can add up to eight zones.
