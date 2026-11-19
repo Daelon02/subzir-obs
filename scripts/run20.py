@@ -18,13 +18,19 @@ def measure(report):
     gpu = "CPU"
     models = ["quickmt"]
     server = APP / "hy-runtime" / "llama-server.exe"
-    if server.is_file() and server.with_name("Hy-MT2-1.8B-Q6_K.gguf").is_file():
+    weights = APP / "models" / "Hy-MT2-7B-Q4_K_M.gguf"
+    gpu_models = []
+    if weights.is_file():
+        gpu_models.append("gguf:" + weights.name)
+    if server.with_name("Hy-MT2-1.8B-Q6_K.gguf").is_file():
+        gpu_models.append("hy")
+    if server.is_file() and gpu_models:
         probe = subprocess.run([server, "--list-devices"], capture_output=True, encoding="utf8", errors="replace")
         devices = (probe.stdout + probe.stderr).splitlines()
         gpu = next((s.strip() for s in devices if s.strip().startswith("CUDA0:")), None)
         if probe.returncode or not gpu:
             raise RuntimeError("CUDA0 недоступна. Перевірте драйвер NVIDIA.")
-        models.append("hy")
+        models.extend(gpu_models)
     print(gpu, flush=True)
     rows = []
     summaries = [gpu, "20 готових кадрів → OCR → переклад → підтвердження OBS. Мілісекунди, після прогріву."]
@@ -33,7 +39,7 @@ def measure(report):
         env = {**os.environ, "SUB_RUNTIME": str(ROOT / "runtime"), "SUB_MODEL": model,
                "SUB_TARGET": "uk", "SUB_ACK": "1", "SUB_BEAM":"3",
                "SUB_PYTHON": str(APP / "python/python.exe"), "SUB_WORKER": str(APP / "worker.py")}
-        with (report / (model+".log")).open("wb") as log:
+        with (report / (model.removeprefix("gguf:")+".log")).open("wb") as log:
             run = subprocess.run([APP / "subtitle-rs.exe", "bench", FRAMES], env=env, cwd=APP,
                                  stdout=subprocess.PIPE, stderr=log, encoding="utf8", check=True)
         batch = [dict(model=model, **json.loads(s)) for s in run.stdout.splitlines()]

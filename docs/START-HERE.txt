@@ -1,26 +1,8 @@
-SubZir v0.3.0 для Windows x64
+SubZir v0.4.0
 
-Розпакуйте основний ZIP повністю й відкрийте SubZir.exe. Він готовий
-перекладати на процесорі. Інструкція для OBS є в README.txt.
+Відкрийте SubZir.exe. Інструкція зі скриншотами: docs/PLAYER-UA.md.
+Для перегляду у браузері відкрийте docs/PLAYER-UA.html.
+У збірках RTX 3080 та RTX 5070 Ti модель Hy-MT2 7B вже встановлено.
 
-Для RTX 5070 Ti відкрийте другий ZIP (GPU-пакет). Перетягніть з нього всю
-папку hy-runtime в папку app біля SubZir.exe. Має з’явитися файл
-app/hy-runtime/llama-server.exe. Запустіть програму, виберіть українську
-мову субтитрів та Hy-MT2 у списку «Модель перекладу». Натисніть
-«Перевірити переклад». Для цієї збірки потрібен сумісний драйвер NVIDIA.
-
-Свій сумісний GGUF для перекладу можна покласти в app/models поруч з
-іншими власними моделями. Перезапустіть SubZir і виберіть назву файлу.
-Для вимірювання затримки закрийте SubZir, залиште джерело субтитрів
-видимим у сцені OBS і відкрийте Test-20.cmd. Звіт буде в benchmarks/results.
-
-English
-
-Extract the main ZIP and open SubZir.exe. The CPU models are ready to use.
-Follow README.en.txt for OBS setup. For the RTX 5070 Ti, open the GPU pack
-and copy the entire hy-runtime folder into the app folder beside SubZir.exe.
-Check for app/hy-runtime/llama-server.exe. Restart SubZir, select a supported
-output language, choose Hy-MT2 and click Test translation. The GPU pack
-requires a compatible NVIDIA driver. To try your own translation GGUF, place
-it in app/models, restart and select the filename. To benchmark, close SubZir,
-keep the subtitle source visible in OBS, and run Test-20.cmd.
+Open SubZir.exe. See docs/PLAYER-EN.md for the illustrated player guide,
+or open docs/PLAYER-EN.html in a browser. Both GPU editions include Hy-MT2 7B.

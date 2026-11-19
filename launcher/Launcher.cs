@@ -73,7 +73,12 @@ class Launcher : Form {
         ButtonAt(play,Msg.Start,26,289,251);play.BackColor=Color.FromArgb(23,78,103);play.ForeColor=Color.White;
         play.Click+=async delegate {if(running!=null)StopOwned();else await Start(true);};
         Button guide=new Button(); ButtonAt(guide,Msg.Guide,352,289,270);
-        guide.Click+=delegate {if (Ui.Language != "en" && Ui.Language != "uk") { MessageBox.Show(this,Ui.Get(Msg.GuideBody),Ui.Get(Msg.Guide)); return; } Process.Start("notepad.exe",Quote(Path.Combine(Root,Ui.Language == "uk" ? "README.txt" : "README.en.txt")));};
+        guide.Click+=delegate {
+            if (Ui.Language != "en" && Ui.Language != "uk") { MessageBox.Show(this,Ui.Get(Msg.GuideBody),Ui.Get(Msg.Guide)); return; }
+            string page=Path.Combine(Root,"docs","PLAYER-"+Ui.Language.ToUpperInvariant()+".html");
+            if(File.Exists(page)) Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
+            else Process.Start("notepad.exe",Quote(Path.Combine(Root,Ui.Language == "uk" ? "README.txt" : "README.en.txt")));
+        };
         status.SetBounds(26,350,652,55);status.ForeColor=Color.FromArgb(35,69,83);Controls.Add(status);
         line.SetBounds(26,409,652,78);line.Font=new Font(Font.FontFamily,12,FontStyle.Bold);Controls.Add(line);
         LabelAt(Msg.Model,26,499,126,29);

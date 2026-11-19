@@ -12,9 +12,15 @@ def main():
     sys.stdin.reconfigure(encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8")
     languages = json.loads(Path(__file__).with_name("hy-languages.json").read_text("utf8"))
-    language = languages[os.environ["SUB_TARGET"]]
+    target = os.environ["SUB_TARGET"]
+    language = languages[target]
     model = os.environ.get("SUB_MODEL","hy").removeprefix("gguf:")
     label = "Hy-MT2-1.8B Q6_K" if model == "hy" else model
+    instruction = (
+        f"Translate this line of game dialogue into natural, conversational {language}. Preserve the intended meaning and tone. Output only the translated line."
+        if target == "uk" and model.casefold() == "hy-mt2-7b-q4_k_m.gguf"
+        else f"Translate the following segment into {language}, without additional explanation."
+    )
     endpoint = os.environ["SUB_HY_URL"]
     auth = {"Authorization": "Bearer " + os.environ["SUB_HY_KEY"], "Content-Type": "application/json"}
     client = build_opener(ProxyHandler({}))
@@ -42,7 +48,7 @@ def main():
         return result
 
     def translate(text, previous):
-        current = {"role":"user","content":f"Translate the following segment into {language}, without additional explanation.\n\n{text}"}
+        current = {"role":"user","content":f"{instruction}\n\n{text}"}
         if previous:
             earlier = " ".join(previous.splitlines())
             conversation = [{"role":"user","content":f"Previous dialogue: {earlier}"},

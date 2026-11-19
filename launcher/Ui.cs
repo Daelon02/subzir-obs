@@ -20,6 +20,7 @@ static class Ui {
     public static string Model { get; private set; }
     static readonly Dictionary<string,string> HyLanguages;
     const string CustomPrefix = "gguf:";
+    const string QualityModel = "Hy-MT2-7B-Q4_K_M.gguf";
     static readonly string CustomDirectory = Path.Combine(Root,"app","models");
     public static bool IsGpuModel(string model) {
         return model=="hy" || (model!=null && model.StartsWith(CustomPrefix,StringComparison.Ordinal));
@@ -33,7 +34,8 @@ static class Ui {
         catch(UnauthorizedAccessException) { yield break; }
         foreach(string path in paths.OrderBy(p=>p,StringComparer.OrdinalIgnoreCase)) {
             if(String.Equals(Path.GetExtension(path),".gguf",StringComparison.OrdinalIgnoreCase))
-                yield return new KeyValuePair<string,string>(CustomPrefix+Path.GetFileName(path),Path.GetFileName(path)+" (GPU)");
+                yield return new KeyValuePair<string,string>(CustomPrefix+Path.GetFileName(path),
+                    Path.GetFileName(path)==QualityModel ? "Hy-MT2 7B Q4_K_M (GPU)" : Path.GetFileName(path)+" (GPU)");
         }
     }
     public static bool Allows(string model,string target) {
@@ -63,7 +65,8 @@ static class Ui {
         Target = prefs.TryGetValue("target",out target) && Names.ContainsKey(target ?? "") ? target : "uk";
         HyLanguages = Read(Path.Combine(Root,"app","hy-languages.json")) ?? new Dictionary<string,string>();
         string model;
-        Model = prefs.TryGetValue("model",out model) && Allows(model,Target) ? model : "auto";
+        Model = prefs.TryGetValue("model",out model) && Allows(model,Target) ? model :
+            Allows(CustomPrefix+QualityModel,Target) ? CustomPrefix+QualityModel : "auto";
         messages = Load(Language);
     }
     static Dictionary<string,string> Read(string path) {
