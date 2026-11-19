@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 
-class Launcher : Form {
+partial class Launcher : Form {
     static readonly string Root = AppDomain.CurrentDomain.BaseDirectory;
     static readonly string App = Path.Combine(Root,"app"), Data = Path.Combine(Root,"runtime");
     static readonly string Lua = Path.Combine(Root,"OBS","PS5-Subtitles.lua");
@@ -29,6 +29,7 @@ class Launcher : Form {
         status.Text = Ui.Get(key) + detail;
     }
     void RefreshLanguage() {
+        UpdateCaption();
         Text = "SubZir — " + Ui.Get(Msg.Window);
         language.Text = Ui.Get(Msg.Language) + (Ui.Language == "en" ? "" : " / Language");
         language.AccessibleName = Ui.Get(Msg.ChooseLanguages);
@@ -63,7 +64,7 @@ class Launcher : Form {
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
         BackColor=Color.White;
         Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
-        LabelAt(Msg.Subtitle,26,68,655,41);
+        LabelAt(Msg.Subtitle,26,68,445,41);
         ButtonAt(connect,Msg.Connect,26,116,208);connect.Click+=delegate { HelpOBS(); };
         LabelAt(Msg.ConnectHint,250,114,436,55);
         ButtonAt(demo,Msg.Test,26,173,208);demo.Click+=async delegate {await Start(false);};
@@ -75,7 +76,7 @@ class Launcher : Form {
         Button guide=new Button(); ButtonAt(guide,Msg.Guide,352,289,270);
         guide.Click+=delegate {
             if (Ui.Language != "en" && Ui.Language != "uk") { MessageBox.Show(this,Ui.Get(Msg.GuideBody),Ui.Get(Msg.Guide)); return; }
-            string page=Path.Combine(Root,"docs","PLAYER-"+Ui.Language.ToUpperInvariant()+".html");
+            string page=Path.Combine(Root,"docs",Ui.Language=="uk"?"PLAYER-UA.html":"PLAYER-EN.html");
             if(File.Exists(page)) Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
             else Process.Start("notepad.exe",Quote(Path.Combine(Root,Ui.Language == "uk" ? "README.txt" : "README.en.txt")));
         };
@@ -100,6 +101,8 @@ class Launcher : Form {
             catch (UnauthorizedAccessException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
         };
         Controls.Add(language);
+        update.SetBounds(482,65,200,34);Controls.Add(update);update.BringToFront();
+        update.Click+=async delegate {await CheckUpdate();};
         Directory.CreateDirectory(Data);
         roi=File.Exists(CropFile)?File.ReadAllText(CropFile).Trim():null;
         if(roi!=null && !System.Text.RegularExpressions.Regex.IsMatch(roi,@"^\d+:\d+:\d+:\d+$"))roi=null;
@@ -127,7 +130,7 @@ class Launcher : Form {
         if(roi!=null)s.EnvironmentVariables["SUB_CROP"]=roi;
         return s;
     }
-    void Lock(bool val){busy=val;models.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
+    void Lock(bool val){busy=val;models.Enabled=!val;update.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
     void StopOwned(){
         Process p=running;
         if(p!=null && !p.HasExited){

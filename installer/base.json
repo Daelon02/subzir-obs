@@ -1,0 +1,52 @@
+{
+  "editions": {
+    "5070-Ti": [
+      {
+        "size": 2080000000,
+        "name": "SubZir-7B-RTX-5070-Ti.zip.001",
+        "sha256": "536a47c242c9155b595ec160847feeeee4416e224e7a60d4e3fe823133a43b67"
+      },
+      {
+        "size": 2080000000,
+        "name": "SubZir-7B-RTX-5070-Ti.zip.002",
+        "sha256": "bf000d8bed9b4c38831fb5046eeef37f3e2a8aaa89a770449837d0cc6afd87f2"
+      },
+      {
+        "size": 1938673701,
+        "name": "SubZir-7B-RTX-5070-Ti.zip.003",
+        "sha256": "7f6c32c857c70249c0730ec3a0004da65cfc50c241b6d941b2b0ea4945c6f7ca"
+      }
+    ],
+    "3080": [
+      {
+        "size": 2080000000,
+        "name": "SubZir-7B-RTX-3080.zip.001",
+        "sha256": "bd834d2d2596793e2baf33d595b94ae59b093f9e4d5ef42cbf7bb6a40dead974"
+      },
+      {
+        "size": 2080000000,
+        "name": "SubZir-7B-RTX-3080.zip.002",
+        "sha256": "9801a952e410bad59fd2694b30e6184f4dfdc568db60c7aec3960ff2a52ec8d9"
+      },
+      {
+        "size": 2080000000,
+        "name": "SubZir-7B-RTX-3080.zip.003",
+        "sha256": "cbd27cf4e874dc3dd1a222e9c73521b7ac3b2e47bc0d15582394d3f134822d85"
+      },
+      {
+        "size": 41780104,
+        "name": "SubZir-7B-RTX-3080.zip.004",
+        "sha256": "3c07e27e866d37dadda3b9cc9f0d6b484969991e2b73b6ccd4cd9bbe91fdfc6a"
+      }
+    ],
+    "cpu": [
+      {
+        "size": 845698366,
+        "name": "PS5-Subtitles-Windows-x64.zip",
+        "sha256": "dcc7b6d84f61122f86791b9c5e32d23875e26043762b5d9fcc1decf51d400e99"
+      }
+    ]
+  },
+  "launcher": "789958139cbcefa1b2bdf4b840b6808e866a61cfa59c0ba01d742d9c30a9c51f",
+  "baseline": "v0.4.0"
+}

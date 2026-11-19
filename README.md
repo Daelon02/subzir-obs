@@ -2,15 +2,15 @@
 
 Translate English subtitles from a game running on your Windows PC or from a console connected through a capture card. Select the game's subtitle area once. SubZir shows each translated line in OBS and clears it when the text disappears.
 
-**[Download v0.4.0 for RTX 3080, RTX 5070 Ti or CPU](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)** · [Illustrated player guide](docs/PLAYER-EN.md) · [Інструкція гравця зі скриншотами](docs/PLAYER-UA.md)
+**[Download SubZir-Setup.exe for Windows](https://github.com/Daelon02/subzir-obs/releases/latest/download/SubZir-Setup.exe)** · [Illustrated player guide](docs/PLAYER-EN.md) · [Інструкція гравця зі скриншотами](docs/PLAYER-UA.md)
 
-Both GPU editions include Tencent Hy-MT2 7B Q4_K_M and their matching CUDA runtime. Download every numbered part of your edition into one folder and extract the first part with 7-Zip. The CPU edition is a single Windows ZIP.
+Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070 Ti** (6.10 GB) or **CPU** (0.85 GB), then click **Install**. Setup downloads and checks the files for your selection. Both GPU options include Hy-MT2 7B and the matching CUDA runtime. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
 
 ![Atreus tells Kratos about Sindri in God of War Ragnarök, with the English line above its Ukrainian translation in OBS](docs/images/god-of-war-obs.jpg)
 
 ## First launch
 
-1. Extract the entire ZIP to Documents and open **SubZir.exe**. Click **Language** to choose the **interface language** and **subtitle language** independently. Both lists have 100 languages. English subtitle output shows the original recognized line.
+1. Click **Open SubZir** when setup finishes. Click **Language** to choose the **interface language** and **subtitle language** independently. Both lists have 100 languages. English subtitle output shows the original recognized line.
 2. Enable **English subtitles** in the game. Choose how to bring its picture into your OBS scene.
    - **Game running on this PC.** Launch the game. In OBS, go to **Sources → + → Game Capture**, choose **Capture specific window**, then select the game window. This works without a console or capture card.
    - **Console.** Add the capture card as a **Video Capture Device**.
@@ -29,7 +29,7 @@ Requires Windows 10/11 x64, Windows English OCR and OBS Studio. The main ZIP inc
 
 In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed English subtitles, oldest first. Only the current translation appears in OBS. A subtitle stays in context while it is visible. History resets once more than eight seconds have passed since the last confirmed line was seen. If OCR consistently reads a different final period, question mark or exclamation mark for four frames, SubZir updates that line in place.
 
-1. Extract your GPU edition and find **SubZir.exe**. Hy-MT2 7B is already in **app/models**. On first launch with Ukrainian output, the launcher selects **Hy-MT2 7B Q4_K_M (GPU)**.
+1. Install your GPU edition and find **SubZir.exe**. Hy-MT2 7B is already in **app/models**. On first launch with Ukrainian output, the launcher selects **Hy-MT2 7B Q4_K_M (GPU)**.
 
 2. Close SubZir. Choose a single-file **GGUF text translation or instruction-tuned model** compatible with llama.cpp b11146. Check its model card for English input, your output language and support for user chat prompts. For a first test, try another quantization of Hy-MT2 1.8B, such as Q4_K_M. [Official Hy-MT2 GGUF files](https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF)
 3. Copy your file into **SubZir/app/models**. For example, `SubZir/app/models/Hy-MT2-1.8B-Q4_K_M.gguf`. Keep the original filename. You can put several GGUF files side by side. Keep the bundled 7B file in **app/models**.
@@ -37,11 +37,13 @@ In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed En
 
 The GPU menu is available for the [target languages configured for this backend](worker/hy-languages.json). Your model must also support the chosen language. GGUF describes a file format. Speech models such as Whisper, adapter-only files and models requiring a custom prompt protocol are unsuitable for this loader. Larger models need more GPU memory and may take longer to translate. If a model fails, check `runtime/diagnostics.txt` and switch back to Hy-MT2 or Automatic. To remove a custom model, close SubZir and delete just its file from `app/models`.
 
+**Updates.** Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
+
 ## Перший запуск
 
 SubZir зчитує англійські субтитри з гри на ПК або з консолі, під’єднаної через карту захоплення, й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
-1. Розпакуйте весь ZIP у «Документи» й відкрийте **SubZir.exe**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
+1. Запустіть **SubZir-Setup.exe**, виберіть **RTX 3080** (6,28 ГБ), **RTX 5070 Ti** (6,10 ГБ) або **CPU** (0,85 ГБ) і натисніть **Встановити**. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
 2. У грі ввімкніть **англійські субтитри**. Додайте зображення гри до сцени OBS.
    - **Гра на цьому ПК.** Запустіть гру. В OBS відкрийте **Джерела → + → Захоплення гри**, виберіть режим захоплення окремого вікна, а потім вікно гри. Для цього достатньо самого ПК.
    - **Консоль.** Додайте карту захоплення як **Пристрій захоплення відео**.
@@ -62,13 +64,15 @@ SubZir зчитує англійські субтитри з гри на ПК а
 
 У v0.4.0 Hy-MT2 і власні GGUF отримують до двох попередніх підтверджених англійських реплік у порядку діалогу. В OBS з’являється лише переклад поточної репліки. Поки репліку видно на екрані, вона залишається в контексті. Історія скидається, коли від останнього розпізнавання підтвердженої репліки минає понад вісім секунд. Якщо чотири кадри поспіль закінчуються іншою крапкою, знаком питання чи оклику, SubZir оновлює ту саму репліку.
 
-1. Розпакуйте GPU-збірку для своєї карти. Модель уже в **app/models**. Під час першого запуску з українськими субтитрами внизу буде вибрано **Hy-MT2 7B Q4_K_M (GPU)**.
+1. Встановіть GPU-збірку для своєї карти. Модель уже в **app/models**. Під час першого запуску з українськими субтитрами внизу буде вибрано **Hy-MT2 7B Q4_K_M (GPU)**.
 
 2. Закрийте SubZir. Завантажте **один файл .gguf** моделі для текстового перекладу або моделі, яка виконує текстові інструкції. Вона має працювати з llama.cpp b11146, приймати звичайний запит у чаті й підтримувати переклад з англійської на вашу мову. Для першої спроби підійде інший варіант Hy-MT2 1.8B, наприклад Q4_K_M. [Офіційні файли Hy-MT2 у форматі GGUF](https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF)
 3. Скопіюйте файл у **SubZir/app/models**. Приклад шляху — `SubZir/app/models/Hy-MT2-1.8B-Q4_K_M.gguf`. Залиште назву файлу як є. У цю папку можна додати кілька моделей. Комплектна модель 7B зберігається в **app/models**.
 4. Запустіть **SubZir.exe**, виберіть **мову субтитрів**, а потім свій файл у списку **Модель перекладу**. Натисніть **Перевірити переклад**. Коли тестова репліка з’явиться в OBS, можна запускати гру.
 
 Вибір GGUF доступний для [мов, які підтримує цей режим SubZir](worker/hy-languages.json). Опис самої моделі має підтверджувати підтримку потрібної мови. Файли Whisper, окремі адаптери й моделі зі спеціальним форматом запиту для цього способу не підходять. Більша модель потребує більше відеопам’яті й може перекладати повільніше. Якщо запуск не вдався, подробиці є в `runtime/diagnostics.txt`. Щоб повернутися до штатного режиму, виберіть **Автоматично** або **Hy-MT2**. Щоб прибрати свою модель, закрийте програму й видаліть її файл із `app/models`.
+
+**Оновлення.** Зупиніть переклад, натисніть **Оновити** і підтвердьте нову версію. Якщо у вас v0.4.0, закрийте SubZir, запустіть інсталятор і виберіть папку, де вже лежить **SubZir.exe**. Встановлені моделі, область субтитрів і налаштування OBS збережуться.
 
 ## For developers / Для розробників
 
@@ -85,6 +89,7 @@ Rust runs the capture, OCR, stability filter and overlay timing. The WinForms la
 On Windows, install Rust MSVC and Visual Studio C++ Build Tools. Extract the **v0.4.0** Windows bundle to a test directory to supply embedded Python, FFmpeg and both model directories. From the repository root run the following commands.
 
 ```powershell
+.\scripts\build-setup.ps1 -Destination .\dist
 cargo build --release --locked
 .\scripts\build.ps1 -BundleDirectory '.\PS5-Subtitles'
 ```
