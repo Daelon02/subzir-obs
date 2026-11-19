@@ -1,12 +1,14 @@
 # SubZir for OBS
 
-Translate English subtitles from a game running on your Windows PC or from a console connected through a capture card. Select the game's subtitle area once. SubZir shows each translated line in OBS and clears it when the text disappears.
+Translate English subtitles from a game running on your Windows PC or from a console connected through a capture card. Mark up to eight areas on one game frame, such as dialogue, objectives and menu labels. Place each translation in the editor. SubZir displays them in OBS and clears each one when its original disappears.
 
 **[Download SubZir-Setup.exe for Windows](https://github.com/Daelon02/subzir-obs/releases/latest/download/SubZir-Setup.exe)** · [Illustrated player guide](docs/PLAYER-EN.md) · [Інструкція гравця зі скриншотами](docs/PLAYER-UA.md)
 
+[Multiple zones and HUD (English)](#multiple-zones-and-hud-above-original) · [Кілька зон і HUD (українською)](#кілька-зон-і-hud-над-оригіналом)
+
 Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070** or **RTX 5070 Ti** (6.10 GB each) or **CPU** (0.85 GB), then click **Install**. Setup downloads and checks the files for your selection. All GPU options include Hy-MT2 7B and the matching CUDA runtime. Choose a parent folder such as `D:\Games`. Setup shows the final path and installs SubZir in `D:\Games\SubZir`. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
 
-![Atreus tells Kratos about Sindri in God of War Ragnarök, with the English line above its Ukrainian translation in OBS](docs/images/god-of-war-obs.jpg)
+![God of War Ragnarök in OBS with the boss name on the left and the separate combat hint near the bottom](docs/images/god-of-war-zones.jpg)
 
 ## First launch
 
@@ -23,7 +25,21 @@ Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070** or **RTX 
 
 Requires Windows 10/11 x64, Windows English OCR and OBS Studio. The main ZIP includes QuickMT and M2M100 for CPU translation. English and Ukrainian have edited interface text. The other localizations are machine-assisted and their quality varies. Some scripts require supplemental Windows fonts. [Player guide and troubleshooting](docs/PLAYER-EN.txt) · [Supported languages](launcher/languages.json)
 
+![Atreus tells Kratos about Sindri in God of War Ragnarök, with the English line above its Ukrainian translation in OBS](docs/images/god-of-war-obs.jpg)
+
 ![SubZir launcher in English](docs/images/launcher-7b-en.png)
+
+### Multiple zones and HUD above original
+
+1. In OBS, select your game source as the **Virtual Camera** output and start the camera. If you upgraded, open **Tools → Scripts**, reload the installed `OBS/PS5-Subtitles.lua`, and use its button to add subtitles to the current scene.
+2. In SubZir, click **Zone editor · OBS** while the English text is visible. To practise on a recording, choose **Zone editor · video file** instead.
+3. Select **Draw OCR area** and draw the yellow box around one English text block. Turn drawing off and drag the sample translation to where you want it in OBS. Use **Width, %** to adjust line wrapping.
+4. Click **Add zone** for another text block. For menus, give each row its own zone, box just the English words and leave the controller icon outside. Enable **HUD above original** for that zone. A compact yellow label appears above the English text. You can keep dialogue in the regular style.
+5. Click **Save zones**, then **Start translation**. OBS displays one transparent layer with all the translations. The layout is saved for the next launch. To return to one subtitle area, use the original single-area picker.
+
+If the scene contains one visible top-level game, capture-card or video source, the layer follows that source. In other scenes, positions use the full OBS canvas.
+
+![Compact yellow HUD translations above the original English menu labels in God of War Ragnarök](docs/images/god-of-war-hud.jpg)
 
 ### Install your own translation model
 
@@ -36,16 +52,6 @@ In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed En
 4. Open **SubZir.exe**, choose the **subtitle language**, then choose your filename under **Translation model**. Click **Test translation**. When the translated demo line appears in OBS, the model is ready.
 
 The GPU menu is available for the [target languages configured for this backend](worker/hy-languages.json). Your model must also support the chosen language. GGUF describes a file format. Speech models such as Whisper, adapter-only files and models requiring a custom prompt protocol are unsuitable for this loader. Larger models need more GPU memory and may take longer to translate. If a model fails, check `runtime/diagnostics.txt` and switch back to Hy-MT2 or Automatic. To remove a custom model, close SubZir and delete just its file from `app/models`.
-
-### Translate several areas of a game
-
-In the Windows test build with the zone editor, click **Zone editor · OBS** to freeze the current frame, or **Zone editor · video file** to replay a local recording. Select **Draw OCR area** and drag around the original English text. Turn drawing off, then drag the sample translation to its output position. **Add zone** repeats this for another region. Choose **Save zones**, then **Start translation**. The layout is saved in `runtime/zones.json`. For a menu item, draw around its English text, leaving the button icon outside the box. **HUD above original** places a compact yellow translation above that row. Give each menu row its own zone. The original single-area picker switches back to single-subtitle mode.
-
-After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add subtitles to the game scene. The script adds one transparent layer for the positioned translations. With one visible game, capture-card or video source at the top level of the scene, the layer follows its transform. Otherwise positions are relative to the full OBS canvas. For live capture, set the virtual camera output to the game **source** so the translation stays out of the OCR input.
-
-![God of War Ragnarök in OBS with the boss name on the left and the separate combat hint near the bottom](docs/images/god-of-war-zones.jpg)
-
-![Compact yellow HUD translations above the original English menu labels in God of War Ragnarök](docs/images/god-of-war-hud.jpg)
 
 **Updates.** Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
 
@@ -68,6 +74,18 @@ After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add
 
 ![Українське меню з польськими субтитрами у вікні вибору мов](docs/images/languages.png)
 
+### Кілька зон і HUD над оригіналом
+
+1. У налаштуваннях **віртуальної камери OBS** виберіть вихід **Джерело**, укажіть гру й запустіть камеру. Якщо оновили SubZir, відкрийте **Інструменти → Скрипти**, перезавантажте встановлений файл `OBS/PS5-Subtitles.lua` та натисніть його кнопку додавання субтитрів до поточної сцени.
+2. Коли англійський текст з’явиться на екрані, у SubZir натисніть **Редактор зон · OBS**. Щоб спробувати на записі, виберіть **Редактор зон · відеофайл**.
+3. Увімкніть **Виділити текст у грі** й обведіть жовтою рамкою один англійський напис. Вимкніть виділення й перетягніть зразок перекладу туди, де його побачить глядач. Поле **Ширина, %** визначає, як текст переноситься на наступний рядок.
+4. Натисніть **Додати зону** для наступного напису. Для меню обводьте кожен рядок окремо, залишаючи іконку кнопки поза рамкою. Увімкніть для цієї зони **HUD над оригіналом**. Жовтий переклад з’явиться на темній плашці над англійським написом. Для діалогів можна залишити звичайні субтитри.
+5. Натисніть **Зберегти зони**, потім **Почати переклад**. Усі переклади з’являться в одному прозорому шарі OBS, а розташування збережеться для наступного запуску. Щоб повернутися до однієї області, натисніть **3. Виділити субтитри**.
+
+Якщо в сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS.
+
+![Меню God of War Ragnarök у кадрі OBS. Над англійським CLOSE видно українську плашку «ЗАКРИТИ», поруч залишається іконка кнопки](docs/images/god-of-war-hud.jpg)
+
 ### Як встановити власну модель перекладу
 
 У v0.4.0 Hy-MT2 і власні GGUF отримують до двох попередніх підтверджених англійських реплік у порядку діалогу. В OBS з’являється лише переклад поточної репліки. Поки репліку видно на екрані, вона залишається в контексті. Історія скидається, коли від останнього розпізнавання підтвердженої репліки минає понад вісім секунд. Якщо чотири кадри поспіль закінчуються іншою крапкою, знаком питання чи оклику, SubZir оновлює ту саму репліку.
@@ -79,12 +97,6 @@ After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add
 4. Запустіть **SubZir.exe**, виберіть **мову субтитрів**, а потім свій файл у списку **Модель перекладу**. Натисніть **Перевірити переклад**. Коли тестова репліка з’явиться в OBS, можна запускати гру.
 
 Вибір GGUF доступний для [мов, які підтримує цей режим SubZir](worker/hy-languages.json). Опис самої моделі має підтверджувати підтримку потрібної мови. Файли Whisper, окремі адаптери й моделі зі спеціальним форматом запиту для цього способу не підходять. Більша модель потребує більше відеопам’яті й може перекладати повільніше. Якщо запуск не вдався, подробиці є в `runtime/diagnostics.txt`. Щоб повернутися до штатного режиму, виберіть **Автоматично** або **Hy-MT2**. Щоб прибрати свою модель, закрийте програму й видаліть її файл із `app/models`.
-
-### Кілька зон перекладу
-
-У тестовій збірці натисніть **Редактор зон · OBS** для кадру віртуальної камери або **Редактор зон · відеофайл** для запису. Увімкніть **Виділити текст у грі** й обведіть англійський напис. Вимкніть виділення й перетягніть приклад перекладу туди, де його має бачити глядач. Виберіть **Додати зону** для наступного напису. Натисніть **Зберегти зони**, потім **Почати переклад**. Розташування відновиться після перезапуску. Для меню виділіть текст одного пункту, залишивши іконку кнопки поза рамкою. **HUD над оригіналом** показує компактну жовту плашку над цим рядком. Для наступного пункту додайте окрему зону. Щоб повернутися до одного рядка, скористайтеся звичайним вибором області субтитрів.
-
-Після оновлення перезавантажте файл `OBS/PS5-Subtitles.lua` у скриптах OBS і натисніть його кнопку додавання субтитрів до сцени. Під час перекладу з’явиться один прозорий шар із усіма зонами. Якщо у сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS. Для віртуальної камери виберіть вихід **Джерело** й укажіть гру.
 
 SubZir зчитує англійські субтитри з гри на ПК або з консолі, під’єднаної через карту захоплення, й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
