@@ -4,7 +4,7 @@ Translate English subtitles from a game running on your Windows PC or from a con
 
 **[Download SubZir-Setup.exe for Windows](https://github.com/Daelon02/subzir-obs/releases/latest/download/SubZir-Setup.exe)** · [Illustrated player guide](docs/PLAYER-EN.md) · [Інструкція гравця зі скриншотами](docs/PLAYER-UA.md)
 
-Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070 Ti** (6.10 GB) or **CPU** (0.85 GB), then click **Install**. Setup downloads and checks the files for your selection. Both GPU options include Hy-MT2 7B and the matching CUDA runtime. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
+Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070** or **RTX 5070 Ti** (6.10 GB each) or **CPU** (0.85 GB), then click **Install**. Setup downloads and checks the files for your selection. All GPU options include Hy-MT2 7B and the matching CUDA runtime. Setup creates the folder shown in **Installation folder**. For example, enter `D:\Games\SubZir` to install there. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
 
 ![Atreus tells Kratos about Sindri in God of War Ragnarök, with the English line above its Ukrainian translation in OBS](docs/images/god-of-war-obs.jpg)
 
@@ -43,7 +43,7 @@ The GPU menu is available for the [target languages configured for this backend]
 
 SubZir зчитує англійські субтитри з гри на ПК або з консолі, під’єднаної через карту захоплення, й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
-1. Запустіть **SubZir-Setup.exe**, виберіть **RTX 3080** (6,28 ГБ), **RTX 5070 Ti** (6,10 ГБ) або **CPU** (0,85 ГБ) і натисніть **Встановити**. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
+1. Запустіть **SubZir-Setup.exe**, виберіть **RTX 3080** (6,28 ГБ), **RTX 5070** чи **RTX 5070 Ti** (по 6,10 ГБ) або **CPU** (0,85 ГБ) і натисніть **Встановити**. Інсталятор створить папку за вказаним шляхом, наприклад `D:\Ігри\SubZir`. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
 2. У грі ввімкніть **англійські субтитри**. Додайте зображення гри до сцени OBS.
    - **Гра на цьому ПК.** Запустіть гру. В OBS відкрийте **Джерела → + → Захоплення гри**, виберіть режим захоплення окремого вікна, а потім вікно гри. Для цього достатньо самого ПК.
    - **Консоль.** Додайте карту захоплення як **Пристрій захоплення відео**.

@@ -53,4 +53,4 @@ replace the script under Tools → Scripts with OBS/PS5-Subtitles.lua from
 the folder containing the new launcher.
 
 CUSTOM MODELS
-The RTX 3080 and RTX 5070 Ti editions already include the runtime and the 7B model. Close SubZir. Copy a compatible chat translation GGUF into app/models, reopen the launcher, choose the filename under Translation model and test it in OBS.
+The RTX 3080, RTX 5070 and RTX 5070 Ti profiles already include the runtime and the 7B model. Close SubZir. Copy a compatible chat translation GGUF into app/models, reopen the launcher, choose the filename under Translation model and test it in OBS.

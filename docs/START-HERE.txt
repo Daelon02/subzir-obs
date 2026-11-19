@@ -1,8 +1,8 @@
-SubZir v0.4.0
+﻿SubZir v0.4.0
 
 Відкрийте SubZir.exe. Інструкція зі скриншотами: docs/PLAYER-UA.md.
 Для перегляду у браузері відкрийте docs/PLAYER-UA.html.
-У збірках RTX 3080 та RTX 5070 Ti модель Hy-MT2 7B вже встановлено.
+У збірках RTX 3080, RTX 5070 та RTX 5070 Ti модель Hy-MT2 7B вже встановлено.
 
 Open SubZir.exe. See docs/PLAYER-EN.md for the illustrated player guide,
-or open docs/PLAYER-EN.html in a browser. Both GPU editions include Hy-MT2 7B.
+or open docs/PLAYER-EN.html in a browser. All GPU profiles include Hy-MT2 7B.

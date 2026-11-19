@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -34,7 +35,11 @@ sealed class Setup : Form {
         var gpuTitle=new Label();
         Place(gpuTitle,T("Graphics card","Відеокарта"),18,16,490,24);
         Place(gpu,"",18,41,506,30);gpu.DropDownStyle=ComboBoxStyle.DropDownList;
-        gpu.Items.AddRange(new object[]{"RTX 3080  ·  Hy-MT2 7B  ·  6.28 GB","RTX 5070 Ti  ·  Hy-MT2 7B  ·  6.10 GB","CPU  ·  QuickMT / M2M100  ·  0.85 GB"});
+        gpu.DisplayMember="Key";
+        gpu.Items.Add(new KeyValuePair<string,string>("RTX 3080  ·  Hy-MT2 7B  ·  6.28 GB","3080"));
+        gpu.Items.Add(new KeyValuePair<string,string>("RTX 5070  ·  Hy-MT2 7B  ·  6.10 GB","5070-Ti"));
+        gpu.Items.Add(new KeyValuePair<string,string>("RTX 5070 Ti  ·  Hy-MT2 7B  ·  6.10 GB","5070-Ti"));
+        gpu.Items.Add(new KeyValuePair<string,string>("CPU  ·  QuickMT / M2M100  ·  0.85 GB","cpu"));
         gpu.SelectedIndex=0;
         Place(new Label(),T("Installation folder","Папка встановлення"),18,85,488,25);
         Place(folder,existing??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),@"Programs\SubZir"),18,112,395,31);
@@ -58,7 +63,7 @@ sealed class Setup : Form {
             if(active!=null){active.Cancel();return;}
             string dir;
             try{if(!Path.IsPathRooted(folder.Text))throw new IOException(T("Select a folder.","Виберіть папку."));dir=Path.GetFullPath(folder.Text);}catch(Exception ex){MessageBox.Show(this,ex.Message,Text);return;}
-            string edition=new[]{"3080","5070-Ti","cpu"}[gpu.SelectedIndex];
+            string edition=((KeyValuePair<string,string>)gpu.SelectedItem).Value;
             bool update=existing!=null || File.Exists(Path.Combine(dir,"SubZir.exe"));
             var token=new CancellationTokenSource();active=token;
             gpu.Enabled=false;folder.Enabled=false;browse.Enabled=false;

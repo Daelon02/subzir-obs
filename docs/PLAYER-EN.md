@@ -4,7 +4,7 @@ SubZir reads a game's English subtitles and displays their translation in your O
 
 ## 1. Get the edition for your PC
 
-Open **SubZir-Setup.exe**, select **RTX 3080**, **RTX 5070 Ti** or **CPU**, and click **Install**. When setup finishes, click **Open SubZir**. Both GPU editions include Hy-MT2 7B. Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
+Open **SubZir-Setup.exe**, select **RTX 3080**, **RTX 5070**, **RTX 5070 Ti** or **CPU**, and click **Install**. When setup finishes, click **Open SubZir**. All GPU profiles include Hy-MT2 7B. Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
 
 ![SubZir showing the three setup buttons, the selected 7B model and the subtitle appearance control](images/launcher-7b-en.png)
 
