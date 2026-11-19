@@ -31,6 +31,23 @@ def echoes_history(result, text, previous, translations):
     return False
 
 
+def retry_dialogue(complete, text, previous, language, known):
+    prompt = (f"Translate only the final line of game dialogue into natural {language}. "
+              "Use the earlier lines to interpret the speaker's meaning. Output only the translation."
+              f"\n\nEarlier lines:\n{previous}\n\nFinal line:\n{text}")
+    try:
+        result = complete([{"role": "user", "content": prompt}])
+    except HTTPError as error:
+        if error.code != 400:
+            raise
+        return None
+    except ValueError:
+        return None
+    if echoes_history(result, text, previous, known):
+        return None
+    return " ".join(result.splitlines())
+
+
 def main():
     sys.stdin.reconfigure(encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8")
@@ -74,7 +91,13 @@ def main():
 
     recent_by_zone = {}
 
-    def translate(text, previous, hud=False, zone=None):
+    def translate(text, previous, hud=False, zone=None, legend=False, nearby=""):
+        if legend:
+            others = ", ".join(nearby.splitlines())
+            prompt = (f"You are localizing a game's interactive map. Write the shortest clear {language} "
+                      f"interface label for the selected control. Other controls: {others}. "
+                      f"Output only the localized label.\n\n{text}")
+            return complete([{"role": "user", "content": prompt}])
         if hud:
             prompt = (f"Localize the following video game interface text into {language}. "
                       "For a menu action use a concise button label. Keep instructions clear. "
@@ -82,10 +105,8 @@ def main():
             return complete([{"role":"user","content":prompt}])
         current = {"role":"user","content":f"{instruction}\n\n{text}"}
         # Limit comparisons to the context selected by this zone's Rust stabilizer.
-        recent = {}
-        if concise_dialogue:
-            known = recent_by_zone.get(zone, {})
-            recent = {line: known[line] for line in previous.splitlines() if line in known}
+        known = recent_by_zone.get(zone, {})
+        recent = {line: known[line] for line in previous.splitlines() if line in known}
         result = None
         if previous:
             if concise_dialogue:
@@ -104,18 +125,21 @@ def main():
                 contextual = complete(conversation)
                 if concise_dialogue and not echoes_history(contextual, text, previous, recent):
                     result = " ".join(contextual.splitlines())
-                elif not concise_dialogue and "\n" not in contextual and sentence_count(contextual) <= sentence_count(text):
+                elif (not concise_dialogue and "\n" not in contextual
+                      and sentence_count(contextual) <= sentence_count(text)
+                      and not echoes_history(contextual, text, previous, recent)):
                     result = contextual
             except HTTPError as error:
                 if error.code != 400:
                     raise
             except ValueError:
                 pass
+            if result is None:
+                result = retry_dialogue(complete, text, previous, language, recent)
         if result is None:
             result = complete([current])
-        if concise_dialogue:
-            recent[text] = result
-            recent_by_zone[zone] = recent
+        recent[text] = result
+        recent_by_zone[zone] = recent
         return result
 
     translate("Ready.", "")
@@ -129,7 +153,8 @@ def main():
             previous, last = obj, now
         else:
             try:
-                result = translate(obj["text"], obj["previous"], obj.get("hud", False), obj.get("zone"))
+                result = translate(obj["text"], obj["previous"], obj.get("hud", False),
+                                   obj.get("zone"), obj.get("legend", False), obj.get("nearby", ""))
             except ValueError:
                 if not obj.get("draft"):
                     raise

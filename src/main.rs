@@ -1,4 +1,5 @@
 mod dialogue;
+mod legend;
 mod stability;
 mod zones;
 use dialogue::DialogueHistory;

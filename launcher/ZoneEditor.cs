@@ -10,6 +10,7 @@ sealed class Zone {
     public float X,Y,Width;
     public int Left,Top,W,H;
     public bool Hud;
+    public bool Legend;
     public float HudOffsetX,HudOffsetY;
     public Zone(){}
     public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f && Math.Abs(HudOffsetX)<=1 && Math.Abs(HudOffsetY)<=1;}
@@ -45,6 +46,7 @@ sealed class Stage : Control {
         var next=new Bitmap(image);if(photo!=null)photo.Dispose();photo=next;Invalidate();
     }
     public static RectangleF DrawCaption(Graphics g,Zone z,string text,SubtitleStyle style){
+        if(z.Legend)return LegendOverlay.Preview(g,z,text,style);
         if(z.Hud)return DrawHud(g,z,text,style);
         float w=z.Width*W;
         using(var font=new Font(style.face,style.size*2f/3f,(FontStyle)(style.flags & 15),GraphicsUnit.Pixel))
@@ -133,7 +135,7 @@ sealed class Stage : Control {
             if(DrawInput){if(p.X<0||p.Y<0||p.X>=W||p.Y>=H)return;anchor=tip=p;drawing=true;Capture=true;Invalidate();return;}
             for(int i=Zones.Count-1;i>=0;i--){
                 var z=Zones[i];RectangleF r;if(!hit.TryGetValue(z,out r)||!r.Contains(p))continue;
-                Selected=z;grab=new PointF(p.X-r.X,p.Y-r.Y);dragging=true;Capture=true;
+                Selected=z;grab=new PointF(p.X-r.X,p.Y-r.Y);dragging=!z.Legend;Capture=dragging;
                 hudOrigin=r.Location;hudOffsets=new PointF(z.HudOffsetX,z.HudOffsetY);
                 if(SelectionChanged!=null)SelectionChanged();Invalidate();break;
             }
@@ -201,11 +203,18 @@ sealed class Editor : Form {
         bottom.Controls.Add(Caption(T("Ширина, %","Width, %")));bottom.Controls.Add(width);
         var hud=new CheckBox{Text=T("HUD над оригіналом","HUD above original"),AutoSize=true,Margin=new Padding(8,8,2,0)};
         bottom.Controls.Add(hud);
+        var legend=new CheckBox{Text=T("Легенда карти · автоматичні пункти","Map legend · automatic entries"),AutoSize=true,Margin=new Padding(8,8,2,0)};
+        bottom.Controls.Add(legend);
         hud.CheckedChanged+=delegate{if(!syncing){stage.Selected.Hud=hud.Checked;stage.Invalidate();}};
+        legend.CheckedChanged+=delegate{if(!syncing){
+            stage.Selected.Legend=legend.Checked;
+            hud.Enabled=width.Enabled=!legend.Checked;stage.Invalidate();
+        }};
         foreach(var z in stage.Zones)zones.Items.Add(z);
         zones.SelectedIndexChanged+=delegate{
             var z=(Zone)zones.SelectedItem;stage.Selected=z;syncing=true;
-            sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);hud.Checked=z.Hud;syncing=false;stage.Invalidate();
+            sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);hud.Checked=z.Hud;legend.Checked=z.Legend;
+            hud.Enabled=width.Enabled=!z.Legend;syncing=false;stage.Invalidate();
         };
         sample.TextChanged+=delegate{if(!syncing){stage.Selected.Text=sample.Text;stage.Invalidate();}};
         width.ValueChanged+=delegate{if(!syncing){stage.Selected.Width=(float)width.Value/100;stage.Invalidate();}};

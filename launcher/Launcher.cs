@@ -116,7 +116,7 @@ partial class Launcher : Form {
         zoneGuide.Click+=delegate {using(var dialog=new ZoneGuide())dialog.ShowDialog(this);};
         language.SetBounds(482,21,200,38);
         language.Click += delegate {
-            try { using(var dialog = new LanguageDialog(busy && Ui.Model!="auto")) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
+            try { using(var dialog = new LanguageDialog(busy && (Ui.Model!="auto" || (layout!=null && Array.Exists(layout,z=>z.Legend))))) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
             catch (IOException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
             catch (UnauthorizedAccessException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
         };

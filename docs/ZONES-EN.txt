@@ -4,6 +4,6 @@
 
 3. Start with dialogue. Turn on “Draw OCR area” and drag a box around the English subtitles, leaving room for a second line. The yellow box marks the text to read. Turn drawing off and drag the sample translation to the position you want in OBS. “Width, %” controls wrapping.
 
-4. Click “Add zone” for an objective or a hint and draw its own reading area. For a short menu item, enable “HUD above original” for that zone. Keep the controller icon outside the yellow box. Leave HUD off for regular dialogue. Select an existing entry in the “Zone” list to adjust it.
+4. Click “Add zone” for an objective or a hint and draw its own reading area. For a whole map legend, enable “Map legend · automatic entries” and draw one box around all the labels and their buttons. Each detected entry gets its own translation. For a single menu item, select “HUD above original” and draw around just the text. Leave HUD off for regular dialogue. Select an existing entry in the “Zone” list to adjust it.
 
 5. Click “Save zones”, then “Start translation”. All zones share one input frame and appear on one transparent layer in OBS. Their positions are saved for the next launch. You can add up to eight zones.

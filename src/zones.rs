@@ -8,6 +8,7 @@ const MAX_ZONES: usize = 8;
 struct Zone {
     crop: [u32; 4],
     hud: bool,
+    legend: Option<legend::Legend>,
     stable: Stabilizer,
     history: DialogueHistory,
     previous: Vec<u8>,
@@ -33,11 +34,36 @@ impl Zone {
         Ok(Self {
             crop: [w, h, x, y],
             hud: row["Hud"].as_bool().unwrap_or_default(),
+            legend: row["Legend"]
+                .as_bool()
+                .unwrap_or_default()
+                .then(legend::Legend::default),
             stable: Stabilizer::default(),
             history: DialogueHistory::default(),
             previous: Vec::new(),
             reading: String::new(),
         })
+    }
+    fn scaled(&self) -> [i32; 2] {
+        let [w, h, _, _] = self.crop;
+        let max_height = if self.legend.is_some() { 1080 } else { HEIGHT };
+        let ratio = (f64::from(WIDTH) / f64::from(w)).min(f64::from(max_height) / f64::from(h));
+        let ratio = if self.legend.is_some() {
+            ratio.min(3.)
+        } else {
+            ratio
+        };
+        [
+            (f64::from(w) * ratio).round() as i32,
+            (f64::from(h) * ratio).round() as i32,
+        ]
+    }
+    fn tile_height(&self) -> i32 {
+        if self.legend.is_some() {
+            self.scaled()[1]
+        } else {
+            HEIGHT
+        }
     }
     fn observe(&mut self, ocr: &OcrEngine, pixels: &[u8], now: Instant) -> Result<Option<String>> {
         if self.previous != pixels {
@@ -91,12 +117,11 @@ fn filter(zones: &[Zone]) -> String {
         let right = format!("round(iw*{}/{CANVAS_W})", x + w);
         let bottom = format!("round(ih*{}/{CANVAS_H})", y + h);
         // The editor stretches its preview to 1280x720 even for non-16:9 input.
-        let ratio = (f64::from(WIDTH) / f64::from(w)).min(f64::from(HEIGHT) / f64::from(h));
-        let scaled_w = (f64::from(w) * ratio).round();
-        let scaled_h = (f64::from(h) * ratio).round();
+        let [scaled_w, scaled_h] = zone.scaled();
+        let height = zone.tile_height();
         let _ = write!(
             graph,
-            ";[r{i}]crop=w='max(1,{right}-{left})':h='max(1,{bottom}-{top})':x={left}:y={top}:exact=1,format=gray,scale={scaled_w}:{scaled_h},pad={WIDTH}:{HEIGHT}:0:0,setsar=1[o{i}]"
+            ";[r{i}]crop=w='max(1,{right}-{left})':h='max(1,{bottom}-{top})':x={left}:y={top}:exact=1,format=gray,scale={scaled_w}:{scaled_h},pad={WIDTH}:{height}:0:0,setsar=1[o{i}]"
         );
     }
     graph.push(';');
@@ -157,7 +182,10 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
     );
     let mut pipe = pipe(capture.0.stdout.take())?;
     let (send, frames) = mpsc::sync_channel(1);
-    let bytes = FRAME_BYTES * zones.len();
+    let bytes = zones
+        .iter()
+        .map(|z| (WIDTH * z.tile_height()) as usize)
+        .sum();
     // Drain the device even while inference is busy. Each message contains every ROI from one frame.
     thread::spawn(move || {
         let mut buffer = vec![0; bytes];
@@ -176,15 +204,43 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
         }
     });
     let ocr = engine()?;
-    let mut captions = vec![String::new(); zones.len()];
+    let mut captions: Vec<_> = zones
+        .iter()
+        .map(|z| {
+            if z.legend.is_some() {
+                json!({"rows":[],"bands":[]})
+            } else {
+                json!("")
+            }
+        })
+        .collect();
+    let mut offset = 0;
+    let mut order: Vec<_> = zones
+        .iter()
+        .enumerate()
+        .map(|(i, z)| {
+            let start = offset;
+            offset += (WIDTH * z.tile_height()) as usize;
+            (i, start..offset)
+        })
+        .collect();
+    order.sort_by_key(|(i, _)| zones[*i].legend.is_some());
     for frame in frames {
         let frame = frame?;
         let now = Instant::now();
-        for (i, (zone, pixels)) in zones
-            .iter_mut()
-            .zip(frame.as_chunks::<FRAME_BYTES>().0)
-            .enumerate()
-        {
+        for &(i, ref span) in &order {
+            let zone = &mut zones[i];
+            let pixels = &frame[span.start..span.end];
+            let scaled = zone.scaled();
+            if let Some(legend) = zone.legend.as_mut() {
+                if let Some(snapshot) =
+                    legend.observe(&ocr, pixels, scaled, zone.crop, worker, i)?
+                {
+                    captions[i] = snapshot;
+                    println!("{}", json!({"zone":i,"captions":captions}));
+                }
+                continue;
+            }
             let Some(en) = zone.observe(&ocr, pixels, now)? else {
                 continue;
             };
@@ -195,7 +251,7 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
                 worker.request(&json!({"zone":i,"text":en,"previous":previous,"hud":zone.hud}))?
             };
             zone.history.confirm(&en, now);
-            captions[i].clone_from(&uk);
+            captions[i] = json!(uk);
             println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
         }
     }

@@ -247,6 +247,9 @@ def main():
         request = json.loads(line)
         if isinstance(request, dict):
             original = request["text"]
+            if request.get("legend"):
+                print(json.dumps(render(original, original, target_language()), ensure_ascii=False), flush=True)
+                continue
             key = request["zone"]
             if key not in zones:
                 zones[key] = DialogueContext()

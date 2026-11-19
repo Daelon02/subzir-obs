@@ -61,6 +61,15 @@ partial class Launcher {
         var captions=(System.Collections.IList)values;
         if(layout==null || captions.Count!=layout.Length)throw new InvalidDataException("Zone count mismatch");
         int next=1-imageSlot;
+        var display=new List<string>();
+        var legends=new LegendSnapshot[layout.Length];
+        var occupied=new List<RectangleF>();
+        var json=new JavaScriptSerializer();
+        for(int i=0;i<layout.Length;i++){
+            if(!layout[i].Legend || captions[i]==null)continue;
+            legends[i]=json.ConvertToType<LegendSnapshot>(captions[i]);
+            LegendOverlay.Protect(layout[i],legends[i],occupied);
+        }
         string path=Path.Combine(Data,"zones-"+next+".png");
         string tmp=path+"."+Guid.NewGuid().ToString("N");
         try {
@@ -69,7 +78,12 @@ partial class Launcher {
             using(var g=Graphics.FromImage(bmp)){
                 for(int i=0;i<layout.Length;i++){
                     string text=captions[i] as string;
-                    if(!String.IsNullOrEmpty(text))Stage.DrawCaption(g,layout[i],text,style);
+                    if(!String.IsNullOrEmpty(text)){
+                        occupied.Add(Stage.DrawCaption(g,layout[i],text,style));display.Add(text);
+                    }
+                }
+                for(int i=0;i<layout.Length;i++){
+                    if(legends[i]!=null)LegendOverlay.Draw(g,layout[i],legends[i],style,occupied,display);
                 }
                 bmp.Save(tmp,ImageFormat.Png);
             }
@@ -77,7 +91,7 @@ partial class Launcher {
             File.WriteAllText(tmp,"zones-"+next+"-"+Guid.NewGuid().ToString("N")+"\n",Utf8);
             ReplaceFile(tmp,Path.Combine(Data,"caption.txt"));imageSlot=next;
         }finally{if(File.Exists(tmp))File.Delete(tmp);}
-        return String.Join(Environment.NewLine,captions.Cast<string>().Where(text=>!String.IsNullOrEmpty(text)));
+        return String.Join(Environment.NewLine,display);
     }
     static void ReplaceFile(string from,string to){
         if(File.Exists(to))File.Replace(from,to,null);else File.Move(from,to);
