@@ -78,8 +78,8 @@ static class Install {
             try {if(!mutex.WaitOne(10000))throw new IOException("Close SubZir and retry.");}
             catch(AbandonedMutexException) {}
             string scratch=Path.Combine(dir,".update-"+Guid.NewGuid().ToString("N"));
-            string[] resources={"engine","worker","obs","launcher"};
-            string[] paths={Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target};
+            string[] resources={"engine","worker","hyworker","obs","launcher"};
+            string[] paths={Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"app\hy_worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target};
             int committed=0;
             try {
                 Directory.CreateDirectory(scratch);

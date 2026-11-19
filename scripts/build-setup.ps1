@@ -31,7 +31,7 @@ using System.Reflection;
         if ($LASTEXITCODE) {throw 'Translation engine build failed.'}
         $metadata = cargo metadata --no-deps --format-version 1 | ConvertFrom-Json
         $engine = Join-Path $metadata.target_directory 'release/subtitle-rs.exe'
-        & $csc @flags "/out:$out/SubZir-Setup.exe" "/resource:$launcher,launcher" "/resource:$engine,engine" '/resource:worker/worker.py,worker' '/resource:obs/PS5-Subtitles.lua,obs' '/resource:installer/base.json,baseline' '/r:System.IO.Compression.dll' '/r:Microsoft.CSharp.dll' $versionFile installer\Channel.cs installer\Install.cs installer\Setup.cs
+        & $csc @flags "/out:$out/SubZir-Setup.exe" "/resource:$launcher,launcher" "/resource:$engine,engine" '/resource:worker/worker.py,worker' '/resource:worker/hy_worker.py,hyworker' '/resource:obs/PS5-Subtitles.lua,obs' '/resource:installer/base.json,baseline' '/r:System.IO.Compression.dll' '/r:Microsoft.CSharp.dll' $versionFile installer\Channel.cs installer\Install.cs installer\Setup.cs
         if ($LASTEXITCODE) {throw 'Installer build failed.'}
     }
 } finally {Pop-Location; [IO.Directory]::Delete($scratch,$true)}

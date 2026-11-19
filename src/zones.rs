@@ -7,6 +7,7 @@ const MAX_ZONES: usize = 8;
 
 struct Zone {
     crop: [u32; 4],
+    hud: bool,
     stable: Stabilizer,
     history: DialogueHistory,
     previous: Vec<u8>,
@@ -31,6 +32,7 @@ impl Zone {
         }
         Ok(Self {
             crop: [w, h, x, y],
+            hud: row["Hud"].as_bool().unwrap_or_default(),
             stable: Stabilizer::default(),
             history: DialogueHistory::default(),
             previous: Vec::new(),
@@ -181,7 +183,7 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
             let uk = if en.is_empty() {
                 String::new()
             } else {
-                worker.request(&json!({"zone":i,"text":en,"previous":previous}))?
+                worker.request(&json!({"zone":i,"text":en,"previous":previous,"hud":zone.hud}))?
             };
             zone.history.confirm(&en, now);
             captions[i].clone_from(&uk);

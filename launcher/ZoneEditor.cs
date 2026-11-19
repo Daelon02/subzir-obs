@@ -9,8 +9,10 @@ sealed class Zone {
     public string Name, Text;
     public float X,Y,Width;
     public int Left,Top,W,H;
+    public bool Hud;
+    public float HudOffsetX,HudOffsetY;
     public Zone(){}
-    public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f;}
+    public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f && Math.Abs(HudOffsetX)<=1 && Math.Abs(HudOffsetY)<=1;}
     public Zone(string name,string text,float x,float y,float width) {
         Name=name; Text=text; X=x; Y=y; Width=width;
         Left=(int)(x*1280);Top=(int)(y*720);W=(int)(width*1280);H=62;
@@ -26,6 +28,7 @@ sealed class Stage : Control {
     Bitmap photo;
 
     PointF grab;
+    PointF hudOrigin,hudOffsets;
     bool dragging;
     const float W=1280,H=720,Pad=12;
     static readonly Color Accent=Color.FromArgb(115,235,207);
@@ -42,6 +45,7 @@ sealed class Stage : Control {
         var next=new Bitmap(image);if(photo!=null)photo.Dispose();photo=next;Invalidate();
     }
     public static RectangleF DrawCaption(Graphics g,Zone z,string text,SubtitleStyle style){
+        if(z.Hud)return DrawHud(g,z,text,style);
         float w=z.Width*W;
         using(var font=new Font(style.face,style.size*2f/3f,(FontStyle)(style.flags & 15),GraphicsUnit.Pixel))
         using(var fmt=new StringFormat{Alignment=StringAlignment.Center})
@@ -57,6 +61,38 @@ sealed class Stage : Control {
                 var outline=body;outline.Offset(d.X,d.Y);g.DrawString(text,font,Brushes.Black,outline,fmt);
             }
             g.DrawString(text,font,ink,body,fmt);return r;
+        }
+    }
+    static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style){
+        const float px=5,py=1,gap=2;
+        string caption=text.ToUpperInvariant();
+        using(var font=new Font(style.face,Math.Max(10,Math.Min(24,style.size*.4f)),FontStyle.Bold,GraphicsUnit.Pixel))
+        using(var fmt=(StringFormat)StringFormat.GenericTypographic.Clone())
+        using(var back=new SolidBrush(Color.FromArgb(240,17,21,23)))
+        using(var ink=new SolidBrush(Color.FromArgb(255,212,70))){
+            fmt.Alignment=StringAlignment.Center;
+            var measured=g.MeasureString(caption.Length==0?" ":caption,font,(int)(zone.Width*W-2*px),fmt);
+            float width=Math.Min(zone.Width*W,(float)Math.Ceiling(measured.Width)+2*px);
+            float height=Math.Min(H,(float)Math.Ceiling(measured.Height)+2*py);
+            float above=zone.Top-height-gap;
+            float top=above>=0?above:zone.Top+zone.H+gap;
+            float x=Math.Max(0,Math.Min(W-width,zone.Left+zone.W-width+zone.HudOffsetX*W));
+            float y=Math.Max(0,Math.Min(H-height,top+zone.HudOffsetY*H));
+            var r=new RectangleF(x,y,width,height);
+            if(caption.Length==0)return r;
+            var state=g.Save();
+            try{
+                g.SmoothingMode=SmoothingMode.AntiAlias;
+                g.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                using(var path=new GraphicsPath()){
+                    float d=Math.Min(10,Math.Min(width,height));
+                    path.AddArc(x,y,d,d,180,90);path.AddArc(r.Right-d,y,d,d,270,90);
+                    path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(x,r.Bottom-d,d,d,90,90);
+                    path.CloseFigure();g.FillPath(back,path);
+                }
+                g.DrawString(caption,font,ink,new RectangleF(x+px,y+py,width-2*px,height-2*py),fmt);
+            }finally{g.Restore(state);}
+            return r;
         }
     }
     readonly SubtitleStyle style=SubtitleStyle.Load();
@@ -98,6 +134,7 @@ sealed class Stage : Control {
             for(int i=Zones.Count-1;i>=0;i--){
                 var z=Zones[i];RectangleF r;if(!hit.TryGetValue(z,out r)||!r.Contains(p))continue;
                 Selected=z;grab=new PointF(p.X-r.X,p.Y-r.Y);dragging=true;Capture=true;
+                hudOrigin=r.Location;hudOffsets=new PointF(z.HudOffsetX,z.HudOffsetY);
                 if(SelectionChanged!=null)SelectionChanged();Invalidate();break;
             }
         }
@@ -106,8 +143,13 @@ sealed class Stage : Control {
         base.OnMouseMove(e);var p=ScenePoint(e.Location);
         if(drawing){tip=new PointF(Math.Max(0,Math.Min(W,p.X)),Math.Max(0,Math.Min(H,p.Y)));Invalidate();return;}
         RectangleF r;if(!dragging||!hit.TryGetValue(Selected,out r))return;
-        Selected.X=Math.Max(0,Math.Min(W-r.Width,p.X-grab.X))/W;
-        Selected.Y=Math.Max(0,Math.Min(H-r.Height,p.Y-grab.Y))/H;Invalidate();
+        float x=Math.Max(0,Math.Min(W-r.Width,p.X-grab.X));
+        float y=Math.Max(0,Math.Min(H-r.Height,p.Y-grab.Y));
+        if(Selected.Hud){
+            Selected.HudOffsetX=Math.Max(-1,Math.Min(1,hudOffsets.X+(x-hudOrigin.X)/W));
+            Selected.HudOffsetY=Math.Max(-1,Math.Min(1,hudOffsets.Y+(y-hudOrigin.Y)/H));
+        }else{Selected.X=x/W;Selected.Y=y/H;}
+        Invalidate();
     }
     protected override void OnMouseUp(MouseEventArgs e){
         if(drawing){var r=InputRect();if(r.Width>=8&&r.Height>=8){Selected.Left=r.X;Selected.Top=r.Y;Selected.W=r.Width;Selected.H=r.Height;}}
@@ -142,7 +184,7 @@ sealed class Editor : Form {
             int n=1;string name;do{name=T("Зона ","Zone ")+(n++);}while(stage.Zones.Any(item=>item.Name==name));
             string example=stage.Zones.Count==1?T("Знайди човен біля пристані.","Find the boat by the dock."):
                 stage.Zones.Count==2?T("Натисни △, щоб взаємодіяти.","Press △ to interact."):T("Приклад перекладу","Example translation");
-            var z=new Zone(name,example,.36f,.43f,.30f);
+            var z=new Zone(name,example,.36f,.43f,.30f){Hud=true};
             stage.Zones.Add(z);zones.Items.Add(z);zones.SelectedItem=z;draw.Checked=true;stage.Invalidate();
         });top.Controls.Add(add);
         top.Controls.Add(Btn(T("Видалити","Remove"),delegate{
@@ -157,10 +199,13 @@ sealed class Editor : Form {
         top.Controls.Add(Caption(T("Жовта рамка зчитує текст. Вимкни виділення, щоб перетягнути переклад.","Yellow box reads text. Turn off drawing to drag a translation.")));
         bottom.Controls.Add(Caption(T("Зона","Zone")));bottom.Controls.Add(zones);bottom.Controls.Add(Caption(T("Приклад","Sample")));bottom.Controls.Add(sample);
         bottom.Controls.Add(Caption(T("Ширина, %","Width, %")));bottom.Controls.Add(width);
+        var hud=new CheckBox{Text=T("HUD над оригіналом","HUD above original"),AutoSize=true,Margin=new Padding(8,8,2,0)};
+        bottom.Controls.Add(hud);
+        hud.CheckedChanged+=delegate{if(!syncing){stage.Selected.Hud=hud.Checked;stage.Invalidate();}};
         foreach(var z in stage.Zones)zones.Items.Add(z);
         zones.SelectedIndexChanged+=delegate{
             var z=(Zone)zones.SelectedItem;stage.Selected=z;syncing=true;
-            sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);syncing=false;stage.Invalidate();
+            sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);hud.Checked=z.Hud;syncing=false;stage.Invalidate();
         };
         sample.TextChanged+=delegate{if(!syncing){stage.Selected.Text=sample.Text;stage.Invalidate();}};
         width.ValueChanged+=delegate{if(!syncing){stage.Selected.Width=(float)width.Value/100;stage.Invalidate();}};

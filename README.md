@@ -39,11 +39,13 @@ The GPU menu is available for the [target languages configured for this backend]
 
 ### Translate several areas of a game
 
-In the Windows test build with the zone editor, click **Zone editor · OBS** to freeze the current frame, or **Zone editor · video file** to replay a local recording. Select **Draw OCR area** and drag around the original English text. Turn drawing off, then drag the sample translation to its output position. **Add zone** repeats this for another region. Choose **Save zones**, then **Start translation**. The layout is saved in `runtime/zones.json`. The original single-area picker switches back to single-subtitle mode.
+In the Windows test build with the zone editor, click **Zone editor · OBS** to freeze the current frame, or **Zone editor · video file** to replay a local recording. Select **Draw OCR area** and drag around the original English text. Turn drawing off, then drag the sample translation to its output position. **Add zone** repeats this for another region. Choose **Save zones**, then **Start translation**. The layout is saved in `runtime/zones.json`. For a menu item, draw around its English text, leaving the button icon outside the box. **HUD above original** places a compact yellow translation above that row. Give each menu row its own zone. The original single-area picker switches back to single-subtitle mode.
 
 After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add subtitles to the game scene. The script adds one transparent layer for the positioned translations. With one visible game, capture-card or video source at the top level of the scene, the layer follows its transform. Otherwise positions are relative to the full OBS canvas. For live capture, set the virtual camera output to the game **source** so the translation stays out of the OCR input.
 
 ![God of War Ragnarök in OBS with the boss name on the left and the separate combat hint near the bottom](docs/images/god-of-war-zones.jpg)
+
+![Compact yellow HUD translations above the original English menu labels in God of War Ragnarök](docs/images/god-of-war-hud.jpg)
 
 **Updates.** Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
 
@@ -80,7 +82,7 @@ After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add
 
 ### Кілька зон перекладу
 
-У тестовій збірці натисніть **Редактор зон · OBS** для кадру віртуальної камери або **Редактор зон · відеофайл** для запису. Увімкніть **Виділити текст у грі** й обведіть англійський напис. Вимкніть виділення й перетягніть приклад перекладу туди, де його має бачити глядач. Виберіть **Додати зону** для наступного напису. Натисніть **Зберегти зони**, потім **Почати переклад**. Розташування відновиться після перезапуску. Щоб повернутися до одного рядка, скористайтеся звичайним вибором області субтитрів.
+У тестовій збірці натисніть **Редактор зон · OBS** для кадру віртуальної камери або **Редактор зон · відеофайл** для запису. Увімкніть **Виділити текст у грі** й обведіть англійський напис. Вимкніть виділення й перетягніть приклад перекладу туди, де його має бачити глядач. Виберіть **Додати зону** для наступного напису. Натисніть **Зберегти зони**, потім **Почати переклад**. Розташування відновиться після перезапуску. Для меню виділіть текст одного пункту, залишивши іконку кнопки поза рамкою. **HUD над оригіналом** показує компактну жовту плашку над цим рядком. Для наступного пункту додайте окрему зону. Щоб повернутися до одного рядка, скористайтеся звичайним вибором області субтитрів.
 
 Після оновлення перезавантажте файл `OBS/PS5-Subtitles.lua` у скриптах OBS і натисніть його кнопку додавання субтитрів до сцени. Під час перекладу з’явиться один прозорий шар із усіма зонами. Якщо у сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS. Для віртуальної камери виберіть вихід **Джерело** й укажіть гру.
 

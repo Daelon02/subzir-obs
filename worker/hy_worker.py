@@ -47,7 +47,12 @@ def main():
             raise ValueError(f"{label} did not finish the subtitle")
         return result
 
-    def translate(text, previous):
+    def translate(text, previous, hud=False):
+        if hud:
+            prompt = (f"Localize the following video game interface text into {language}. "
+                      "For a menu action use a concise button label. Keep instructions clear. "
+                      "Output only the translation.\n\n" + text)
+            return complete([{"role":"user","content":prompt}])
         current = {"role":"user","content":f"{instruction}\n\n{text}"}
         if previous:
             earlier = " ".join(previous.splitlines())
@@ -77,7 +82,7 @@ def main():
             previous, last = obj, now
         else:
             try:
-                result = translate(obj["text"], obj["previous"])
+                result = translate(obj["text"], obj["previous"], obj.get("hud", False))
             except ValueError:
                 if not obj.get("draft"):
                     raise
