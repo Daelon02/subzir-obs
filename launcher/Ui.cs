@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
 
-enum Msg { Window, Title, Subtitle, Connect, ConnectHint, Test, TestHint, SelectArea, SelectHint, Start, Guide, ConnectFirst, AreaReady, Help, ConnectTitle, Stopped, Loading, Checking, Active, TestSuccess, TestNoAck, ResponseError, Waiting, Stop, OcrMissing, CheckCamera, TestFailed, TestEmpty, StartError, GettingFrame, NoFrame, Cancelled, Saved, FrameError, AlreadyOpen, LaunchError, Picker, Save, Cancel, Language, Interface, Target, Apply, ChooseLanguages, SettingsError, GuideBody, AddScene, Model, Automatic, Appearance, Font, Background, Opacity, Outline, ModelError }
+enum Msg { Window, Title, Subtitle, Connect, ConnectHint, Test, TestHint, SelectArea, SelectHint, Start, Guide, ConnectFirst, AreaReady, Help, ConnectTitle, Stopped, Loading, Checking, Active, TestSuccess, TestNoAck, ResponseError, Waiting, Stop, OcrMissing, CheckCamera, TestFailed, TestEmpty, StartError, GettingFrame, NoFrame, Cancelled, Saved, FrameError, AlreadyOpen, LaunchError, Picker, Save, Cancel, Language, Interface, Target, Apply, ChooseLanguages, SettingsError, GuideBody, AddScene, Model, Automatic, Appearance, Font, Background, Opacity, Outline, ModelError, CaptureSaveError }
 
 static class Ui {
     static readonly string Root = AppDomain.CurrentDomain.BaseDirectory;
@@ -92,12 +92,15 @@ static class Ui {
         ConciseDialogue=next;
         Language=ui; Target=target; Model=model; messages=Load(ui);
     }
-    public static void WriteJson(string path,object value) {
+    public static void WriteJson(string path,object value,string backup=null) {
+        WriteText(path,Json.Serialize(value),backup);
+    }
+    public static void WriteText(string path,string text,string backup=null) {
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         string temp = path + "." + Guid.NewGuid().ToString("N");
         try {
-            File.WriteAllText(temp,Json.Serialize(value),new UTF8Encoding(false));
-            if(File.Exists(path)) File.Replace(temp,path,null);
+            File.WriteAllText(temp,text,new UTF8Encoding(false));
+            if(File.Exists(path)) File.Replace(temp,path,backup);
             else File.Move(temp,path);
         } finally { if(File.Exists(temp)) File.Delete(temp); }
     }

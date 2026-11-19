@@ -1,8 +1,9 @@
 mod dialogue;
+mod dialogue_ocr;
 mod legend;
 mod stability;
 mod zones;
-use dialogue::{Card, DialogueHistory};
+use dialogue::{Card, DialogueHistory, ShownCaption};
 use serde_json::{json, Value};
 use stability::{Observation, Stabilizer};
 use std::{
@@ -19,7 +20,7 @@ use windows::{
     core::{HSTRING, PCWSTR},
     Globalization::Language,
     Graphics::Imaging::{BitmapPixelFormat, SoftwareBitmap},
-    Media::Ocr::OcrEngine,
+    Media::Ocr::{OcrEngine, OcrResult},
     Security::Cryptography::CryptographicBuffer,
     Win32::{
         Storage::FileSystem::{MoveFileExW, MOVEFILE_REPLACE_EXISTING},
@@ -199,12 +200,16 @@ fn engine() -> Result<OcrEngine> {
         &Language::CreateLanguage(&HSTRING::from("en-US"))?,
     )?)
 }
-fn recognize(engine: &OcrEngine, pixels: &[u8]) -> Result<String> {
+fn recognize_result(engine: &OcrEngine, pixels: &[u8]) -> Result<OcrResult> {
     let buf = CryptographicBuffer::CreateFromByteArray(pixels)?;
     let bmp = SoftwareBitmap::CreateCopyFromBuffer(&buf, BitmapPixelFormat::Gray8, WIDTH, HEIGHT)?;
-    Ok(engine
-        .RecognizeAsync(&bmp)?
-        .join()?
+    Ok(engine.RecognizeAsync(&bmp)?.join()?)
+}
+fn recognize(engine: &OcrEngine, pixels: &[u8]) -> Result<String> {
+    recognized_text(&recognize_result(engine, pixels)?)
+}
+fn recognized_text(result: &OcrResult) -> Result<String> {
+    Ok(result
         .Text()?
         .to_string()
         .split_whitespace()
@@ -312,6 +317,7 @@ enum Stage {
     Confirmed,
 }
 struct Line {
+    upper_end: Option<usize>,
     stage: Stage,
     context: String,
     start: Instant,
@@ -375,6 +381,7 @@ fn capture(
     let mut last_frame = Vec::new();
     let mut cleaned = vec![0; FRAME_BYTES];
     let mut reading = String::new();
+    let mut upper_end = None;
     let mut held = false;
     let mut stable = Stabilizer::default();
     loop {
@@ -388,12 +395,16 @@ fn capture(
             for ((out, &current), &prior) in cleaned.iter_mut().zip(bright).zip(previous) {
                 *out = current.min(prior);
             }
-            reading = recognize(&ocr, &cleaned)?;
+            (reading, upper_end) = dialogue_ocr::read(&ocr, &cleaned, stable.shown_text())?;
             if reading.trim().is_empty() && !unchanged {
-                reading = recognize(&ocr, bright)?;
+                (reading, upper_end) = dialogue_ocr::read(&ocr, bright, stable.shown_text())?;
             }
             if reading.trim().is_empty() {
-                reading = recognize(&ocr, gray)?;
+                (reading, upper_end) = dialogue_ocr::read(&ocr, gray, stable.shown_text())?;
+            } else {
+                let (text, boundary) = dialogue_ocr::recover(&ocr, reading, gray, &cleaned)?;
+                reading = text;
+                upper_end = boundary.or(upper_end);
             }
             // The high-contrast mask can split a letter in a short word. On
             // isolated text prefer the original strokes, then the enlarged crop.
@@ -411,6 +422,7 @@ fn capture(
                     };
                     if !candidate.is_empty() {
                         reading = candidate;
+                        upper_end = None;
                     }
                 }
                 if reading.is_empty() {
@@ -420,27 +432,40 @@ fn capture(
             last_frame.clone_from(&pixels);
             held = unchanged;
         }
-        let event = match stable.observe(&reading, start) {
+        let event = match stable.observe(&reading, upper_end, start) {
             Observation::Held => {
                 history.visible(start);
                 None
             }
             Observation::Revised(text) => Some((Stage::Confirmed, Card::Revised, text)),
             Observation::Confirmed(text) => Some((Stage::Confirmed, Card::New, text)),
+            Observation::Appended(text, end) => Some((Stage::Confirmed, Card::Appended(end), text)),
             Observation::Cleared => Some((Stage::Confirmed, Card::New, String::new())),
             Observation::Pending if speculate => stable
                 .first_candidate()
                 .map(|s| (Stage::Draft, Card::Draft, s.to_owned())),
             Observation::Pending => None,
         };
-        let ready = match event {
-            Some((stage, kind, raw)) => history.present(raw, start, kind).map(|pair| (stage, pair)),
-            None => history
+        let append = match &event {
+            Some((_, Card::Appended(end), _)) => Some(*end),
+            Some((Stage::Draft, _, _)) => upper_end,
+            _ => None,
+        };
+        let ready = match (event, append) {
+            (Some((Stage::Draft, _, raw)), Some(end)) if raw.get(..end) == stable.shown_text() => {
+                let context = history.append_context(&raw, end, start);
+                Some((Stage::Draft, (raw, context)))
+            }
+            (Some((stage, kind, raw)), _) => {
+                history.present(raw, start, kind).map(|pair| (stage, pair))
+            }
+            (None, _) => history
                 .due(&reading, start)
                 .map(|pair| (Stage::Confirmed, pair)),
         };
         if let Some((stage, (text, context))) = ready {
             let line = Line {
+                upper_end: append,
                 stage,
                 context,
                 start,
@@ -468,6 +493,7 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
         return live_context(worker, out, rx, check_obs);
     }
     let mut pending = None;
+    let mut shown = ShownCaption::default();
     loop {
         let line = match pending.take() {
             Some(v) => v,
@@ -476,10 +502,11 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
                 .map_err(|_| AppError::Config("Capture ended".into()))??,
         };
         let translate_start = Instant::now();
-        let text = if line.text.is_empty() {
+        let target = shown.target(&line.text, line.upper_end);
+        let translated = if target.is_empty() {
             String::new()
         } else {
-            worker.translate(&line.text)?
+            worker.translate(target)?
         };
         if let Some(newer) = latest(&rx)? {
             pending = Some(newer);
@@ -487,6 +514,7 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
         }
         let translation_ms = ms(translate_start);
         let publish_start = Instant::now();
+        let text = shown.assemble(target, &line.text, translated);
         let id = out.publish(&text)?;
         let write_ms = ms(publish_start);
         let publish_ms = ms(line.start);
@@ -495,6 +523,7 @@ fn live(worker: &mut Translator, out: &mut Overlay) -> Result<()> {
             "{}",
             json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":obs_tick_ms})
         );
+        shown.remember(line.text, text);
     }
 }
 // A draft may use idle GPU time, but only the stabilizer can authorize publication.
@@ -507,6 +536,7 @@ fn live_context(
     use std::collections::VecDeque;
     let mut queued: VecDeque<Line> = VecDeque::new();
     let mut draft: Option<(String, String, String)> = None;
+    let mut shown = ShownCaption::default();
     loop {
         let line = match queued.pop_front() {
             Some(line) => line,
@@ -516,22 +546,23 @@ fn live_context(
         };
         let context = line.context;
         let start = Instant::now();
+        let target = shown.target(&line.text, line.upper_end);
         let cached = draft
             .take()
-            .filter(|(en, prior, _)| en == &line.text && prior == &context);
+            .filter(|(en, prior, _)| en == target && prior == &context);
         let reused = cached.is_some();
         let text = match cached {
             Some((_, _, translation)) => translation,
             None if line.text.is_empty() => String::new(),
             None if line.stage == Stage::Draft => {
                 let reply =
-                    worker.exchange(&json!({"text":line.text,"previous":context,"draft":true}))?;
+                    worker.exchange(&json!({"text":target,"previous":context,"draft":true}))?;
                 if reply.is_null() {
                     continue;
                 }
                 serde_json::from_value(reply)?
             }
-            None => worker.request(&json!({"text":line.text,"previous":context}))?,
+            None => worker.request(&json!({"text":target,"previous":context}))?,
         };
         let translation_ms = ms(start);
         // Coalesce obsolete work, preserving the newest confirmation and any draft after it.
@@ -545,13 +576,14 @@ fn live_context(
             queued.push_back(next);
         }
         if line.stage == Stage::Draft {
-            draft = Some((line.text, context, text));
+            draft = Some((target.to_owned(), context, text));
             continue;
         }
         if queued.iter().any(|next| next.stage == Stage::Confirmed) {
             continue;
         }
         let write = Instant::now();
+        let text = shown.assemble(target, &line.text, text);
         let id = out.publish(&text)?;
         let write_ms = ms(write);
         let publish_ms = ms(line.start);
@@ -561,6 +593,7 @@ fn live_context(
             json!({"en":line.text,"uk":text,"ocr_ms":line.ocr_ms,"translation_ms":translation_ms,
             "reused_draft":reused,"context_lines":context.lines().count(),"write_ms":write_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
         );
+        shown.remember(line.text, text);
     }
 }
 fn latest(rx: &Receiver<Result<Line>>) -> Result<Option<Line>> {
@@ -601,7 +634,7 @@ fn bench(root: &Path, worker: &mut Translator, out: &mut Overlay) -> Result<()> 
         };
         println!(
             "{}",
-            json!({"case":i,"expected":expected,"en":en,"source":source,"uk":uk,"ocr_ms":ocr_ms,"translation_ms":translation_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
+            json!({"case":i,"expected":expected,"en":en,"source":source,"context":context,"uk":uk,"ocr_ms":ocr_ms,"translation_ms":translation_ms,"publish_ms":publish_ms,"obs_tick_ms":ack})
         );
     }
     Ok(())

@@ -53,5 +53,6 @@
   "Background": "Background color",
   "Opacity": "Background opacity (%)",
   "Outline": "Text outline",
+  "CaptureSaveError": "Could not save the capture settings. ",
   "ModelError": "The translation model could not complete the request. See runtime/diagnostics.txt."
 }

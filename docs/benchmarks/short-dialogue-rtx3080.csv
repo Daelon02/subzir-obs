@@ -1,0 +1,161 @@
+﻿run,scene,role,expected,en,uk,ocr_ms,translation_ms,obs_tick_ms
+A1,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,10.917100000000001,264.6348,309.8035
+A1,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,4.3993,256.583,294.4374
+A1,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,1.9918000000000002,194.6847,233.39770000000001
+A1,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.18,196.93099999999998,233.6056
+A1,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, почнеться дощ.",1.635,166.9398,199.4401
+A1,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,13.3054,260.5822,309.3396
+A1,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,2.5444,144.49890000000002,183.2938
+A1,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.0577,187.03910000000002,215.28040000000001
+A1,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.395,233.2494,266.72990000000004
+A1,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.7997,158.4005,200.2623
+A1,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,11.0078,201.6086,251.8203
+A1,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Ми мусимо триматися разом.,2.0854,176.0377,215.97990000000001
+A1,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.6384999999999996,221.92090000000002,249.3935
+A1,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,2.2944,168.5343,202.0068
+A1,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,"Мабуть, ще трохи займе.",2.1685,214.9297,248.5558
+A1,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.621699999999999,165.6921,211.7895
+A1,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.4646999999999997,170.0549,200.5606
+A1,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.5694,217.6037,249.9466
+A1,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0477999999999996,231.7108,266.0736
+A1,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в ціле багатство.,1.9484000000000001,253.00549999999998,283.91909999999996
+B1,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,11.2481,267.2546,308.5077
+B1,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,4.061999999999999,255.43670000000003,282.5426
+B1,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,2.042,175.6273,217.1082
+B1,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.2304999999999997,185.4682,215.3477
+B1,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, піде дощ.",1.6118000000000001,144.1032,184.5841
+B1,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.347900000000001,242.0462,281.6454
+B1,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,2.0397000000000003,142.71790000000001,182.6703
+B1,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.5261,163.2498,199.737
+B1,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.2256,224.28699999999998,250.60080000000002
+B1,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",2.4209,175.2699,216.3083
+B1,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,10.4245,188.5866,236.53640000000001
+B1,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Нам треба триматися разом.,2.156,178.7253,215.55440000000002
+B1,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,3.2387,227.4394,266.18609999999995
+B1,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,1.9265,140.2972,166.8536
+B1,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,Це ще трохи потриває.,2.2813,198.1171,233.2619
+B1,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,11.733699999999999,156.1079,191.23090000000002
+B1,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.1274,161.3627,199.46959999999999
+B1,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.4099999999999997,216.4481,249.3768
+B1,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0696999999999997,226.0646,266.65290000000005
+B1,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в купу грошей.,2.3432,223.6068,249.7543
+B2,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,10.9268,265.6418,315.9562
+B2,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,3.8513,234.8259,266.0024
+B2,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,2.4373,172.595,199.33880000000002
+B2,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.2082,198.3677,233.2595
+B2,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, піде дощ.",1.8007,139.2198,166.3093
+B2,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.2585,238.7259,281.4667
+B2,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.8493,137.6666,166.942
+B2,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.3873,175.8877,215.9064
+B2,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.7748,225.1958,266.3579
+B2,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.8981,150.8545,183.3097
+B2,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,13.517100000000001,178.6609,217.7267
+B2,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Нам треба триматися разом.,2.0585,187.8612,215.86759999999998
+B2,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.7269,216.0636,250.2801
+B2,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,2.1948,146.6609,183.4466
+B2,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,Це ще трохи потриває.,1.8768,194.9537,233.2499
+B2,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.735899999999999,166.1912,212.3326
+B2,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.021,171.7207,198.82649999999998
+B2,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.3640000000000003,215.2342,250.20969999999997
+B2,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0092,209.1665,250.2817
+B2,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в купу грошей.,2.2476000000000003,221.4794,249.475
+A2,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,11.1738,248.4307,291.1769
+A2,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,4.2373,246.7289,283.0944
+A2,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,2.0311,183.6024,216.11849999999998
+A2,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.2056,190.1753,217.0312
+A2,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, почнеться дощ.",1.6891,173.59369999999998,199.7309
+A2,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.0583,241.5157,289.5065
+A2,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.6811,135.05800000000002,166.73499999999999
+A2,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.3318000000000003,169.4645,199.6027
+A2,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.0795000000000003,226.21720000000002,266.94230000000005
+A2,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",2.1332,146.59890000000001,183.28150000000002
+A2,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,10.7855,197.3096,237.2027
+A2,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Ми мусимо триматися разом.,2.0359000000000003,186.45790000000002,216.1533
+A2,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.5682,215.3538,250.3509
+A2,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,1.8075,163.7072,198.7537
+A2,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,"Мабуть, ще трохи займе.",2.2016,190.65679999999998,216.82489999999999
+A2,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,11.502500000000001,177.8219,215.4043
+A2,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.0656,169.11419999999998,198.9093
+A2,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.4077,215.70600000000002,250.24839999999998
+A2,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0393999999999997,209.406,250.23780000000002
+A2,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в ціле багатство.,2.0354,231.18259999999998,265.7073
+B3,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,11.3093,252.94670000000002,292.73290000000003
+B3,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,4.7322,236.5044,266.47290000000004
+B3,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,1.8789,182.23069999999998,216.67149999999998
+B3,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.2131,188.04979999999998,216.815
+B3,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, піде дощ.",1.6109,140.1033,165.5859
+B3,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.7033,253.88379999999998,291.6297
+B3,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.7026999999999999,153.2531,182.7951
+B3,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.0944000000000003,176.3947,217.35989999999998
+B3,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.0845,226.66410000000002,267.2069
+B3,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.8634000000000002,172.5856,198.8759
+B3,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,10.3217,183.3305,221.08149999999998
+B3,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Нам треба триматися разом.,2.29,182.75469999999999,216.4073
+B3,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,3.7454,220.6685,249.4218
+B3,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,1.7522,152.3936,183.8784
+B3,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,Це ще трохи потриває.,1.8667,208.5434,249.1966
+B3,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.675600000000001,164.54569999999998,203.0835
+B3,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.021,150.5256,182.85139999999998
+B3,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.395,231.55349999999999,266.1934
+B3,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0766,211.1679,250.70850000000002
+B3,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в купу грошей.,1.9783000000000002,228.11190000000002,266.0322
+A3,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,11.358,265.9863,309.2379
+A3,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,3.8310000000000004,244.372,283.1052
+A3,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,1.8929,181.10979999999998,216.43689999999998
+A3,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.196,178.8226,216.9789
+A3,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, почнеться дощ.",1.5805,164.133,200.034
+A3,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.4664,229.9607,270.65119999999996
+A3,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.8544,135.6534,167.1466
+A3,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,1.9970999999999999,161.81,199.53199999999998
+A3,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.2967,222.71450000000002,249.24689999999998
+A3,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.6492,145.6407,184.3647
+A3,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,11.1249,171.9823,215.705
+A3,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Ми мусимо триматися разом.,2.2209,173.6894,199.8962
+A3,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.7337,215.027,249.82180000000002
+A3,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,2.1262,154.4847,183.4027
+A3,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,"Мабуть, ще трохи займе.",1.9594999999999998,204.12269999999998,233.5267
+A3,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.841,156.7824,205.8466
+A3,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.0612,153.8401,183.4503
+A3,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.3146,217.46579999999997,249.5902
+A3,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,1.9551,231.672,267.0802
+A3,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в ціле багатство.,2.0581,233.6796,265.5885
+A4,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,10.860399999999998,266.747,316.1367
+A4,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,3.8259000000000003,253.78450000000004,284.263
+A4,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,2.4723,185.71779999999998,214.40980000000002
+A4,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.2678,197.5329,232.8539
+A4,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, почнеться дощ.",1.6956,177.1161,216.6812
+A4,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.598099999999999,239.4724,289.069
+A4,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.5777,157.9826,182.5296
+A4,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.0241000000000002,179.9359,216.9247
+A4,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.0931,244.7,283.1226
+A4,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.7757999999999998,160.5693,199.6379
+A4,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,10.530100000000001,182.7839,218.6631
+A4,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Ми мусимо триматися разом.,2.0859,190.34539999999998,215.7842
+A4,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.557,218.8392,250.9036
+A4,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,1.8591,141.9676,182.5501
+A4,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,"Мабуть, ще трохи займе.",2.0244999999999997,207.4827,232.57549999999998
+A4,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.232800000000001,152.1613,200.083
+A4,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,2.3832,168.89100000000002,200.24259999999998
+A4,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.3939,215.0967,249.1919
+A4,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,2.0896,209.7078,249.48600000000002
+A4,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в ціле багатство.,1.9616,230.48579999999998,266.7803
+B4,own,context,Jay: What do you feel like doing after your shift?,Jay: What do you feel like doing after your shift?,Що б ти хотів робити після зміни?,11.2005,248.64339999999999,290.6401
+B4,own,target,"Lucia: Wanna get home, lie down.","Lucia: Wanna get home, lie down.",Хочу повернутися додому та лягти.,4.026400000000001,232.12849999999997,266.2259
+B4,weather,context,Cal: Look at those clouds.,Cal: Look at those clouds.,Подивіться на ті хмари.,1.9388,171.32410000000002,199.7783
+B4,weather,context,Lucia: The sky just turned black.,Lucia: The sky just turned black.,Небо щойно стало чорним.,2.1140999999999996,180.4982,216.9122
+B4,weather,target,Cal: Gonna rain.,Cal: Gonna rain.,"Мабуть, піде дощ.",1.5228,140.5094,166.25889999999998
+B4,obligation,context,Cal: The bus leaves in two minutes.,Cal: The bus leaves in two minutes.,Автобус вирушає через дві хвилини.,10.1436,241.7388,277.6705
+B4,obligation,target,Jay: Gotta run.,Jay: Gotta run.,Мені треба йти.,1.6121,139.182,167.0349
+B4,guess,context,Jay: Nobody else has a key.,Jay: Nobody else has a key.,У інших немає ключа.,2.1461,163.3882,198.95860000000002
+B4,guess,context,Cal: Who left the lights on?,Cal: Who left the lights on?,Хто залишив світло увімкненим?,2.1659,227.3439,266.19710000000003
+B4,guess,target,Jay: Gotta be Brian.,Jay: Gotta be Brian.,"Мабуть, це Браян.",1.8547,151.05689999999998,183.7551
+B4,group,context,Lucia: Both of us signed the agreement.,Lucia: Both of us signed the agreement.,Ми обидві підписали угоду.,11.4578,176.49609999999998,225.3445
+B4,group,target,Cal: Gotta stick together.,Cal: Gotta stick together.,Нам треба триматися разом.,2.0203,169.3943,199.1956
+B4,duration,context,Lucia: The mechanic just opened the hood.,Lucia: The mechanic just opened the hood.,Механік щойно відкрив капот.,2.5457,218.9589,250.2705
+B4,duration,context,Cal: Is the car ready?,Cal: Is the car ready?,Чи готова машина?,1.8497999999999999,146.02,212.1095
+B4,duration,target,Lucia: Gonna take a while.,Lucia: Gonna take a while.,Це ще трохи потриває.,2.0728,199.62949999999998,237.564
+B4,question,context,Cal: We have an hour before the ferry.,Cal: We have an hour before the ferry.,У нас ще година до порома.,10.4847,178.69080000000002,227.17870000000002
+B4,question,target,Lucia: Wanna grab a coffee?,Lucia: Wanna grab a coffee?,Хочеш випити кави?,1.9894,152.0255,182.96519999999998
+B4,cost,context,Jay: The whole gearbox is cracked.,Jay: The whole gearbox is cracked.,Увесь коробок передач розтріснувся.,2.3213,217.5866,249.6309
+B4,cost,context,Cal: Can we afford a new one?,Cal: Can we afford a new one?,Чи вистачить у нас грошей на новий?,1.9493,228.4445,266.6766
+B4,cost,target,Jay: Gonna cost a fortune.,Jay: Gonna cost a fortune.,Це обійдеться в купу грошей.,2.3784,227.23329999999999,266.36809999999997

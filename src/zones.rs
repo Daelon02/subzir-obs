@@ -11,8 +11,11 @@ struct Zone {
     legend: Option<legend::Legend>,
     stable: Stabilizer,
     history: DialogueHistory,
+    shown: ShownCaption,
     previous: Vec<u8>,
+    recheck_mask: bool,
     reading: String,
+    upper_end: Option<usize>,
 }
 impl Zone {
     fn load(row: &Value) -> Result<Self> {
@@ -40,8 +43,11 @@ impl Zone {
                 .then(legend::Legend::default),
             stable: Stabilizer::default(),
             history: DialogueHistory::default(),
+            shown: ShownCaption::default(),
             previous: Vec::new(),
+            recheck_mask: false,
             reading: String::new(),
+            upper_end: None,
         })
     }
     fn scaled(&self) -> [i32; 2] {
@@ -71,7 +77,8 @@ impl Zone {
         pixels: &[u8],
         now: Instant,
     ) -> Result<Option<(String, Card)>> {
-        if self.previous != pixels {
+        let changed = self.previous != pixels;
+        if changed || self.recheck_mask {
             let prior = if self.previous.len() == pixels.len() {
                 self.previous.as_slice()
             } else {
@@ -84,18 +91,39 @@ impl Zone {
                     current.min(previous).saturating_sub(130).saturating_mul(4)
                 })
                 .collect();
-            self.reading = recognize(ocr, &high)?;
+            let shown = self.stable.shown_text().filter(|_| !self.hud);
+            (self.reading, self.upper_end) = dialogue_ocr::read(ocr, &high, shown)?;
+            // On a hard cut the intersection of two different captions may itself
+            // read as text. A held frame must then be read with its settled mask
+            // before its cached OCR can count as a second observation.
+            self.recheck_mask = changed
+                && !self.reading.trim().is_empty()
+                && pixels
+                    .iter()
+                    .zip(&high)
+                    .any(|(&raw, &masked)| raw.saturating_sub(130).saturating_mul(4) != masked);
             if self.reading.trim().is_empty() {
-                self.reading = recognize(ocr, pixels)?;
+                (self.reading, self.upper_end) = dialogue_ocr::read(ocr, pixels, shown)?;
+            } else if !self.hud {
+                let (text, boundary) =
+                    dialogue_ocr::recover(ocr, std::mem::take(&mut self.reading), pixels, &high)?;
+                self.reading = text;
+                self.upper_end = boundary.or(self.upper_end);
+                if boundary.is_some() {
+                    self.recheck_mask = false;
+                }
             }
             if self.reading.trim().is_empty() {
                 self.reading = retry_short(ocr, &high)?;
             }
-            self.previous.clear();
-            self.previous.extend_from_slice(pixels);
+            if changed {
+                self.previous.clear();
+                self.previous.extend_from_slice(pixels);
+            }
         }
-        match self.stable.observe(&self.reading, now) {
+        match self.stable.observe(&self.reading, self.upper_end, now) {
             Observation::Confirmed(text) => Ok(Some((text, Card::New))),
+            Observation::Appended(text, end) => Ok(Some((text, Card::Appended(end)))),
             Observation::Revised(text) => Ok(Some((text, Card::Revised))),
             Observation::Cleared => Ok(Some((String::new(), Card::New))),
             Observation::Held => {
@@ -243,7 +271,12 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
                 }
                 continue;
             }
-            let ready = match zone.observe(&ocr, pixels, now)? {
+            let observed = zone.observe(&ocr, pixels, now)?;
+            let upper_end = match &observed {
+                Some((_, Card::Appended(end))) => Some(*end),
+                _ => None,
+            };
+            let ready = match observed {
                 Some((raw, _)) if zone.hud => Some((raw, String::new())),
                 Some((raw, kind)) => zone.history.present(raw, now, kind),
                 None => zone.history.due(&zone.reading, now),
@@ -251,13 +284,17 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
             let Some((en, previous)) = ready else {
                 continue;
             };
-            let uk = if en.is_empty() {
+            let target = zone.shown.target(&en, upper_end);
+            let translated = if target.is_empty() {
                 String::new()
             } else {
-                worker.request(&json!({"zone":i,"text":en,"previous":previous,"hud":zone.hud}))?
+                worker
+                    .request(&json!({"zone":i,"text":target,"previous":previous,"hud":zone.hud}))?
             };
+            let uk = zone.shown.assemble(target, &en, translated);
             captions[i] = json!(uk);
             println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
+            zone.shown.remember(en, uk);
         }
     }
     let status = capture.0.wait()?;

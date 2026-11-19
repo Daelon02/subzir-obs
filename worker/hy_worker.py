@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, ProxyHandler, build_opener
 
 MIN_ECHO_LENGTH = 8
+MAX_RECENT_TRANSLATIONS = 6
 SUBJECTLESS_STATEMENT = re.compile(r"(?:wanna|gotta|gonna)\b[^.?!]*\.\s*$", re.I)
 SPEAKER_LINE = re.compile(r"([^\W\d_][\w .’'-]{0,35}):\s+(.+)", re.UNICODE)
 SUBJECT_PERSON = {"she":"third-person feminine singular", "he":"third-person masculine singular",
@@ -28,7 +29,8 @@ def dialogue_source(text):
             notes.append(f"The speaker is {speaker.group(1)}. Translate only their spoken words. "
                          "Preserve the original point of view, including an implied subject.")
     if SUBJECTLESS_STATEMENT.fullmatch(body):
-        notes.append("The speaker states their own intention. Use a first-person statement.")
+        notes.append("Keep statements declarative. If the speaker and a companion must act together, "
+                     "explicitly say we. For individual actions and predictions, infer the subject from context.")
     return body, " ".join(notes)
 
 
@@ -129,7 +131,9 @@ def main():
         voice = " " + notes if notes else ""
         current = {"role":"user","content":f"{instruction}{voice}\n\n{body}"}
         # Limit comparisons to the context selected by this zone's Rust stabilizer.
-        known = recent_by_zone.get(zone, {})
+        known = recent_by_zone.setdefault(zone, {})
+        if not previous:
+            known.clear()
         recent = {line: known[line] for line in previous.splitlines() if line in known}
         result = None
         if previous:
@@ -162,8 +166,11 @@ def main():
                 result = retry_dialogue(complete, text, previous, language, recent)
         if result is None:
             result = complete([current])
-        recent[text] = result
-        recent_by_zone[zone] = recent
+        # Keep older translations available if Rust selects their source again.
+        known.pop(text, None)
+        known[text] = result
+        if len(known) > MAX_RECENT_TRANSLATIONS:
+            del known[next(iter(known))]
         return result
 
     translate("Ready.", "")

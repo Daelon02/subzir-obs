@@ -72,6 +72,8 @@ partial class Launcher : Form {
     bool busy, closing;
     string roi;
     static readonly string CropFile = Path.Combine(Data,"area.txt");
+    static readonly string SingleModeFile=Path.Combine(Data,"single-area.active");
+    static readonly string PreviousCrop=Path.Combine(Data,"area.previous.txt");
     public Launcher() {
         Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,633);
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
@@ -125,9 +127,7 @@ partial class Launcher : Form {
         update.Click+=async delegate {await CheckUpdate();};
         Directory.CreateDirectory(Data);
         ZoneButtons();
-        roi=File.Exists(CropFile)?File.ReadAllText(CropFile).Trim():null;
-        if(roi!=null && !System.Text.RegularExpressions.Regex.IsMatch(roi,@"^\d+:\d+:\d+:\d+$"))roi=null;
-        SetStatus(roi==null && layout==null?Msg.ConnectFirst:Msg.AreaReady);
+        LoadCaptureSettings();
         RefreshLanguage();
         FormClosing+=delegate {closing=true;StopOwned();};
     }
@@ -205,8 +205,10 @@ partial class Launcher : Form {
             }
             using(var img=new Bitmap(path))using(var picker=new Picker(img)){
                 if(picker.ShowDialog(this)!=DialogResult.OK){SetStatus(Msg.Cancelled);return;}
-                Rectangle a=picker.Area;roi=String.Format("{0}:{1}:{2}:{3}",a.Width,a.Height,a.X,a.Y);
-                File.WriteAllText(CropFile,roi,Utf8);if(File.Exists(ZoneFile))File.Delete(ZoneFile);layout=null;recording=null;SetStatus(Msg.Saved);
+                try {SaveArea(picker.Area);}
+                catch(IOException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
+                catch(UnauthorizedAccessException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
+                SetStatus(Msg.Saved);
             }
         }catch(Exception ex){if(!closing)SetStatus(Msg.FrameError,ex.Message);}
         finally{running=null;try{File.Delete(path);}catch(IOException){} if(!closing)Lock(false);}

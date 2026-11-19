@@ -20,6 +20,7 @@ pub enum Observation {
     Pending,
     Held,
     Confirmed(String),
+    Appended(String, usize),
     Revised(String),
     Cleared,
 }
@@ -86,6 +87,7 @@ struct Candidate {
     previous_ending: Option<char>,
     exact: u8,
     hits: u8,
+    appended_row: bool,
 }
 
 #[derive(Default)]
@@ -96,6 +98,9 @@ pub struct Stabilizer {
 }
 
 impl Stabilizer {
+    pub fn shown_text(&self) -> Option<&str> {
+        self.shown.as_ref().map(|reading| reading.text.as_str())
+    }
     pub fn first_candidate(&self) -> Option<&str> {
         self.pending
             .as_ref()
@@ -103,7 +108,7 @@ impl Stabilizer {
             .map(|p| p.best.text.as_str())
     }
 
-    pub fn observe(&mut self, text: &str, now: Instant) -> Observation {
+    pub fn observe(&mut self, text: &str, upper_end: Option<usize>, now: Instant) -> Observation {
         if self.shown.as_ref().is_some_and(|s| s.text == text) {
             self.last_seen = Some(now);
             self.pending = None;
@@ -131,8 +136,14 @@ impl Stabilizer {
             }
         }
 
+        let appended_row = upper_end
+            .and_then(|end| text.get(..end))
+            .is_some_and(|upper| self.shown.as_ref().is_some_and(|shown| shown.text == upper));
+        let mut repeated_append = false;
         let candidate = match self.pending.as_mut() {
             Some(p) if p.best.similarity(&reading) >= MATCH_PENDING => {
+                repeated_append = p.appended_row && p.best.text == text;
+                p.appended_row = appended_row;
                 p.hits = p.hits.saturating_add(1);
                 p.exact = if p.previous_key == reading.key && p.previous_ending == new_ending {
                     p.exact.saturating_add(1)
@@ -141,7 +152,10 @@ impl Stabilizer {
                 };
                 p.previous_key.clone_from(&reading.key);
                 p.previous_ending = new_ending;
-                if p.exact >= EXACT_REPLACEMENT_FRAMES || reading.score() > p.best.score() {
+                if appended_row
+                    || p.exact >= EXACT_REPLACEMENT_FRAMES
+                    || reading.score() > p.best.score()
+                {
                     p.best = reading;
                 }
                 p
@@ -152,15 +166,25 @@ impl Stabilizer {
                 best: reading,
                 hits: 1,
                 exact: 1,
+                appended_row,
             }),
         };
-        if candidate.hits >= 2 && (!resembles_shown || candidate.exact >= EXACT_REPLACEMENT_FRAMES)
+        if candidate.hits >= 2
+            && (repeated_append
+                || (!appended_row && !resembles_shown)
+                || candidate.exact >= EXACT_REPLACEMENT_FRAMES)
         {
             if let Some(candidate) = self.pending.take() {
                 let update = candidate.best.text.clone();
+                let upper = self
+                    .shown_text()
+                    .map(str::len)
+                    .filter(|_| repeated_append || appended_row);
                 self.shown = Some(candidate.best);
                 self.last_seen = Some(now);
-                return if same_words {
+                return if let Some(end) = upper {
+                    Observation::Appended(update, end)
+                } else if same_words {
                     Observation::Revised(update)
                 } else {
                     Observation::Confirmed(update)
@@ -194,19 +218,19 @@ mod tests {
     fn a_single_reading_can_start_translation_but_cannot_publish() {
         let mut stable = Stabilizer::default();
         let now = Instant::now();
-        assert_eq!(stable.observe("one", now), Observation::Pending);
+        assert_eq!(stable.observe("one", None, now), Observation::Pending);
         assert_eq!(stable.first_candidate(), Some("one"));
         assert_eq!(
-            stable.observe("", now + Duration::from_millis(100)),
+            stable.observe("", None, now + Duration::from_millis(100)),
             Observation::Pending
         );
         assert_eq!(stable.first_candidate(), None);
         assert_eq!(
-            stable.observe("two", now + Duration::from_millis(200)),
+            stable.observe("two", None, now + Duration::from_millis(200)),
             Observation::Pending
         );
         assert_eq!(
-            stable.observe("two", now + Duration::from_millis(300)),
+            stable.observe("two", None, now + Duration::from_millis(300)),
             Observation::Confirmed("two".into())
         );
         assert_eq!(stable.first_candidate(), None);
@@ -215,7 +239,7 @@ mod tests {
     fn holds_a_misread_and_clears_on_sustained_silence() {
         let mut s = Stabilizer::default();
         let t = Instant::now();
-        let mut read = |text: &str, ms| s.observe(text, t + Duration::from_millis(ms));
+        let mut read = |text: &str, ms| s.observe(text, None, t + Duration::from_millis(ms));
         assert_eq!(read("Keep moving!", 0), Observation::Pending);
         assert_eq!(
             read("Keep moving!", 100),
@@ -234,18 +258,21 @@ mod tests {
         for i in 0..2 {
             s.observe(
                 "Please turn left at the next corner!",
+                None,
                 t + Duration::from_millis(100 * i),
             );
         }
         for i in 2..5 {
             s.observe(
                 "Please turn right at the next corner!",
+                None,
                 t + Duration::from_millis(100 * i),
             );
         }
         assert_eq!(
             s.observe(
                 "Please turn right at the next corner!",
+                None,
                 t + Duration::from_millis(500)
             ),
             Observation::Confirmed("Please turn right at the next corner!".into())
@@ -256,8 +283,8 @@ mod tests {
     fn only_four_consecutive_matching_endings_revise_a_caption() {
         let mut s = Stabilizer::default();
         let t = Instant::now();
-        s.observe("You're coming.", t);
-        s.observe("You're coming.", t);
+        s.observe("You're coming.", None, t);
+        s.observe("You're coming.", None, t);
         for text in [
             "You're coming?",
             "You're coming?",
@@ -270,12 +297,41 @@ mod tests {
             "You're coming?",
             "You're coming?",
         ] {
-            assert_eq!(s.observe(text, t), Observation::Held);
+            assert_eq!(s.observe(text, None, t), Observation::Held);
         }
         assert_eq!(
-            s.observe("You're coming?", t),
+            s.observe("You're coming?", None, t),
             Observation::Revised("You're coming?".into())
         );
-        assert_eq!(s.observe("You're coming?", t), Observation::Held);
+        assert_eq!(s.observe("You're coming?", None, t), Observation::Held);
+    }
+    #[test]
+    fn only_a_repeated_physical_append_can_fast_track_a_similar_caption() {
+        let mut stable = Stabilizer::default();
+        let now = Instant::now();
+        let top = "Lucia: Fits me better, anyway.";
+        let both = "Lucia: Fits me better, anyway. Fuck you!";
+        let end = Some(top.len());
+        stable.observe(top, None, now);
+        assert_eq!(
+            stable.observe(top, None, now),
+            Observation::Confirmed(top.into())
+        );
+        assert_eq!(stable.observe(both, end, now), Observation::Pending);
+        assert_eq!(stable.observe(top, None, now), Observation::Held);
+        assert_eq!(stable.observe(both, end, now), Observation::Pending);
+        assert_eq!(
+            stable.observe("Lucia: Fits me better, anyway. Duck you!", end, now),
+            Observation::Pending
+        );
+        assert_eq!(stable.observe(both, end, now), Observation::Pending);
+        assert_eq!(
+            stable.observe(both, None, now),
+            Observation::Appended(both.into(), top.len())
+        );
+        for _ in 0..2 {
+            assert_eq!(stable.observe(top, None, now), Observation::Pending);
+        }
+        assert_eq!(stable.observe(both, end, now), Observation::Held);
     }
 }

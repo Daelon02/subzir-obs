@@ -1,18 +1,67 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeSet, VecDeque};
 use std::time::{Duration, Instant};
 
-const MAX_LINES: usize = 2;
+const MAX_LINES: usize = 6;
 const DIALOGUE_GAP: Duration = Duration::from_secs(8);
 // Leave room for the current subtitle and response in the 1024-token context.
 const MAX_HISTORY_BYTES: usize = 384;
 const CARD_GAP: Duration = Duration::from_secs(2);
 const PARTIAL_WAIT: Duration = Duration::from_millis(750);
 
+// English function words and acknowledgments carry little information about the topic.
+const NEUTRAL_WORDS: &str = "a an and are as at be been but by did do does for from had has have he her here him his how i if in into is it its just me my no of oh okay on or our she so that the their them then there they this to uh was we well were what with would yeah yes you your";
+
+fn topic_words(text: &str) -> BTreeSet<String> {
+    speaker(text)
+        .1
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|w| w.len() >= 3)
+        .map(str::to_ascii_lowercase)
+        .filter(|w| {
+            !NEUTRAL_WORDS
+                .split_ascii_whitespace()
+                .any(|neutral| neutral == w)
+        })
+        .collect()
+}
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum Card {
     Draft,
     New,
     Revised,
+    Appended(usize),
+}
+
+#[derive(Default)]
+pub struct ShownCaption {
+    source: String,
+    translation: String,
+}
+
+impl ShownCaption {
+    pub fn target<'a>(&self, source: &'a str, upper_end: Option<usize>) -> &'a str {
+        match upper_end.and_then(|end| source.split_at_checked(end)) {
+            Some((upper, rest)) if upper == self.source && !self.translation.is_empty() => rest
+                .strip_prefix(' ')
+                .filter(|s| !s.is_empty())
+                .unwrap_or(source),
+            _ => source,
+        }
+    }
+
+    pub fn assemble(&self, target: &str, source: &str, translated: String) -> String {
+        if target.len() == source.len() {
+            translated
+        } else {
+            format!("{}\n{}", self.translation, translated)
+        }
+    }
+
+    pub fn remember(&mut self, source: String, translation: String) {
+        self.source = source;
+        self.translation = translation;
+    }
 }
 
 fn speaker(text: &str) -> (Option<&str>, &str) {
@@ -85,7 +134,32 @@ pub struct DialogueHistory {
 }
 
 impl DialogueHistory {
+    pub fn append_context(&mut self, raw: &str, end: usize, now: Instant) -> String {
+        self.expire_history(now);
+        if let Some(upper) = raw.get(..end) {
+            if !self.lines.back().is_some_and(|last| last == upper) {
+                let start = upper.ceil_char_boundary(upper.len().saturating_sub(MAX_HISTORY_BYTES));
+                return upper[start..].to_owned();
+            }
+        }
+        self.select(raw.get(end..).unwrap_or(raw), self.lines.len())
+    }
+
     pub fn present(&mut self, raw: String, now: Instant, kind: Card) -> Option<(String, String)> {
+        if let Card::Appended(end) = kind {
+            let context = self.append_context(&raw, end, now);
+            if self
+                .lines
+                .back()
+                .is_some_and(|last| raw.get(..end) == Some(last.as_str()))
+            {
+                self.discard_last_version();
+            }
+            self.pending = None;
+            self.joined_prefix = None;
+            self.confirm(&raw, now);
+            return Some((raw, context));
+        }
         let wait = unfinished(speaker(&raw).1);
         if wait && kind == Card::Draft {
             return None;
@@ -128,9 +202,9 @@ impl DialogueHistory {
     }
 
     pub fn card(&mut self, raw: String, now: Instant, kind: Card) -> (String, String) {
-        let all = self.previous(now);
+        self.expire_history(now);
         if raw.is_empty() {
-            return (raw, all);
+            return (raw, self.select("", self.lines.len()));
         }
         let recent = self
             .last_visible
@@ -144,16 +218,10 @@ impl DialogueHistory {
             .filter(|_| recent)
             .and_then(|p| continuation(p, &raw));
         let replace = kind == Card::Revised || merged.is_some();
-        let context = if replace {
-            self.lines
-                .iter()
-                .take(self.lines.len().saturating_sub(1))
-                .map(String::as_str)
-                .collect::<Vec<_>>()
-                .join("\n")
-        } else {
-            all
-        };
+        let context = self.select(
+            merged.as_deref().unwrap_or(&raw),
+            self.lines.len().saturating_sub(usize::from(replace)),
+        );
         if kind != Card::Draft {
             if merged.is_none() {
                 self.joined_prefix = None;
@@ -171,17 +239,60 @@ impl DialogueHistory {
         (text, context)
     }
 
-    pub fn previous(&mut self, now: Instant) -> String {
+    fn expire_history(&mut self, now: Instant) {
         if self.expired(now) {
             self.lines.clear();
             self.joined_prefix = None;
             self.last_visible = None;
         }
-        self.lines
-            .iter()
-            .map(String::as_str)
-            .collect::<Vec<_>>()
-            .join("\n")
+    }
+
+    fn select(&self, current: &str, count: usize) -> String {
+        let mut earlier = self.lines.iter().take(count).rev();
+        let Some(latest) = earlier.next() else {
+            return String::new();
+        };
+        let Some(default) = earlier.clone().next() else {
+            return latest.to_owned();
+        };
+        let fits = |line: &str| line.len() + 1 + latest.len() <= MAX_HISTORY_BYTES;
+        let mut choice = default;
+        if count > 2 && !current.is_empty() {
+            let query = topic_words(current);
+            let recent = topic_words(latest);
+            let mut best = 0;
+            let mut tied = false;
+            let mut only_feedback = recent.len() <= 1;
+            for line in earlier {
+                let words = topic_words(line);
+                let overlap =
+                    2 * words.intersection(&query).count() + words.intersection(&recent).count();
+                if fits(line) {
+                    if overlap > best || (best == 0 && only_feedback && words.len() >= 2) {
+                        choice = line;
+                        best = overlap;
+                        tied = false;
+                    } else if overlap > 0 && overlap == best {
+                        tied = true;
+                    }
+                }
+                only_feedback &= words.is_empty();
+            }
+            if tied {
+                choice = default;
+            }
+        }
+        if fits(choice) {
+            format!("{choice}\n{latest}")
+        } else {
+            latest.to_owned()
+        }
+    }
+
+    #[cfg(test)]
+    fn previous(&mut self, now: Instant) -> String {
+        self.expire_history(now);
+        self.select("", self.lines.len())
     }
 
     pub fn confirm(&mut self, text: &str, now: Instant) {
@@ -199,13 +310,6 @@ impl DialogueHistory {
         if self.lines.len() == MAX_LINES {
             self.lines.pop_front();
         }
-        if self
-            .lines
-            .back()
-            .is_some_and(|s| s.len() + 1 + text.len() > MAX_HISTORY_BYTES)
-        {
-            self.lines.clear();
-        }
         self.lines.push_back(text.to_owned());
     }
 }
@@ -213,6 +317,92 @@ impl DialogueHistory {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn ambiguous_older_matches_leave_the_recent_pair_in_place() {
+        let mut h = DialogueHistory::default();
+        let now = Instant::now();
+        for s in [
+            "The bank needs cash.",
+            "The store takes cash.",
+            "Take the train.",
+            "Look at me.",
+        ] {
+            h.confirm(s, now);
+        }
+        assert_eq!(
+            h.card("Got the cash?".into(), now, Card::Draft).1,
+            "Take the train.\nLook at me."
+        );
+    }
+    #[test]
+    fn selection_stays_within_turn_and_byte_limits_and_skips_revised_text() {
+        let t = Instant::now();
+        let mut h = DialogueHistory::default();
+        for line in [
+            "The red pickup broke down.",
+            "Check the battery.",
+            "Meet outside.",
+            "Tow the pickup.",
+        ] {
+            h.card(line.into(), t, Card::New);
+        }
+        let (_, context) = h.card("Who owns the pickup?".into(), t, Card::Draft);
+        assert_eq!(context, "The red pickup broke down.\nTow the pickup.");
+        assert_eq!(
+            h.card("Meet outside now.".into(), t, Card::Revised)
+                .1
+                .lines()
+                .last(),
+            Some("Meet outside.")
+        );
+        for _ in 0..2 {
+            for line in ["Hello.", "Yes.", "Okay.", "Yeah."] {
+                h.confirm(line, t);
+            }
+        }
+        assert_eq!(h.lines.len(), MAX_LINES);
+        assert!(!h.select("That pickup?", MAX_LINES).contains("pickup"));
+        assert_eq!(
+            h.card(
+                "New scene.".into(),
+                t + DIALOGUE_GAP + Duration::from_secs(1),
+                Card::New
+            )
+            .1,
+            ""
+        );
+        h.confirm(&"b".repeat(MAX_HISTORY_BYTES), t);
+        assert_eq!(
+            h.select("Is it ready?", h.lines.len()).len(),
+            MAX_HISTORY_BYTES
+        );
+    }
+    #[test]
+    fn appended_row_uses_only_a_published_prefix_and_keeps_one_history_entry() {
+        let top = "Lucia: Fits me better, anyway.";
+        let both = "Lucia: Fits me better, anyway. Fuck you!";
+        let upper_uk = "Мені так краще.";
+        let now = Instant::now();
+        let mut history = DialogueHistory::default();
+        let mut shown = ShownCaption::default();
+        history.present(top.into(), now, Card::New);
+        assert_eq!(shown.target(both, Some(top.len())), both);
+        shown.remember(top.into(), upper_uk.into());
+        assert_eq!(shown.target(both, None), both);
+        let target = shown.target(both, Some(top.len()));
+        assert_eq!(target, "Fuck you!");
+        assert_eq!(
+            shown.assemble(target, both, "Пішов ти!".into()),
+            "Мені так краще.\nПішов ти!"
+        );
+        assert_eq!(
+            history.present(both.into(), now, Card::Appended(top.len())),
+            Some((both.into(), top.into()))
+        );
+        assert_eq!(history.previous(now), both);
+        shown.remember(String::new(), String::new());
+        assert_eq!(shown.target(both, Some(top.len())), both);
+    }
     #[test]
     fn waits_only_for_a_visibly_unfinished_card() {
         let t = Instant::now();

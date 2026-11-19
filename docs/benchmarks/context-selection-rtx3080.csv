@@ -1,0 +1,577 @@
+﻿context,control,en,final,frames,obs_ms,scene,select_us,translation_ms,trial,uk,marker
+,True,Okay.,False,2,230.8553,debt-near,10.5,90.13839999999999,0,Гаразд.,zones-1-26bd60d6a1ad4efab5f528b36b263ab7
+Okay.,True,Yeah.,False,2,189.42680000000001,debt-near,15.6,63.582100000000004,0,Так.,zones-0-255b89ea9fe2487db716b9f60f35d69e
+"Okay.
+Yeah.",True,Here is the money I owed you.,False,2,421.531,debt-near,2.0999999999999996,286.3483,0,"Ось гроші, які я тобі був завдячний.",zones-1-7503ed9213b944d58704ef8490d0b4a5
+"Yeah.
+Here is the money I owed you.",True,Look at me.,False,2,253.3477,debt-near,3.5,123.5077,0,Подивися на мене.,zones-0-6002e66596e84b19bc2464737adac7be
+"Here is the money I owed you.
+Look at me.",True,Are we square?,True,2,345.6365,debt-near,2.0999999999999996,209.2658,0,"Усе, тепер між нами рівно?",zones-1-7a1d9cd952654f56ab082d8c2976551b
+,False,Okay.,False,2,193.8741,debt-near,16.099999999999998,64.9631,0,Гаразд.,zones-0-1c46192041254e6392ed099ccd95804d
+Okay.,False,Yeah.,False,2,173.0363,debt-near,19.8,46.4321,0,Так.,zones-1-79a61eea55784951a5241e1404f426bf
+"Okay.
+Yeah.",False,Here is the money I owed you.,False,2,389.7503,debt-near,2.2,263.4868,0,"Ось гроші, які я тобі був завдячний.",zones-0-8c8d499a35054ba5a058a860f7236073
+"Yeah.
+Here is the money I owed you.",False,Look at me.,False,2,238.1754,debt-near,26.400000000000002,103.6293,0,Подивися на мене.,zones-1-9e0fee73d2f14f809727a45c17a7a22f
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,330.788,debt-near,14.5,184.2036,0,"Усе, тепер між нами рівно?",zones-0-104258bc90ad41feb2d5b8bd9ecb0975
+,False,Here is the money I owed you.,False,2,407.1083,debt-far,1.3,278.9685,0,"Ось гроші, які я тобі був завдячний.",zones-1-bcfe088038084fd0907f1f1da0638e71
+Here is the money I owed you.,False,Okay.,False,2,221.77079999999998,debt-far,1.5,84.80930000000001,0,Гаразд.,zones-0-fd3b20eea14944c28f048d38672b25e4
+"Here is the money I owed you.
+Okay.",False,Yeah.,False,2,207.42569999999998,debt-far,3.5,81.82929999999999,0,Гаразд.,zones-1-11e6bda885a04e4d9103ff3183303d27
+"Here is the money I owed you.
+Yeah.",False,Look at me.,False,2,267.971,debt-far,12.9,141.7207,0,Подивіться на мене.,zones-0-c6600d654a1b4c25bb88b5619df8ab19
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,315.4038,debt-far,15.299999999999999,179.3001,0,"Усе, тепер між нами рівно?",zones-1-084ac83081ed4d39b4b976c33a8ec5a5
+,True,Here is the money I owed you.,False,2,409.65000000000003,debt-far,3.4,266.32099999999997,0,"Ось гроші, які я тобі був завдячний.",zones-0-c5fb5e1dc9ec43c79f82c1387c6d6b0b
+Here is the money I owed you.,True,Okay.,False,2,220.08089999999999,debt-far,2.6,79.54129999999999,0,Гаразд.,zones-1-ef2f308b37ab4268b118fab4173b9c90
+"Here is the money I owed you.
+Okay.",True,Yeah.,False,2,191.7712,debt-far,1.7,64.47229999999999,0,Гаразд.,zones-0-ee8aac0ac0074a638aea60c97e3d7a7a
+"Okay.
+Yeah.",True,Look at me.,False,2,253.73639999999997,debt-far,3.1999999999999997,117.6155,0,Подивися на мене.,zones-1-4fdc9f9143eb4f10814fcca16cd1fa2e
+"Yeah.
+Look at me.",True,Are we square?,True,2,225.4702,debt-far,5.3,101.8304,0,Усе ясно?,zones-0-25246560073342fbb7fa83ddfc2d72f7
+,True,Okay.,False,2,218.52550000000002,fight-near,2.6,88.6613,0,Гаразд.,zones-1-dee2dfdd720e41049841655cee48021d
+Okay.,True,Yeah.,False,2,194.2941,fight-near,2.5,62.9024,0,Так.,zones-0-2279f7e8492b479c9cd1dd7a9998fa34
+"Okay.
+Yeah.",True,I am sorry about our fight.,False,2,334.4495,fight-near,2.2,206.6654,0,"Вибач, що ми посварилися.",zones-1-a839d349d1cd43578c08ac7bf22b3928
+"Yeah.
+I am sorry about our fight.",True,Look at me.,False,2,246.8356,fight-near,3.0,121.835,0,Подивися на мене.,zones-0-01253a204ed645b9bdb8127dad09ab24
+"I am sorry about our fight.
+Look at me.",True,Are we square?,True,2,283.2095,fight-near,2.4,156.3091,0,Усе гаразд між нами?,zones-1-9d132aa8891a467a88fd686dea3e1741
+,False,Okay.,False,2,207.637,fight-near,1.5999999999999999,80.1529,0,Гаразд.,zones-0-93ca821d063e4ffc872dcbffd27bd66b
+Okay.,False,Yeah.,False,2,165.0973,fight-near,1.0,46.4233,0,Так.,zones-1-ec4ac530aca4497ab40afe13d21a8cc7
+"Okay.
+Yeah.",False,I am sorry about our fight.,False,2,315.0993,fight-near,2.8,188.3855,0,"Вибач, що ми посварилися.",zones-0-19bd575052ec4195ab4ad84ae9a02621
+"Yeah.
+I am sorry about our fight.",False,Look at me.,False,2,234.11950000000002,fight-near,9.0,103.4768,0,Подивися на мене.,zones-1-0f5f64bf52d8415780e216992e7ba290
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,267.91740000000004,fight-near,13.4,141.34459999999999,0,Усе гаразд між нами?,zones-0-3c929721ed304ca69c1d771f3aa63f15
+,False,I am sorry about our fight.,False,2,328.8883,fight-far,1.4,200.9954,0,"Вибач, що ми посварилися.",zones-1-ed83bf62e2d84e5eac17c9a482a3b384
+I am sorry about our fight.,False,Okay.,False,2,209.8902,fight-far,1.5999999999999999,78.50070000000001,0,Гаразд.,zones-0-9185e7080a9f409f8a3c3ad00f963994
+"I am sorry about our fight.
+Okay.",False,Yeah.,False,2,202.8621,fight-far,3.0,80.5063,0,Гаразд.,zones-1-5f07e8c5e2fb4a79bd5b1c8fe9c835ce
+"I am sorry about our fight.
+Yeah.",False,Look at me.,False,2,252.3451,fight-far,11.3,116.7786,0,Подивися на мене.,zones-0-e2bdea0e4f36471f9d74e0c5fd9971b9
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,272.7928,fight-far,16.4,140.601,0,Усе гаразд між нами?,zones-1-caba55da792e47b4a5edbd71131ee6f4
+,True,I am sorry about our fight.,False,2,331.2952,fight-far,1.2,200.1366,0,"Вибач, що ми посварилися.",zones-0-9b53df2375484c148b7046e10e4fc2d1
+I am sorry about our fight.,True,Okay.,False,2,203.0639,fight-far,2.4,76.2419,0,Гаразд.,zones-1-2ef2e8e567dd4c75bce440711de82c15
+"I am sorry about our fight.
+Okay.",True,Yeah.,False,2,192.3718,fight-far,1.5,65.6164,0,Гаразд.,zones-0-7dd9409eca1943568347e961541ec4f9
+"Okay.
+Yeah.",True,Look at me.,False,2,269.0954,fight-far,1.4,131.2679,0,Подивися на мене.,zones-1-ba1005326fcb4ee38b9561ffcf6106b4
+"Yeah.
+Look at me.",True,Are we square?,True,2,210.54229999999998,fight-far,3.5,83.7038,0,Усе ясно?,zones-0-86e55bee21d246e9a32096242ec43a7c
+,True,Okay.,False,2,203.8244,teams-near,1.2,73.0628,0,Гаразд.,zones-1-b6293bd6551c4cf6bc66b5488ca7b867
+Okay.,True,Yeah.,False,2,176.3885,teams-near,1.7,44.8996,0,Так.,zones-0-5507c443b3af476e9472922a72ff871a
+"Okay.
+Yeah.",True,Both teams now have five players each.,False,2,362.5546,teams-near,1.7999999999999998,227.6427,0,У обох командах тепер по п’ять гравців.,zones-1-a6dcf60c6c2d4f029c62a7f0609ceece
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,250.8374,teams-near,3.1999999999999997,128.8267,0,Подивіться на мене.,zones-0-8da5bc05948a49db94c45688df9a4c73
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,283.8387,teams-near,2.2,153.5659,0,У нас по п’ять гравців?,zones-1-5789c3e703b846efa8eb1a93b47b0eb1
+,False,Okay.,False,2,192.2967,teams-near,1.3,63.4815,0,Гаразд.,zones-0-26df5fdabb2e47848a061c10a941a307
+Okay.,False,Yeah.,False,2,181.88889999999998,teams-near,1.4,47.5333,0,Так.,zones-1-cfc38f1785dc41b7bf515e0b243faf3d
+"Okay.
+Yeah.",False,Both teams now have five players each.,False,2,371.21840000000003,teams-near,3.4,230.1494,0,У обох командах тепер по п’ять гравців.,zones-0-1640e13cc33b4816a71d54dc69bd4b23
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,241.0784,teams-near,16.0,113.85860000000001,0,Подивіться на мене.,zones-1-a9c29df9cbd2451c9eb8b960204f24a2
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,265.0965,teams-near,12.700000000000001,142.2603,0,У нас по п’ять гравців?,zones-0-2e5fa0c19b034bccb75c374af44ac41a
+,False,Both teams now have five players each.,False,2,363.70750000000004,teams-far,1.9,227.5135,0,У обох командах тепер по п’ять гравців.,zones-1-ed0b9d26e77a41d2bc878e8fff750003
+Both teams now have five players each.,False,Okay.,False,2,219.2817,teams-far,2.0,81.43839999999999,0,Гаразд.,zones-0-eb36bf6b673b4bb3b9dd7db50fda469f
+"Both teams now have five players each.
+Okay.",False,Yeah.,False,2,208.8913,teams-far,3.7,77.3929,0,Так.,zones-1-675fe9e899a5450b8514c43ce9d2561a
+"Both teams now have five players each.
+Yeah.",False,Look at me.,False,2,252.54090000000002,teams-far,12.6,127.52340000000001,0,Подивіться на мене.,zones-0-0ee2cb8ec1d94e7aa210195f7c95219c
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,267.12940000000003,teams-far,18.3,141.4044,0,У нас по п’ять гравців?,zones-1-bf67d7209867434586b32128ab29ebb3
+,True,Both teams now have five players each.,False,2,344.1959,teams-far,1.3,214.1342,0,У обох командах тепер по п’ять гравців.,zones-0-8047ba72d0e04d9c853e9e96118c61ef
+Both teams now have five players each.,True,Okay.,False,2,211.1617,teams-far,2.5,79.6214,0,Гаразд.,zones-1-52ebcf05a864411aa37a7d332c06813b
+"Both teams now have five players each.
+Okay.",True,Yeah.,False,2,172.19719999999998,teams-far,1.4,46.486399999999996,0,Так.,zones-0-f684b6d4b34d47d2906c7899527790e6
+"Okay.
+Yeah.",True,Look at me.,False,2,241.71970000000002,teams-far,2.0999999999999996,111.9401,0,Подивися на мене.,zones-1-e75fd1fe4d2c434383107557ffedaab9
+"Yeah.
+Look at me.",True,Are we square?,True,2,216.7796,teams-far,1.7999999999999998,94.77539999999999,0,Усе ясно?,zones-0-c22a9b5230194d5d8d304a84522ab5db
+,True,Here is the money I owed you.,False,2,420.6557,switch-debt-teams,1.3,291.2372,0,"Ось гроші, які я тобі був завдячний.",zones-1-57018dfca2dd4686b231dfa17b2868c4
+Here is the money I owed you.,True,Yeah.,False,2,207.0861,switch-debt-teams,2.6,88.7557,0,Гаразд.,zones-0-b93be20120b64979a49e91008247ec48
+"Here is the money I owed you.
+Yeah.",True,Both teams now have five players each.,False,2,366.0037,switch-debt-teams,1.4,228.6767,0,У обох командах тепер по п’ять гравців.,zones-1-e8278bbc97d44358babaa5e1ccb6b819
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,234.62120000000002,switch-debt-teams,1.9,114.2709,0,Подивіться на мене.,zones-0-abf7325cfbcc443288d87857c0ac8509
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,267.1128,switch-debt-teams,1.7,141.3969,0,У нас по п’ять гравців?,zones-1-5e08dfc9b9654b7d93787a7f3a68f187
+,False,Here is the money I owed you.,False,2,392.42159999999996,switch-debt-teams,1.1,264.7926,0,"Ось гроші, які я тобі був завдячний.",zones-0-1b7a05bf71434de3916822f111ae1483
+Here is the money I owed you.,False,Yeah.,False,2,207.204,switch-debt-teams,1.7999999999999998,67.33250000000001,0,Гаразд.,zones-1-e2abc0af1720475aa3a096ec1add5e5d
+"Here is the money I owed you.
+Yeah.",False,Both teams now have five players each.,False,2,375.61260000000004,switch-debt-teams,2.6,235.4271,0,У обох командах тепер по п’ять гравців.,zones-0-0c153eddf8cb4d4ab718747224ff706d
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,243.0214,switch-debt-teams,14.600000000000001,113.54060000000001,0,Подивіться на мене.,zones-1-660e793033154411b8d22b39e5840648
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,264.3113,switch-debt-teams,18.0,140.9338,0,У нас по п’ять гравців?,zones-0-eb4f140e93584868916e02962794cebc
+,False,Here is the money I owed you.,False,2,421.1862,distracted-debt,1.1,280.5951,0,"Ось гроші, які я тобі був завдячний.",zones-1-190e8cfaa68246cfbcd34759b7a9b501
+Here is the money I owed you.,False,Meet me at the station.,False,2,329.3013,distracted-debt,1.4,192.0541,0,Зустрінемося на вокзалі.,zones-0-2544bdaa58804ebaba6bd31a5e43c9b3
+"Here is the money I owed you.
+Meet me at the station.",False,The train leaves at noon.,False,2,393.3498,distracted-debt,5.5,270.6716,0,Поїзд відправляється о півдні.,zones-1-24b549936ffb4871bd91688406fdb54a
+"Meet me at the station.
+The train leaves at noon.",False,Look at me.,False,2,253.9601,distracted-debt,14.600000000000001,119.0566,0,Подивися на мене.,zones-0-ecef54a9ce4845c78fee064b0a44ff05
+"The train leaves at noon.
+Look at me.",False,Are we square?,True,2,241.34439999999998,distracted-debt,18.3,113.7548,0,Усе ясно?,zones-1-b0254754a39c47e18ffec5fd85e1a35b
+,True,Here is the money I owed you.,False,2,401.1612,distracted-debt,1.1,264.9687,0,"Ось гроші, які я тобі був завдячний.",zones-0-d2d6baab914543c38270aba64b73e254
+Here is the money I owed you.,True,Meet me at the station.,False,2,281.2127,distracted-debt,2.3,159.8332,0,Зустрінемося на вокзалі.,zones-1-db313003e1664b34b7fbe05b09e85383
+"Here is the money I owed you.
+Meet me at the station.",True,The train leaves at noon.,False,2,361.7384,distracted-debt,2.0,235.8356,0,Поїзд відправляється о півдні.,zones-0-b3db86556610450cbe4b26bebbb89518
+"Meet me at the station.
+The train leaves at noon.",True,Look at me.,False,2,253.9095,distracted-debt,2.0,121.2844,0,Подивися на мене.,zones-1-fa9e43e4d6b240a5a069913e6e35f61b
+"The train leaves at noon.
+Look at me.",True,Are we square?,True,2,207.5864,distracted-debt,2.3,84.5925,0,Усе ясно?,zones-0-cb28738ad3ab4060902e747954a8d939
+,True,The cash covers the debt in full.,False,2,423.2264,lexical-debt,1.4,287.6014,0,"Грошей вистачить, щоб повністю покрити борг.",zones-1-8b5adc0e5c3a4acbabb18345ce31c3c0
+The cash covers the debt in full.,True,Meet me at the station.,False,2,330.6755,lexical-debt,1.5999999999999999,193.0773,0,Зустрінемося на вокзалі.,zones-0-6947f59c84774139bc186c45b810420f
+"The cash covers the debt in full.
+Meet me at the station.",True,The train leaves at noon.,False,2,375.70120000000003,lexical-debt,5.0,251.1696,0,Поїзд відправляється о півдні.,zones-1-62d7533d390246ad9fc74620b5f94204
+"Meet me at the station.
+The train leaves at noon.",True,Count the cash.,False,2,267.6501,lexical-debt,3.1,140.5093,0,Підрахуй готівку.,zones-0-c4d3554f21f749b89c24ad9a05b04b53
+"The train leaves at noon.
+Count the cash.",True,Are we square?,True,2,251.3142,lexical-debt,2.6,122.33,0,Усе в порядку?,zones-1-3685435c86d64ff29ba1743c61fea41a
+,False,The cash covers the debt in full.,False,2,421.6471,lexical-debt,1.0,287.6535,0,"Грошей вистачить, щоб повністю покрити борг.",zones-0-7f06dfe8840141eda4a5ba5fc8a6d272
+The cash covers the debt in full.,False,Meet me at the station.,False,2,283.5147,lexical-debt,2.0,159.4203,0,Зустрінемося на вокзалі.,zones-1-6edd773af5fb4b0db935b06e537a9765
+"The cash covers the debt in full.
+Meet me at the station.",False,The train leaves at noon.,False,2,364.0534,lexical-debt,4.0,234.6029,0,Поїзд відправляється о півдні.,zones-0-c8c6ec668a7c4f0da5d11188e6702923
+"The cash covers the debt in full.
+The train leaves at noon.",False,Count the cash.,False,2,265.5044,lexical-debt,14.600000000000001,147.21280000000002,0,Підрахуй гроші.,zones-1-88362729edd24ef79da9d5df640911fe
+"The cash covers the debt in full.
+Count the cash.",False,Are we square?,True,2,284.5831,lexical-debt,15.0,147.3075,0,Усе врегульовано?,zones-0-e2309933b88d4d91be851f3dd6237906
+,False,Okay.,False,2,210.5582,debt-near,1.5999999999999999,90.0721,1,Гаразд.,zones-1-7b6f9b24e2574a9dbff72b97b209fbc8
+Okay.,False,Yeah.,False,2,172.58599999999998,debt-near,1.9,45.2123,1,Так.,zones-0-2c9cfcf5577c457ba8764625d8f467f3
+"Okay.
+Yeah.",False,Here is the money I owed you.,False,2,424.3939,debt-near,3.3000000000000003,291.33209999999997,1,"Ось гроші, які я тобі був завдячний.",zones-1-6d995c9ae7e842ca97e8da28638e80a2
+"Yeah.
+Here is the money I owed you.",False,Look at me.,False,2,250.5877,debt-near,12.2,117.7413,1,Подивися на мене.,zones-0-75ba40286733490aaf04afefd48d176d
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,316.7964,debt-near,11.3,177.7091,1,"Усе, тепер між нами рівно?",zones-1-ae013d2a90e5442d978f1b801618e3e1
+,True,Okay.,False,2,191.7521,debt-near,2.0,65.2014,1,Гаразд.,zones-0-12982a4731e64502859bd43eacd5cdd4
+Okay.,True,Yeah.,False,2,190.37689999999998,debt-near,1.9,46.5662,1,Так.,zones-1-544c02731dc2422d9e39c2126da3272a
+"Okay.
+Yeah.",True,Here is the money I owed you.,False,2,422.2355,debt-near,2.5,282.5074,1,"Ось гроші, які я тобі був завдячний.",zones-0-5fb071d83e1243c6830e6ae623f39a60
+"Yeah.
+Here is the money I owed you.",True,Look at me.,False,2,251.39460000000003,debt-near,2.6,120.3321,1,Подивися на мене.,zones-1-99ca688b235c44d5bd5af91f416625f4
+"Here is the money I owed you.
+Look at me.",True,Are we square?,True,2,313.21529999999996,debt-near,2.0999999999999996,179.88879999999997,1,"Усе, тепер між нами рівно?",zones-0-b535a79f1ac74245b116fb81dc0f9101
+,True,Here is the money I owed you.,False,2,437.28650000000005,debt-far,2.6,297.6216,1,"Ось гроші, які я тобі був завдячний.",zones-1-37eabb1136314b0280c6f6c784cf483a
+Here is the money I owed you.,True,Okay.,False,2,223.6299,debt-far,3.1,93.0052,1,Гаразд.,zones-0-90ff1947d525485698f3471494ce7897
+"Here is the money I owed you.
+Okay.",True,Yeah.,False,2,207.0314,debt-far,2.8,66.5775,1,Гаразд.,zones-1-2b8d852d1bba4939bea702e8aa78ca98
+"Okay.
+Yeah.",True,Look at me.,False,2,255.409,debt-far,2.6,132.39319999999998,1,Подивися на мене.,zones-0-4a0a7de512344b6db2dff88905578e34
+"Yeah.
+Look at me.",True,Are we square?,True,2,236.0362,debt-far,3.3000000000000003,100.6419,1,Усе ясно?,zones-1-f784551a24a14e60a6f764376cb70a0e
+,False,Here is the money I owed you.,False,2,425.70599999999996,debt-far,1.5,285.8524,1,"Ось гроші, які я тобі був завдячний.",zones-0-1a41b561402a4fd3837a9986d3f8f38d
+Here is the money I owed you.,False,Okay.,False,2,204.9649,debt-far,1.9,66.30940000000001,1,Гаразд.,zones-1-5d1e750d11564a8595fd0e37b701bb35
+"Here is the money I owed you.
+Okay.",False,Yeah.,False,2,192.3241,debt-far,4.8999999999999995,67.273,1,Гаразд.,zones-0-ebf0b0d59985482589bc0a05581b4429
+"Here is the money I owed you.
+Yeah.",False,Look at me.,False,2,252.93280000000001,debt-far,12.0,122.55000000000001,1,Подивіться на мене.,zones-1-660883daf377454691e26d5da269561b
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,315.1662,debt-far,10.7,180.3547,1,"Усе, тепер між нами рівно?",zones-0-e653859d646245c5837581de08171713
+,False,Okay.,False,2,191.8209,fight-near,1.1,74.30879999999999,1,Гаразд.,zones-1-7ad1abd880b24647aa0fc4c45b4ab147
+Okay.,False,Yeah.,False,2,180.45159999999998,fight-near,2.4,62.4715,1,Так.,zones-0-c5447d7b02ff4058a681428461cce48a
+"Okay.
+Yeah.",False,I am sorry about our fight.,False,2,341.0479,fight-near,2.0,199.14270000000002,1,"Вибач, що ми посварилися.",zones-1-4fae29f3d22b47f9855040eceb97f789
+"Yeah.
+I am sorry about our fight.",False,Look at me.,False,2,222.0771,fight-near,10.6,103.2287,1,Подивися на мене.,zones-0-fb08ad1b185b46229ad140149bf32142
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,269.90520000000004,fight-near,13.4,141.75879999999998,1,Усе гаразд між нами?,zones-1-19fde5fb779f49ee83d80a6717e490f2
+,True,Okay.,False,2,207.8593,fight-near,1.5999999999999999,81.70739999999999,1,Гаразд.,zones-0-ebf548e6f6bf4434a42f5338342f802f
+Okay.,True,Yeah.,False,2,164.6454,fight-near,2.0999999999999996,45.6093,1,Так.,zones-1-5207189aee83435087bb6366eea7f756
+"Okay.
+Yeah.",True,I am sorry about our fight.,False,2,314.6089,fight-near,1.4,189.1139,1,"Вибач, що ми посварилися.",zones-0-c8bf494089a14b479c9be14aca273e8b
+"Yeah.
+I am sorry about our fight.",True,Look at me.,False,2,235.0206,fight-near,1.5999999999999999,115.7389,1,Подивися на мене.,zones-1-b11cc9533ae7497a9d1d29ff5d1bf72f
+"I am sorry about our fight.
+Look at me.",True,Are we square?,True,2,269.7503,fight-near,1.5999999999999999,141.49,1,Усе гаразд між нами?,zones-0-7690654eff514fe38b061e0e1e9de87b
+,True,I am sorry about our fight.,False,2,331.10830000000004,fight-far,1.4,202.4809,1,"Вибач, що ми посварилися.",zones-1-05cc570946344341a1d046117cefd547
+I am sorry about our fight.,True,Okay.,False,2,192.417,fight-far,2.7,66.27669999999999,1,Гаразд.,zones-0-e77227f5d21f4cfdbbcf5b83b6741240
+"I am sorry about our fight.
+Okay.",True,Yeah.,False,2,223.5077,fight-far,1.2,81.3214,1,Гаразд.,zones-1-3b5d8e52e3784a13b676cdba6e612bdf
+"Okay.
+Yeah.",True,Look at me.,False,2,237.82229999999998,fight-far,2.3,111.269,1,Подивися на мене.,zones-0-97033f3072d34358bf3481b6e70ab856
+"Yeah.
+Look at me.",True,Are we square?,True,2,237.55399999999997,fight-far,1.5999999999999999,100.2926,1,Усе ясно?,zones-1-8772e7b24db74b5b9345de9d17d87fa8
+,False,I am sorry about our fight.,False,2,313.9495,fight-far,1.1,190.0103,1,"Вибач, що ми посварилися.",zones-0-53393b8162bb420eb445e5f1bb9bacb2
+I am sorry about our fight.,False,Okay.,False,2,192.1225,fight-far,1.7,66.3078,1,Гаразд.,zones-1-72a39c9927114a7ab6b29af5e8e10f1e
+"I am sorry about our fight.
+Okay.",False,Yeah.,False,2,180.7949,fight-far,4.8,65.5915,1,Гаразд.,zones-0-aa27f78f3da848f8be5016dcadbcf1df
+"I am sorry about our fight.
+Yeah.",False,Look at me.,False,2,236.54330000000002,fight-far,8.399999999999999,102.9549,1,Подивися на мене.,zones-1-65f452f8be504703b272fe9ba0f12aa7
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,284.9354,fight-far,9.700000000000001,144.6731,1,Усе гаразд між нами?,zones-0-b7ce2e5cc0af4684ba75b89d029df3ae
+,False,Okay.,False,2,207.43429999999998,teams-near,1.9,75.0899,1,Гаразд.,zones-1-998affe897604bd1bc06b20471f22c3f
+Okay.,False,Yeah.,False,2,181.4204,teams-near,1.3,62.964999999999996,1,Так.,zones-0-1640979cb49d4b69bf9f58906f744a40
+"Okay.
+Yeah.",False,Both teams now have five players each.,False,2,371.96770000000004,teams-near,2.3,242.4333,1,У обох командах тепер по п’ять гравців.,zones-1-0b33856d9dc34b2fb7eba234c58eccd5
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,240.6769,teams-near,19.400000000000002,115.39240000000001,1,Подивіться на мене.,zones-0-c7c5a8994d84425dbfa9fe53897c3238
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,264.94509999999997,teams-near,10.8,142.03050000000002,1,У нас по п’ять гравців?,zones-1-386cc8be461a49b9b4076b0e19082672
+,True,Okay.,False,2,181.50820000000002,teams-near,1.7,63.592499999999994,1,Гаразд.,zones-0-8dcc991adfce43bb83051f50bb0d1a99
+Okay.,True,Yeah.,False,2,188.1689,teams-near,1.9,57.732,1,Так.,zones-1-68d4dfab9edd45948fb0d5073036558e
+"Okay.
+Yeah.",True,Both teams now have five players each.,False,2,346.04249999999996,teams-near,1.4,216.53140000000002,1,У обох командах тепер по п’ять гравців.,zones-0-4db60104b46e4e4694297fe6d94d7910
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,252.814,teams-near,3.3000000000000003,113.1831,1,Подивіться на мене.,zones-1-d20a70706e6a44dd821a9317aecc38d0
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,272.09610000000004,teams-near,1.9,141.1255,1,У нас по п’ять гравців?,zones-0-a9e992890f79420e99a34f5401aabf09
+,True,Both teams now have five players each.,False,2,370.4516,teams-far,1.0,239.6914,1,У обох командах тепер по п’ять гравців.,zones-1-384dd74dc8a7456f9c24bb3d1ce5c8e7
+Both teams now have five players each.,True,Okay.,False,2,208.8165,teams-far,1.5999999999999999,82.1178,1,Гаразд.,zones-0-1395b07a4cc44d96810bd9b50e98ff9d
+"Both teams now have five players each.
+Okay.",True,Yeah.,False,2,181.12519999999998,teams-far,1.9,61.460300000000004,1,Так.,zones-1-ee4efb4012ff48baa969917608fe3812
+"Okay.
+Yeah.",True,Look at me.,False,2,232.8357,teams-far,2.2,115.1345,1,Подивися на мене.,zones-0-ed8204c526ea46dab96f7b3ad0f02afd
+"Yeah.
+Look at me.",True,Are we square?,True,2,220.75910000000002,teams-far,2.0,84.7362,1,Усе ясно?,zones-1-2c7e3d58ff1d4e5a85a55ced4b52b5cd
+,False,Both teams now have five players each.,False,2,345.1719,teams-far,1.2,216.7856,1,У обох командах тепер по п’ять гравців.,zones-0-f6e9f820637441138da4d5372ac5e0f3
+Both teams now have five players each.,False,Okay.,False,2,194.61329999999998,teams-far,2.0,65.1723,1,Гаразд.,zones-1-b091c9db310b4131b319c82ded468b0e
+"Both teams now have five players each.
+Okay.",False,Yeah.,False,2,174.6147,teams-far,4.199999999999999,45.6749,1,Так.,zones-0-56cbd24565b846f29a4156fa0b002836
+"Both teams now have five players each.
+Yeah.",False,Look at me.,False,2,238.01510000000002,teams-far,14.3,114.1929,1,Подивіться на мене.,zones-1-5fe6b6401ba3447b9effc898cf378fd5
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,268.0924,teams-far,12.0,140.6363,1,У нас по п’ять гравців?,zones-0-9c84d51f83cc4096968f61b461905523
+,False,Here is the money I owed you.,False,2,427.4905,switch-debt-teams,1.1,292.4244,1,"Ось гроші, які я тобі був завдячний.",zones-1-e204d56d2b7a4b8c8df2695eb058a73b
+Here is the money I owed you.,False,Yeah.,False,2,202.8839,switch-debt-teams,1.7,72.38459999999999,1,Гаразд.,zones-0-364cb7e5d2dc49b39b40c250abef014e
+"Here is the money I owed you.
+Yeah.",False,Both teams now have five players each.,False,2,362.47220000000004,switch-debt-teams,3.4,226.38230000000001,1,У обох командах тепер по п’ять гравців.,zones-1-bbf7039e634b4787ae3a76dc25c4dc70
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,254.27670000000003,switch-debt-teams,17.099999999999998,129.07930000000002,1,Подивіться на мене.,zones-0-4ade4fb3b46f4ddfb61053c7e599b48a
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,290.4428,switch-debt-teams,26.8,161.1395,1,У нас по п’ять гравців?,zones-1-f4a7c54bf1ac4f6dadbed32d0709d402
+,True,Here is the money I owed you.,False,2,399.5505,switch-debt-teams,1.2,262.95210000000003,1,"Ось гроші, які я тобі був завдячний.",zones-0-177eb997388f4eb99985c8258f091942
+Here is the money I owed you.,True,Yeah.,False,2,196.389,switch-debt-teams,1.7,65.1692,1,Гаразд.,zones-1-f55b240800d84956af0a99d80b80e08f
+"Here is the money I owed you.
+Yeah.",True,Both teams now have five players each.,False,2,357.3509,switch-debt-teams,2.3,216.51909999999998,1,У обох командах тепер по п’ять гравців.,zones-0-41a4c3eb7e7b49eab152c2bf2f86cd91
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,255.9817,switch-debt-teams,2.8,128.4813,1,Подивіться на мене.,zones-1-9a9790c3d4de4efeada9eba8412bf44e
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,265.22970000000004,switch-debt-teams,1.5,141.93339999999998,1,У нас по п’ять гравців?,zones-0-55016346adbf4e05b256ded1edddd438
+,True,Here is the money I owed you.,False,2,406.4079,distracted-debt,2.0,263.1875,1,"Ось гроші, які я тобі був завдячний.",zones-1-1dc7d4cd9c6448f3bfa0177388781819
+Here is the money I owed you.,True,Meet me at the station.,False,2,288.6834,distracted-debt,2.6,171.465,1,Зустрінемося на вокзалі.,zones-0-505d9bd25d03453c8f914f364d7ef9ac
+"Here is the money I owed you.
+Meet me at the station.",True,The train leaves at noon.,False,2,371.8913,distracted-debt,1.7,247.3106,1,Поїзд відправляється о півдні.,zones-1-7844b211e6194f5296fb53fcd9f4a53f
+"Meet me at the station.
+The train leaves at noon.",True,Look at me.,False,2,257.28810000000004,distracted-debt,3.5,133.83419999999998,1,Подивися на мене.,zones-0-98118f595ee446f39a72f2cf6e8e6900
+"The train leaves at noon.
+Look at me.",True,Are we square?,True,2,218.1496,distracted-debt,2.5,96.47940000000001,1,Усе ясно?,zones-1-ab4b883019cb4b4daa6030f576613946
+,False,Here is the money I owed you.,False,2,410.4633,distracted-debt,0.8999999999999999,284.19280000000003,1,"Ось гроші, які я тобі був завдячний.",zones-0-8eec39c437104cc9aa1445d2e7c40140
+Here is the money I owed you.,False,Meet me at the station.,False,2,281.81640000000004,distracted-debt,1.3,158.6487,1,Зустрінемося на вокзалі.,zones-1-b90f0cf044d3429f9967ae87da60b24a
+"Here is the money I owed you.
+Meet me at the station.",False,The train leaves at noon.,False,2,375.0034,distracted-debt,2.6,236.61860000000001,1,Поїзд відправляється о півдні.,zones-0-ef7e2bcd9f444ec9bd02111ad0105e8d
+"Meet me at the station.
+The train leaves at noon.",False,Look at me.,False,2,222.2815,distracted-debt,17.0,103.7638,1,Подивися на мене.,zones-1-cc7e4ef3ed514382bac6fd7891582acb
+"The train leaves at noon.
+Look at me.",False,Are we square?,True,2,221.3778,distracted-debt,12.2,83.9169,1,Усе ясно?,zones-0-1022d2f1cbad47b3959e534698fda682
+,False,The cash covers the debt in full.,False,2,439.5602,lexical-debt,1.5999999999999999,304.7441,1,"Грошей вистачить, щоб повністю покрити борг.",zones-1-0225fe76cd874a858da102c68f24ed29
+The cash covers the debt in full.,False,Meet me at the station.,False,2,281.3473,lexical-debt,1.5999999999999999,159.8401,1,Зустрінемося на вокзалі.,zones-0-606015ef38c8440caf5e50c082e63148
+"The cash covers the debt in full.
+Meet me at the station.",False,The train leaves at noon.,False,2,364.8587,lexical-debt,3.5999999999999996,233.5848,1,Поїзд відправляється о півдні.,zones-1-43c7e64536654221971eb7bdfe51e65b
+"The cash covers the debt in full.
+The train leaves at noon.",False,Count the cash.,False,2,263.8386,lexical-debt,12.799999999999999,145.21609999999998,1,Підрахуй гроші.,zones-0-5db66f0130e54e7598f36cdfe4a3a465
+"The cash covers the debt in full.
+Count the cash.",False,Are we square?,True,2,267.2986,lexical-debt,15.2,147.7211,1,Усе врегульовано?,zones-1-0eb6c185562d415182b550f6be45b5f8
+,True,The cash covers the debt in full.,False,2,420.1571,lexical-debt,1.1,278.4051,1,"Грошей вистачить, щоб повністю покрити борг.",zones-0-acc46aa085f54779bffdac5e83646248
+The cash covers the debt in full.,True,Meet me at the station.,False,2,297.8329,lexical-debt,2.0999999999999996,160.95999999999998,1,Зустрінемося на вокзалі.,zones-1-66e9f3dc8c2c4ba184d7d6ca371ea842
+"The cash covers the debt in full.
+Meet me at the station.",True,The train leaves at noon.,False,2,360.0227,lexical-debt,2.9000000000000004,237.40120000000002,1,Поїзд відправляється о півдні.,zones-0-efe7f89e3c5a42028928af4e92628a2b
+"Meet me at the station.
+The train leaves at noon.",True,Count the cash.,False,2,267.2753,lexical-debt,1.5999999999999999,141.0544,1,Підрахуй готівку.,zones-1-5a1cde0802e54deba7b4eec0ec063730
+"The train leaves at noon.
+Count the cash.",True,Are we square?,True,2,221.5994,lexical-debt,1.5,95.2403,1,Усе в порядку?,zones-0-c2a8d31d671f4f1eb306bb7f9bef8126
+,True,Okay.,False,2,206.7204,debt-near,1.2,73.9302,2,Гаразд.,zones-1-c4018af06620452ebfd94b74271a83ed
+Okay.,True,Yeah.,False,2,179.6818,debt-near,1.4,46.1608,2,Так.,zones-0-6f049a41126548df848ad9b48a31480d
+"Okay.
+Yeah.",True,Here is the money I owed you.,False,2,416.3353,debt-near,2.8,287.2625,2,"Ось гроші, які я тобі був завдячний.",zones-1-dfca0701fd734ca7a34cd07fff29e7ba
+"Yeah.
+Here is the money I owed you.",True,Look at me.,False,2,236.3994,debt-near,3.5,104.13719999999999,2,Подивися на мене.,zones-0-2bd486a4c42a47898a4844a6f2915dea
+"Here is the money I owed you.
+Look at me.",True,Are we square?,True,2,313.49739999999997,debt-near,2.2,181.8887,2,"Усе, тепер між нами рівно?",zones-1-be33b13a90224c9591517b301c27f4c5
+,False,Okay.,False,2,191.8562,debt-near,1.3,67.2737,2,Гаразд.,zones-0-899d6d5b642c4c8da67cc5d92bc140ad
+Okay.,False,Yeah.,False,2,191.7625,debt-near,1.7999999999999998,64.2314,2,Так.,zones-1-8219f077ce184fb4ad9605abfe6e612c
+"Okay.
+Yeah.",False,Here is the money I owed you.,False,2,421.8159,debt-near,3.1,283.6325,2,"Ось гроші, які я тобі був завдячний.",zones-0-e1cf48a60f664d24b6e5acf8d34f60c5
+"Yeah.
+Here is the money I owed you.",False,Look at me.,False,2,252.34839999999997,debt-near,11.7,119.8496,2,Подивися на мене.,zones-1-452c69b8f6e74657825f94b06838931c
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,313.40430000000003,debt-near,9.5,180.6718,2,"Усе, тепер між нами рівно?",zones-0-041614a61e504bcba6c2218062695f2c
+,False,Here is the money I owed you.,False,2,421.968,debt-far,1.3,277.22679999999997,2,"Ось гроші, які я тобі був завдячний.",zones-1-9e36a8db9b3b41a190527c090b5150a6
+Here is the money I owed you.,False,Okay.,False,2,205.0115,debt-far,1.5999999999999999,74.75489999999999,2,Гаразд.,zones-0-a441cf10a09e4f2cabf5f9e5156a59c6
+"Here is the money I owed you.
+Okay.",False,Yeah.,False,2,220.9264,debt-far,4.1,80.4691,2,Гаразд.,zones-1-c30097f21992447eac9abcc8d6d9da66
+"Here is the money I owed you.
+Yeah.",False,Look at me.,False,2,256.2332,debt-far,13.5,123.74159999999999,2,Подивіться на мене.,zones-0-11f658a7fa454f8db224061bcd43a5c9
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,315.0222,debt-far,13.9,180.8002,2,"Усе, тепер між нами рівно?",zones-1-3f10a74aca8440e6affe0cf3d9c3d2ac
+,True,Here is the money I owed you.,False,2,417.6273,debt-far,2.0999999999999996,287.3827,2,"Ось гроші, які я тобі був завдячний.",zones-0-b8627488f0944b6f9a9617524c1a3145
+Here is the money I owed you.,True,Okay.,False,2,210.6796,debt-far,2.7,85.15929999999999,2,Гаразд.,zones-1-0064396e64154ad3b2f3a2054288b21c
+"Here is the money I owed you.
+Okay.",True,Yeah.,False,2,217.86159999999998,debt-far,2.8,80.21060000000001,2,Гаразд.,zones-0-b97af81c9c79479791be7b21e9c2969e
+"Okay.
+Yeah.",True,Look at me.,False,2,267.0656,debt-far,2.9000000000000004,131.411,2,Подивися на мене.,zones-1-c888cc994ef34f428865dc9fe1b18ee6
+"Yeah.
+Look at me.",True,Are we square?,True,2,225.4554,debt-far,2.7,100.2715,2,Усе ясно?,zones-0-c40c04d4107a41c4b3078239c9d64b59
+,True,Okay.,False,2,203.1216,fight-near,1.2,72.85650000000001,2,Гаразд.,zones-1-b194ba31887a4321b1e9de5dd3638453
+Okay.,True,Yeah.,False,2,193.4957,fight-near,1.5999999999999999,62.023599999999995,2,Так.,zones-0-543d4a6cb5bc444ea7a4902bab867bc3
+"Okay.
+Yeah.",True,I am sorry about our fight.,False,2,330.82030000000003,fight-near,1.9,199.0598,2,"Вибач, що ми посварилися.",zones-1-d7b40f1001d148eeaf20bc3db22b9c69
+"Yeah.
+I am sorry about our fight.",True,Look at me.,False,2,234.3222,fight-near,1.4,101.8044,2,Подивися на мене.,zones-0-20574076c8b64bde9cc24ce91c04cb36
+"I am sorry about our fight.
+Look at me.",True,Are we square?,True,2,284.032,fight-near,2.6,159.3428,2,Усе гаразд між нами?,zones-1-604b98d302f64249bf7a94d17d5d52a5
+,False,Okay.,False,2,192.5105,fight-near,1.5999999999999999,65.0918,2,Гаразд.,zones-0-12b052a63ace4589af59382a0aaef891
+Okay.,False,Yeah.,False,2,188.6036,fight-near,1.1,58.4043,2,Так.,zones-1-616caca07a4449208959c79829f5b3d2
+"Okay.
+Yeah.",False,I am sorry about our fight.,False,2,313.5595,fight-near,3.1,187.399,2,"Вибач, що ми посварилися.",zones-0-868c9c8b6ede41af8fe83c668d43f166
+"Yeah.
+I am sorry about our fight.",False,Look at me.,False,2,226.45860000000002,fight-near,8.7,103.72720000000001,2,Подивися на мене.,zones-1-069b554769f74d7a9f6912b718ba3f55
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,263.5552,fight-near,11.9,141.7417,2,Усе гаразд між нами?,zones-0-a0397dabd2054c9ba8dc42e4efaca157
+,False,I am sorry about our fight.,False,2,331.93109999999996,fight-far,0.8999999999999999,203.171,2,"Вибач, що ми посварилися.",zones-1-11da3864178a4809a06866309a3e3eb4
+I am sorry about our fight.,False,Okay.,False,2,188.765,fight-far,1.5999999999999999,65.8667,2,Гаразд.,zones-0-7b6393f1714d4a818c5b8c78576157d7
+"I am sorry about our fight.
+Okay.",False,Yeah.,False,2,191.98229999999998,fight-far,4.0,65.92439999999999,2,Гаразд.,zones-1-6fd74a44144547de8b89bd8451141ac0
+"I am sorry about our fight.
+Yeah.",False,Look at me.,False,2,252.18570000000003,fight-far,11.7,118.55359999999999,2,Подивися на мене.,zones-0-9149b72ab9924c178f8fefe504f838f3
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,268.8555,fight-far,11.3,142.90349999999998,2,Усе гаразд між нами?,zones-1-bebe1f5e62dd4f728f1ee489f9c78c8c
+,True,I am sorry about our fight.,False,2,313.4903,fight-far,1.7,189.163,2,"Вибач, що ми посварилися.",zones-0-5484c497ca454372a0397118250842c3
+I am sorry about our fight.,True,Okay.,False,2,191.78470000000002,fight-far,1.7,65.8065,2,Гаразд.,zones-1-e10571e830434be5b4e2d0d17cbe4083
+"I am sorry about our fight.
+Okay.",True,Yeah.,False,2,196.99810000000002,fight-far,1.5999999999999999,64.9607,2,Гаразд.,zones-0-12ae84f746904de098d52ddb1d889083
+"Okay.
+Yeah.",True,Look at me.,False,2,232.921,fight-far,1.4,111.997,2,Подивися на мене.,zones-1-553e1447003f43a49af84b39651fa640
+"Yeah.
+Look at me.",True,Are we square?,True,2,221.42100000000002,fight-far,1.7999999999999998,83.3497,2,Усе ясно?,zones-0-dfa5e11a21b0432f96572b165f4ddf8e
+,True,Okay.,False,2,207.4366,teams-near,1.1,88.8201,2,Гаразд.,zones-1-a3768fff7b7c4d7ea82755ced254a6a1
+Okay.,True,Yeah.,False,2,191.22320000000002,teams-near,1.5999999999999999,62.7026,2,Так.,zones-0-03857562996444a5b402876b126828aa
+"Okay.
+Yeah.",True,Both teams now have five players each.,False,2,359.6071,teams-near,2.0,230.95479999999998,2,У обох командах тепер по п’ять гравців.,zones-1-354ae67e0ecb4eeeae0203c75dc3dc24
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,254.17030000000003,teams-near,2.7,113.6799,2,Подивіться на мене.,zones-0-fb7f573b27964012a45ddb0af1ad0bba
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,286.9954,teams-near,2.0,160.7083,2,У нас по п’ять гравців?,zones-1-6e1b9ac30f204a65af21044a4e5fe554
+,False,Okay.,False,2,203.613,teams-near,1.7,64.9138,2,Гаразд.,zones-0-c3ea23f9aaff47b3b10fd817cdd1387a
+Okay.,False,Yeah.,False,2,175.93900000000002,teams-near,1.9,45.9634,2,Так.,zones-1-9230c68f09514745bd0a4dfc72ec3aed
+"Okay.
+Yeah.",False,Both teams now have five players each.,False,2,365.58119999999997,teams-near,2.5,234.8601,2,У обох командах тепер по п’ять гравців.,zones-0-d3e024a3c924473db5ff51709cbc501f
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,247.4084,teams-near,11.1,123.5843,2,Подивіться на мене.,zones-1-7182e1bd876c4f81ac831852131f7a8a
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,267.2333,teams-near,11.5,140.3799,2,У нас по п’ять гравців?,zones-0-70191dd85013449e86591ab76b006ddf
+,False,Both teams now have five players each.,False,2,378.5224,teams-far,1.3,245.6401,2,У обох командах тепер по п’ять гравців.,zones-1-bc55a75c884a492bb35eba49dfeee685
+Both teams now have five players each.,False,Okay.,False,2,186.6909,teams-far,1.7999999999999998,65.027,2,Гаразд.,zones-0-17e722a3994547faba6c464b82e92cb7
+"Both teams now have five players each.
+Okay.",False,Yeah.,False,2,176.3546,teams-far,3.7,46.3041,2,Так.,zones-1-016eb4839f7740a2a182055c82a170ad
+"Both teams now have five players each.
+Yeah.",False,Look at me.,False,2,251.40859999999998,teams-far,13.7,129.1978,2,Подивіться на мене.,zones-0-a9d1fcf82a2147d5a13e4df585e96afa
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,298.5706,teams-far,13.4,158.4648,2,У нас по п’ять гравців?,zones-1-e9955b4eebcf4751aca336c6357e96df
+,True,Both teams now have five players each.,False,2,344.4476,teams-far,1.1,215.6198,2,У обох командах тепер по п’ять гравців.,zones-0-09be82223a68435caa70fbc8d1630ded
+Both teams now have five players each.,True,Okay.,False,2,205.7324,teams-far,1.5999999999999999,80.3399,2,Гаразд.,zones-1-95592a6cdcff4c5380a91d07e1536ddb
+"Both teams now have five players each.
+Okay.",True,Yeah.,False,2,190.5219,teams-far,2.6,61.1643,2,Так.,zones-0-9005be0d85864ebd945b6bc97433f39b
+"Okay.
+Yeah.",True,Look at me.,False,2,237.0414,teams-far,2.0999999999999996,112.9835,2,Подивися на мене.,zones-1-a8f22f8f71c9469fa98ad2fb713e68e3
+"Yeah.
+Look at me.",True,Are we square?,True,2,208.99880000000002,teams-far,2.4,83.30319999999999,2,Усе ясно?,zones-0-a8206cb64b7a466f95fe649f28a91af5
+,True,Here is the money I owed you.,False,2,416.8946,switch-debt-teams,1.0,288.9005,2,"Ось гроші, які я тобі був завдячний.",zones-1-3e1052409aeb42148ffb7003023c64c5
+Here is the money I owed you.,True,Yeah.,False,2,196.71,switch-debt-teams,3.1,74.4424,2,Гаразд.,zones-0-06759659d069495b90f01d58e733e085
+"Here is the money I owed you.
+Yeah.",True,Both teams now have five players each.,False,2,369.95070000000004,switch-debt-teams,3.1999999999999997,229.2389,2,У обох командах тепер по п’ять гравців.,zones-1-0ed8e88e337f495abfb164a86cf3ce96
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,267.39390000000003,switch-debt-teams,2.5,127.59200000000001,2,Подивіться на мене.,zones-0-355613f0615b4822b49cfda9d5890055
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,297.3746,switch-debt-teams,1.7,155.8579,2,У нас по п’ять гравців?,zones-1-015987cb3a6b4d108b4a51fec038c294
+,False,Here is the money I owed you.,False,2,390.4643,switch-debt-teams,1.3,264.2929,2,"Ось гроші, які я тобі був завдячний.",zones-0-696d5a7a85d548cfa051713fc9259216
+Here is the money I owed you.,False,Yeah.,False,2,206.1255,switch-debt-teams,2.2,66.18169999999999,2,Гаразд.,zones-1-3aa77691c35e4fccbd6dca56c7f27554
+"Here is the money I owed you.
+Yeah.",False,Both teams now have five players each.,False,2,359.6055,switch-debt-teams,2.9000000000000004,220.388,2,У обох командах тепер по п’ять гравців.,zones-0-6b2b98f8e5f043dca368fdbbb771ce1a
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,268.0657,switch-debt-teams,15.6,131.54080000000002,2,Подивіться на мене.,zones-1-3a18a0680af24b4894d391b76694e4f5
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,274.6458,switch-debt-teams,13.299999999999999,143.0727,2,У нас по п’ять гравців?,zones-0-db81df3b22e84d418da33cfd8f0c399c
+,False,Here is the money I owed you.,False,2,403.68199999999996,distracted-debt,1.2,266.1384,2,"Ось гроші, які я тобі був завдячний.",zones-1-afd8c4f2c3c04ad291df1f8055d8eb61
+Here is the money I owed you.,False,Meet me at the station.,False,2,298.2834,distracted-debt,2.0,174.1645,2,Зустрінемося на вокзалі.,zones-0-b6ad46b8be214105823b8c1c17975f46
+"Here is the money I owed you.
+Meet me at the station.",False,The train leaves at noon.,False,2,375.11280000000005,distracted-debt,2.7,251.71290000000002,2,Поїзд відправляється о півдні.,zones-1-e8f2209db4be4efda1f4a9816d41fb11
+"Meet me at the station.
+The train leaves at noon.",False,Look at me.,False,2,267.6713,distracted-debt,11.9,129.4199,2,Подивися на мене.,zones-0-d0c4127b8f304bcab45ab696ede04543
+"The train leaves at noon.
+Look at me.",False,Are we square?,True,2,210.8629,distracted-debt,19.9,84.02170000000001,2,Усе ясно?,zones-1-50d1c9f202354dfbb7ad9ade7c2e911c
+,True,Here is the money I owed you.,False,2,402.281,distracted-debt,1.5999999999999999,263.0687,2,"Ось гроші, які я тобі був завдячний.",zones-0-062a82ae8a2448f5bbd06a08e82dc7b8
+Here is the money I owed you.,True,Meet me at the station.,False,2,297.16110000000003,distracted-debt,2.5,176.64260000000002,2,Зустрінемося на вокзалі.,zones-1-096562beb5db4f4584c9539b6290b46b
+"Here is the money I owed you.
+Meet me at the station.",True,The train leaves at noon.,False,2,377.497,distracted-debt,2.7,252.7449,2,Поїзд відправляється о півдні.,zones-0-85c9ffedcd25487ca8e44ccdfd3eb3cf
+"Meet me at the station.
+The train leaves at noon.",True,Look at me.,False,2,234.2815,distracted-debt,2.9000000000000004,104.2982,2,Подивися на мене.,zones-1-9218a3ee8eb141cc9a9c8df01c883730
+"The train leaves at noon.
+Look at me.",True,Are we square?,True,2,210.67659999999998,distracted-debt,2.3,82.3695,2,Усе ясно?,zones-0-2634a1d58bf64965887c5010b080c8ac
+,True,The cash covers the debt in full.,False,2,416.34130000000005,lexical-debt,1.7999999999999998,285.2803,2,"Грошей вистачить, щоб повністю покрити борг.",zones-1-98cb779694584babba27a48cd9713e31
+The cash covers the debt in full.,True,Meet me at the station.,False,2,282.37780000000004,lexical-debt,2.6,161.5751,2,Зустрінемося на вокзалі.,zones-0-87d1567ddd8c4b26b49e9c50669adc6d
+"The cash covers the debt in full.
+Meet me at the station.",True,The train leaves at noon.,False,2,376.7758,lexical-debt,2.7,249.9288,2,Поїзд відправляється о півдні.,zones-1-a6c42018bd134e0280a6385ff0016384
+"Meet me at the station.
+The train leaves at noon.",True,Count the cash.,False,2,281.5066,lexical-debt,2.3,155.0566,2,Підрахуй готівку.,zones-0-2d5143ffa9c34e87b027270c39d70698
+"The train leaves at noon.
+Count the cash.",True,Are we square?,True,2,221.34390000000002,lexical-debt,4.1,93.04320000000001,2,Усе в порядку?,zones-1-ed6b09c453ce4895b9f401afd9e00f76
+,False,The cash covers the debt in full.,False,2,408.44989999999996,lexical-debt,1.1,270.63910000000004,2,"Грошей вистачить, щоб повністю покрити борг.",zones-0-84571204b4384ed59bd0aa296f908246
+The cash covers the debt in full.,False,Meet me at the station.,False,2,297.2835,lexical-debt,2.2,177.2788,2,Зустрінемося на вокзалі.,zones-1-12684d0c76e04c45a25c1c7a34867ddb
+"The cash covers the debt in full.
+Meet me at the station.",False,The train leaves at noon.,False,2,372.7441,lexical-debt,4.300000000000001,235.2305,2,Поїзд відправляється о півдні.,zones-0-d5dd3700cd1d4bff8f17a0e12dc86835
+"The cash covers the debt in full.
+The train leaves at noon.",False,Count the cash.,False,2,267.4766,lexical-debt,16.7,135.1104,2,Підрахуй гроші.,zones-1-a3e1ebba47204d6bac5872163fc9942b
+"The cash covers the debt in full.
+Count the cash.",False,Are we square?,True,2,253.01059999999998,lexical-debt,15.400000000000002,135.2433,2,Усе врегульовано?,zones-0-5ef91d685af74139a5e80a074ab1b403
+,False,Okay.,False,2,221.6275,debt-near,1.2,89.2629,3,Гаразд.,zones-1-917a8a1811014c86a59ac25e83ed38f2
+Okay.,False,Yeah.,False,2,177.3563,debt-near,1.7,45.0731,3,Так.,zones-0-14b11b1899ec48f79d32369f7c6e2cd3
+"Okay.
+Yeah.",False,Here is the money I owed you.,False,2,433.6038,debt-near,3.3000000000000003,292.6395,3,"Ось гроші, які я тобі був завдячний.",zones-1-990b889d1557444e9d8b983694601b58
+"Yeah.
+Here is the money I owed you.",False,Look at me.,False,2,237.5333,debt-near,12.799999999999999,104.0927,3,Подивися на мене.,zones-0-3234fc190d4c47d3b39b036493a83a55
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,313.22860000000003,debt-near,9.5,178.6768,3,"Усе, тепер між нами рівно?",zones-1-3bf0c1accc0e408f99e19a78fbba179c
+,True,Okay.,False,2,191.14159999999998,debt-near,3.7,66.1979,3,Гаразд.,zones-0-325aca1310d94696ab04dd345b722d32
+Okay.,True,Yeah.,False,2,180.7824,debt-near,2.4,46.6506,3,Так.,zones-1-82d3034f7532470787a4a72e258ae84a
+"Okay.
+Yeah.",True,Here is the money I owed you.,False,2,402.5248,debt-near,3.5999999999999996,266.2272,3,"Ось гроші, які я тобі був завдячний.",zones-0-aa76fe6bbcec4b11841e5750934ac8ce
+"Yeah.
+Here is the money I owed you.",True,Look at me.,False,2,251.44830000000002,debt-near,2.0999999999999996,121.6468,3,Подивися на мене.,zones-1-9c5a1b40c6b7491bbf6f0ffb93d8abf3
+"Here is the money I owed you.
+Look at me.",True,Are we square?,True,2,329.1996,debt-near,2.8,195.2668,3,"Усе, тепер між нами рівно?",zones-0-a1b7bf7027ac41bb8962cbfad4be8665
+,True,Here is the money I owed you.,False,2,435.6698,debt-far,1.7,297.94169999999997,3,"Ось гроші, які я тобі був завдячний.",zones-1-f2f0c0dc3bed45d5896b2dfdf20e0189
+Here is the money I owed you.,True,Okay.,False,2,207.1051,debt-far,3.1999999999999997,73.2924,3,Гаразд.,zones-0-bcb28ea71b0143409ed236fba379c63f
+"Here is the money I owed you.
+Okay.",True,Yeah.,False,2,206.8987,debt-far,1.5999999999999999,66.5962,3,Гаразд.,zones-1-942185a5316e41adb5a470fe1cfac0fb
+"Okay.
+Yeah.",True,Look at me.,False,2,238.1123,debt-far,2.5,113.5851,3,Подивися на мене.,zones-0-6a2f8685a4284efa912c32649f60ec73
+"Yeah.
+Look at me.",True,Are we square?,True,2,237.45559999999998,debt-far,3.0,100.321,3,Усе ясно?,zones-1-307352205d344c568b098abd30065707
+,False,Here is the money I owed you.,False,2,405.0984,debt-far,1.1,282.486,3,"Ось гроші, які я тобі був завдячний.",zones-0-7150e722e730438aa7786e33951591e7
+Here is the money I owed you.,False,Okay.,False,2,207.151,debt-far,1.7,81.9083,3,Гаразд.,zones-1-633e2dc56cd043f09e5971d4c53d672f
+"Here is the money I owed you.
+Okay.",False,Yeah.,False,2,206.4506,debt-far,4.4,80.2164,3,Гаразд.,zones-0-a968a979174d41628ae25c02f13aa197
+"Here is the money I owed you.
+Yeah.",False,Look at me.,False,2,251.75469999999999,debt-far,12.4,121.75070000000001,3,Подивіться на мене.,zones-1-339568f640344e89a6472103ea956c98
+"Here is the money I owed you.
+Look at me.",False,Are we square?,True,2,328.7946,debt-far,12.6,196.5835,3,"Усе, тепер між нами рівно?",zones-0-4a0bb765faac46e3aca0f53378f3a1fb
+,False,Okay.,False,2,221.6428,fight-near,1.2,90.1169,3,Гаразд.,zones-1-97a8594ec9d74979a6e7f8f26c7babd7
+Okay.,False,Yeah.,False,2,176.5654,fight-near,1.1,44.9726,3,Так.,zones-0-cbd5de90cb9a462fab39a7404b1377bc
+"Okay.
+Yeah.",False,I am sorry about our fight.,False,2,346.18149999999997,fight-near,3.5999999999999996,219.48790000000002,3,"Вибач, що ми посварилися.",zones-1-889ede4819554c328b646f8121be75fc
+"Yeah.
+I am sorry about our fight.",False,Look at me.,False,2,235.61860000000001,fight-near,9.4,103.764,3,Подивися на мене.,zones-0-a1a01612ce314bc5af17aceddc16c8a0
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,280.59279999999995,fight-near,17.6,145.34279999999998,3,Усе гаразд між нами?,zones-1-28ee3aa4a93f44bf961973c2e0aea89b
+,True,Okay.,False,2,193.2633,fight-near,2.4,65.8703,3,Гаразд.,zones-0-60948ac01fad4949b343767233d20e6b
+Okay.,True,Yeah.,False,2,172.7461,fight-near,2.6,46.887100000000004,3,Так.,zones-1-5927a98842e944a290a2bfc6bb358fd3
+"Okay.
+Yeah.",True,I am sorry about our fight.,False,2,328.4263,fight-near,2.0,187.9169,3,"Вибач, що ми посварилися.",zones-0-d877f9cef42a4b3ba26fdd317e1616ad
+"Yeah.
+I am sorry about our fight.",True,Look at me.,False,2,251.93619999999999,fight-near,2.7,119.5532,3,Подивися на мене.,zones-1-7da55da51cfc4b289b11a16c9423c952
+"I am sorry about our fight.
+Look at me.",True,Are we square?,True,2,273.25100000000003,fight-near,3.1999999999999997,145.458,3,Усе гаразд між нами?,zones-0-62d00dca7b314d70b1f3da002e3359ea
+,True,I am sorry about our fight.,False,2,356.52430000000004,fight-far,1.2,219.5158,3,"Вибач, що ми посварилися.",zones-1-79637bcd36804438999c7e74ccd5fbf6
+I am sorry about our fight.,True,Okay.,False,2,191.7499,fight-far,2.7,66.8304,3,Гаразд.,zones-0-8eb12ab4bdce4df7b16d4c3962878d75
+"I am sorry about our fight.
+Okay.",True,Yeah.,False,2,195.1976,fight-far,1.7,64.88470000000001,3,Гаразд.,zones-1-841dfdcc89b04016ac437ccb4c4c3abe
+"Okay.
+Yeah.",True,Look at me.,False,2,248.31320000000002,fight-far,2.6,129.1849,3,Подивися на мене.,zones-0-46a4555127dd405dac9d13f45ab92e7b
+"Yeah.
+Look at me.",True,Are we square?,True,2,236.7019,fight-far,2.9000000000000004,101.3709,3,Усе ясно?,zones-1-24fe876e16a34a25b8f0b3a28b7eb377
+,False,I am sorry about our fight.,False,2,329.9015,fight-far,1.4,191.4637,3,"Вибач, що ми посварилися.",zones-0-34ae1c67a362461590af23b2ca1a1a9c
+I am sorry about our fight.,False,Okay.,False,2,211.28259999999997,fight-far,1.7,80.42739999999999,3,Гаразд.,zones-1-30898a56ba9b4bc89cecbea65f0325bd
+"I am sorry about our fight.
+Okay.",False,Yeah.,False,2,203.6785,fight-far,3.5999999999999996,77.4294,3,Гаразд.,zones-0-27e9d77051db4437add58fe149f580be
+"I am sorry about our fight.
+Yeah.",False,Look at me.,False,2,225.3808,fight-far,10.9,102.66640000000001,3,Подивися на мене.,zones-1-43f9c3eaecbb4be9b877594ad092088f
+"I am sorry about our fight.
+Look at me.",False,Are we square?,True,2,264.9484,fight-far,9.9,140.0784,3,Усе гаразд між нами?,zones-0-d204868bb46144caa96060e19deff544
+,False,Okay.,False,2,222.33530000000002,teams-near,1.2,89.21379999999999,3,Гаразд.,zones-1-4a7750b125a744088fc1e4e03bb0f906
+Okay.,False,Yeah.,False,2,192.3409,teams-near,1.0,63.25359999999999,3,Так.,zones-0-0dc4f086bfd24fa0b945cc7849697897
+"Okay.
+Yeah.",False,Both teams now have five players each.,False,2,380.2896,teams-near,2.4,244.743,3,У обох командах тепер по п’ять гравців.,zones-1-2829440814df46d19363453c821b7854
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,232.8839,teams-near,12.1,112.4427,3,Подивіться на мене.,zones-0-64517a19d57d4a40a1c8154040af6f2a
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,282.82669999999996,teams-near,14.1,157.8019,3,У нас по п’ять гравців?,zones-1-e7b52f8552e64f12b4fa25297af8662b
+,True,Okay.,False,2,196.2255,teams-near,1.7,79.8105,3,Гаразд.,zones-0-02700f2c920d46f989e5143e12ef9e5e
+Okay.,True,Yeah.,False,2,171.0643,teams-near,1.4,45.0426,3,Так.,zones-1-77872ced2eea42a69b019e458c55cde7
+"Okay.
+Yeah.",True,Both teams now have five players each.,False,2,344.95369999999997,teams-near,2.4,217.7303,3,У обох командах тепер по п’ять гравців.,zones-0-76ae1fbbf495476192962cb5c8303271
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,252.80970000000002,teams-near,2.6,113.0205,3,Подивіться на мене.,zones-1-c1716221df714b70b74de90b44b44151
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,272.65270000000004,teams-near,1.7999999999999998,142.17270000000002,3,У нас по п’ять гравців?,zones-0-1ddc5f1df7e442e79d4ce5b7457e1d59
+,True,Both teams now have five players each.,False,2,370.95860000000005,teams-far,1.1,230.5382,3,У обох командах тепер по п’ять гравців.,zones-1-2a7e20914b034262ae25ff4dc2c6436b
+Both teams now have five players each.,True,Okay.,False,2,192.7328,teams-far,1.9,65.86649999999999,3,Гаразд.,zones-0-4c8867aae4b444b9a68382077e20a574
+"Both teams now have five players each.
+Okay.",True,Yeah.,False,2,164.4366,teams-far,2.3,45.417899999999996,3,Так.,zones-1-803369e39e5d4b3082702da6d73843ca
+"Okay.
+Yeah.",True,Look at me.,False,2,231.8132,teams-far,2.2,113.0077,3,Подивися на мене.,zones-0-e632b5caf0b84f5d91cb78375878287d
+"Yeah.
+Look at me.",True,Are we square?,True,2,237.4,teams-far,1.7,100.2845,3,Усе ясно?,zones-1-9347fb02a9514ab6827d26990a81cdea
+,False,Both teams now have five players each.,False,2,358.92269999999996,teams-far,1.4,232.0338,3,У обох командах тепер по п’ять гравців.,zones-0-3b812ae37f774ee1ba0d95714c0cf0b7
+Both teams now have five players each.,False,Okay.,False,2,181.29039999999998,teams-far,1.5,63.842499999999994,3,Гаразд.,zones-1-ff69fd6e4ce84cc19fc77bfc9fd06ad4
+"Both teams now have five players each.
+Okay.",False,Yeah.,False,2,186.3333,teams-far,3.5,57.6432,3,Так.,zones-0-1d987f7f645c4d1da518a2bcaa0a4bee
+"Both teams now have five players each.
+Yeah.",False,Look at me.,False,2,252.89879999999997,teams-far,10.9,113.74629999999999,3,Подивіться на мене.,zones-1-22bb409321334ef0a4a7a920f7d66d0b
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,274.01370000000003,teams-far,15.2,143.57510000000002,3,У нас по п’ять гравців?,zones-0-4d0bdb96b38248c99b0c36b07276c385
+,False,Here is the money I owed you.,False,2,433.8578,switch-debt-teams,1.5999999999999999,295.3038,3,"Ось гроші, які я тобі був завдячний.",zones-1-904a366c5ef343f7a7e561ca963881f9
+Here is the money I owed you.,False,Yeah.,False,2,193.9558,switch-debt-teams,2.0,73.21940000000001,3,Гаразд.,zones-0-9e9c73aad9e749399cf3f0e62974cdca
+"Here is the money I owed you.
+Yeah.",False,Both teams now have five players each.,False,2,373.0964,switch-debt-teams,3.1,227.4037,3,У обох командах тепер по п’ять гравців.,zones-1-f398f1ae5bea43fe944dcbdf58c8c13e
+"Yeah.
+Both teams now have five players each.",False,Look at me.,False,2,239.8855,switch-debt-teams,12.2,112.443,3,Подивіться на мене.,zones-0-6b800e4c7eb944c497125c79d46208ad
+"Both teams now have five players each.
+Look at me.",False,Are we square?,True,2,265.66450000000003,switch-debt-teams,17.7,138.97729999999999,3,У нас по п’ять гравців?,zones-1-1a02e105f47e408681c0a07bcc1cda81
+,True,Here is the money I owed you.,False,2,406.2441,switch-debt-teams,1.4,263.0917,3,"Ось гроші, які я тобі був завдячний.",zones-0-3cf57087f08b4ec78bf192e98b1f05b0
+Here is the money I owed you.,True,Yeah.,False,2,191.5136,switch-debt-teams,1.7,65.53580000000001,3,Гаразд.,zones-1-e49ae19f61ff4124b0a78d373dbfeffb
+"Here is the money I owed you.
+Yeah.",True,Both teams now have five players each.,False,2,345.6031,switch-debt-teams,2.0999999999999996,217.0428,3,У обох командах тепер по п’ять гравців.,zones-0-cb7556bd44fc4f1c9cdc332340759a11
+"Yeah.
+Both teams now have five players each.",True,Look at me.,False,2,237.5044,switch-debt-teams,2.7,113.18780000000001,3,Подивіться на мене.,zones-1-985ffebefb804f13b3ef5256e88e4022
+"Both teams now have five players each.
+Look at me.",True,Are we square?,True,2,268.6322,switch-debt-teams,2.0,142.9805,3,У нас по п’ять гравців?,zones-0-220ef0241478412aa11ece4ad3841104
+,True,Here is the money I owed you.,False,2,390.77729999999997,distracted-debt,1.1,267.2045,3,"Ось гроші, які я тобі був завдячний.",zones-1-c263243f70724880875f0cbe1d47fc4e
+Here is the money I owed you.,True,Meet me at the station.,False,2,301.63620000000003,distracted-debt,1.5,173.63590000000002,3,Зустрінемося на вокзалі.,zones-0-cf59a8cdeee4461d8454dd58e6966de0
+"Here is the money I owed you.
+Meet me at the station.",True,The train leaves at noon.,False,2,360.2518,distracted-debt,1.9,237.6617,3,Поїзд відправляється о півдні.,zones-1-4faf445a399b4ae8b9c219016a975a56
+"Meet me at the station.
+The train leaves at noon.",True,Look at me.,False,2,236.86579999999998,distracted-debt,1.7,112.7359,3,Подивися на мене.,zones-0-3bfc8a515bb8417392f4842de6915002
+"The train leaves at noon.
+Look at me.",True,Are we square?,True,2,209.5988,distracted-debt,1.5999999999999999,83.85900000000001,3,Усе ясно?,zones-1-360b437ae4b54eff8bccfe697b8faa22
+,False,Here is the money I owed you.,False,2,403.0814,distracted-debt,1.2,261.87899999999996,3,"Ось гроші, які я тобі був завдячний.",zones-0-d0f880343f37407faf70e3853f944fd5
+Here is the money I owed you.,False,Meet me at the station.,False,2,297.136,distracted-debt,2.3,176.99190000000002,3,Зустрінемося на вокзалі.,zones-1-ce1c386c4bc541b08b6d2a893d6ea2b9
+"Here is the money I owed you.
+Meet me at the station.",False,The train leaves at noon.,False,2,376.0559,distracted-debt,3.1,251.8431,3,Поїзд відправляється о півдні.,zones-0-081e314f2ef94601aad6c7cc0711ea18
+"Meet me at the station.
+The train leaves at noon.",False,Look at me.,False,2,235.8602,distracted-debt,18.5,101.64380000000001,3,Подивися на мене.,zones-1-b998e95cc3584865a9831deea3c53156
+"The train leaves at noon.
+Look at me.",False,Are we square?,True,2,210.4518,distracted-debt,18.7,82.4787,3,Усе ясно?,zones-0-d9b456185c8745d4b024ee1b421c68f7
+,False,The cash covers the debt in full.,False,2,417.5625,lexical-debt,1.2,283.6047,3,"Грошей вистачить, щоб повністю покрити борг.",zones-1-45bff25b57744d1196c72da03ee44fa8
+The cash covers the debt in full.,False,Meet me at the station.,False,2,283.0974,lexical-debt,1.7,159.76950000000002,3,Зустрінемося на вокзалі.,zones-0-c9a30dfb9a6a450fb55633651c58d616
+"The cash covers the debt in full.
+Meet me at the station.",False,The train leaves at noon.,False,2,377.4342,lexical-debt,4.0,249.79319999999998,3,Поїзд відправляється о півдні.,zones-1-9db4f47e73b848dd83183d00b1ddd977
+"The cash covers the debt in full.
+The train leaves at noon.",False,Count the cash.,False,2,248.3664,lexical-debt,13.8,130.06789999999998,3,Підрахуй гроші.,zones-0-55fcd9baec5d41d08375ed1d57fcc009
+"The cash covers the debt in full.
+Count the cash.",False,Are we square?,True,2,266.8468,lexical-debt,15.2,148.4149,3,Усе врегульовано?,zones-1-79f6e36704be4cd1aa0df35a42d63cb4
+,True,The cash covers the debt in full.,False,2,418.91,lexical-debt,1.7,286.5316,3,"Грошей вистачить, щоб повністю покрити борг.",zones-0-c2440a3b21bf419b9ac489e39cb2f58b
+The cash covers the debt in full.,True,Meet me at the station.,False,2,299.1579,lexical-debt,1.9,160.30849999999998,3,Зустрінемося на вокзалі.,zones-1-0a8d5bcde08d4f1bac37f7c333595e16
+"The cash covers the debt in full.
+Meet me at the station.",True,The train leaves at noon.,False,2,359.6247,lexical-debt,1.5999999999999999,235.7429,3,Поїзд відправляється о півдні.,zones-0-6911cabfe85847368263f1ce58abfd0c
+"Meet me at the station.
+The train leaves at noon.",True,Count the cash.,False,2,283.3828,lexical-debt,3.3000000000000003,156.2229,3,Підрахуй готівку.,zones-1-dcf32899b8374ed1a75ac0d358b82bfb
+"The train leaves at noon.
+Count the cash.",True,Are we square?,True,2,210.3894,lexical-debt,1.5999999999999999,93.069,3,Усе в порядку?,zones-0-0387979c3841485a88219264d837e499

@@ -28,10 +28,6 @@ partial class Launcher {
                 if(pick.ShowDialog(this)==DialogResult.OK)await EditZones(pick.FileName);
             }
         };
-        if(File.Exists(ZoneFile))try{
-            var saved=new JavaScriptSerializer().Deserialize<Zone[]>(File.ReadAllText(ZoneFile));
-            if(saved!=null && saved.Length>=1 && saved.Length<=8 && saved.All(z=>z!=null && z.Valid()))layout=saved;
-        }catch(Exception e){MessageBox.Show(this,e.Message,"SubZir");}
     }
     async Task EditZones(string video){
         if(busy)return;
@@ -46,12 +42,11 @@ partial class Launcher {
                 running=null;if(closing)return;
                 if(p.ExitCode!=0 || !File.Exists(path)){SetStatus(Msg.NoFrame);return;}
             }
-            var json=new JavaScriptSerializer();
-            var initial=layout==null?new[]{new Zone(Editor.T("Діалог","Dialogue"),Editor.T("Тримайся поруч.","Stay close."),.23f,.80f,.54f)}:
-                json.Deserialize<Zone[]>(json.Serialize(layout));
-            using(var photo=new Bitmap(path))using(var editor=new Editor(photo,initial)){
+            using(var photo=new Bitmap(path))using(var editor=new Editor(photo,ZonesForEditor())){
                 if(editor.ShowDialog(this)!=DialogResult.OK){SetStatus(Msg.Cancelled);return;}
-                var zones=editor.LayoutZones;Ui.WriteJson(ZoneFile,zones);layout=zones;recording=video;
+                try {SaveZones(editor.LayoutZones,video);}
+                catch(IOException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
+                catch(UnauthorizedAccessException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
                 SetStatus(Msg.Saved," · "+(video==null?"OBS":Path.GetFileName(video)));
             }
         }catch(Exception e){if(!closing)SetStatus(Msg.FrameError,e.Message);}

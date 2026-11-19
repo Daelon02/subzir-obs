@@ -45,7 +45,7 @@ In v0.8.0, SubZir samples the game at 15 frames per second. For dialogue, select
 
 ### Install your own translation model
 
-In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed English subtitles, oldest first. Only the current translation appears in OBS. A subtitle stays in context while it is visible. History resets once more than eight seconds have passed since the last confirmed line was seen. If OCR consistently reads a different final period, question mark or exclamation mark for four frames, SubZir updates that line in place.
+In v0.9.0, each dialogue zone remembers up to six confirmed English lines. Hy-MT2 and custom GGUF models receive the latest line and up to one relevant earlier line, in dialogue order. When a new lower line appears beneath a confirmed subtitle, SubZir keeps the upper translation and translates the addition using the previous dialogue as context. You can switch to a single capture area and reopen the zone editor later to restore your layout. A subtitle stays in context while it is visible. History resets once more than eight seconds have passed since the last confirmed line was seen. If OCR consistently reads a different final period, question mark or exclamation mark for four frames, SubZir updates that line in place.
 
 1. Install your GPU edition and find **SubZir.exe**. Hy-MT2 7B is already in **app/models**. On first launch with Ukrainian output, the launcher selects **Hy-MT2 7B Q4_K_M (GPU)**.
 
@@ -92,7 +92,7 @@ The GPU menu is available for the [target languages configured for this backend]
 
 ### Як встановити власну модель перекладу
 
-У v0.4.0 Hy-MT2 і власні GGUF отримують до двох попередніх підтверджених англійських реплік у порядку діалогу. В OBS з’являється лише переклад поточної репліки. Поки репліку видно на екрані, вона залишається в контексті. Історія скидається, коли від останнього розпізнавання підтвердженої репліки минає понад вісім секунд. Якщо чотири кадри поспіль закінчуються іншою крапкою, знаком питання чи оклику, SubZir оновлює ту саму репліку.
+У v0.9.0 кожна зона діалогу пам’ятає до шести підтверджених англійських реплік. Hy-MT2 і власні GGUF отримують останню репліку й за можливості одну доречну ранішу в порядку розмови. Коли під підтвердженим субтитром з’являється новий рядок, SubZir зберігає готовий переклад верхнього й перекладає доданий текст із контекстом. Після переходу на одну область попередню розкладку можна знову відкрити в редакторі зон. Поки репліку видно на екрані, вона залишається в контексті. Історія скидається, коли від останнього розпізнавання підтвердженої репліки минає понад вісім секунд. Якщо чотири кадри поспіль закінчуються іншою крапкою, знаком питання чи оклику, SubZir оновлює ту саму репліку.
 
 1. Встановіть GPU-збірку для своєї карти. Модель уже в **app/models**. Під час першого запуску з українськими субтитрами внизу буде вибрано **Hy-MT2 7B Q4_K_M (GPU)**.
 
