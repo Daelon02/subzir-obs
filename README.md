@@ -37,11 +37,17 @@ In v0.4.0, Hy-MT2 and custom GGUF models receive up to two previous confirmed En
 
 The GPU menu is available for the [target languages configured for this backend](worker/hy-languages.json). Your model must also support the chosen language. GGUF describes a file format. Speech models such as Whisper, adapter-only files and models requiring a custom prompt protocol are unsuitable for this loader. Larger models need more GPU memory and may take longer to translate. If a model fails, check `runtime/diagnostics.txt` and switch back to Hy-MT2 or Automatic. To remove a custom model, close SubZir and delete just its file from `app/models`.
 
+### Translate several areas of a game
+
+In the Windows test build with the zone editor, click **Zone editor · OBS** to freeze the current frame, or **Zone editor · video file** to replay a local recording. Select **Draw OCR area** and drag around the original English text. Turn drawing off, then drag the sample translation to its output position. **Add zone** repeats this for another region. Choose **Save zones**, then **Start translation**. The layout is saved in `runtime/zones.json`. The original single-area picker switches back to single-subtitle mode.
+
+After upgrading, reload `OBS/PS5-Subtitles.lua` in OBS and use its button to add subtitles to the game scene. The script adds one transparent layer for the positioned translations. With one visible game, capture-card or video source at the top level of the scene, the layer follows its transform. Otherwise positions are relative to the full OBS canvas. For live capture, set the virtual camera output to the game **source** so the translation stays out of the OCR input.
+
+![God of War Ragnarök in OBS with the boss name on the left and the separate combat hint near the bottom](docs/images/god-of-war-zones.jpg)
+
 **Updates.** Stop translation, click **Check for updates** and confirm the new version. To upgrade from v0.4.0, close SubZir and run the installer once. Select the folder containing your existing **SubZir.exe** to keep your models, subtitle area and OBS settings.
 
 ## Перший запуск
-
-SubZir зчитує англійські субтитри з гри на ПК або з консолі, під’єднаної через карту захоплення, й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
 1. Запустіть **SubZir-Setup.exe**, виберіть **RTX 3080** (6,28 ГБ), **RTX 5070** чи **RTX 5070 Ti** (по 6,10 ГБ) або **CPU** (0,85 ГБ) і натисніть **Встановити**. Виберіть папку, наприклад `D:\Ігри`. Інсталятор покаже повний шлях і встановить програму в `D:\Ігри\SubZir`. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
 2. У грі ввімкніть **англійські субтитри**. Додайте зображення гри до сцени OBS.
@@ -71,6 +77,14 @@ SubZir зчитує англійські субтитри з гри на ПК а
 4. Запустіть **SubZir.exe**, виберіть **мову субтитрів**, а потім свій файл у списку **Модель перекладу**. Натисніть **Перевірити переклад**. Коли тестова репліка з’явиться в OBS, можна запускати гру.
 
 Вибір GGUF доступний для [мов, які підтримує цей режим SubZir](worker/hy-languages.json). Опис самої моделі має підтверджувати підтримку потрібної мови. Файли Whisper, окремі адаптери й моделі зі спеціальним форматом запиту для цього способу не підходять. Більша модель потребує більше відеопам’яті й може перекладати повільніше. Якщо запуск не вдався, подробиці є в `runtime/diagnostics.txt`. Щоб повернутися до штатного режиму, виберіть **Автоматично** або **Hy-MT2**. Щоб прибрати свою модель, закрийте програму й видаліть її файл із `app/models`.
+
+### Кілька зон перекладу
+
+У тестовій збірці натисніть **Редактор зон · OBS** для кадру віртуальної камери або **Редактор зон · відеофайл** для запису. Увімкніть **Виділити текст у грі** й обведіть англійський напис. Вимкніть виділення й перетягніть приклад перекладу туди, де його має бачити глядач. Виберіть **Додати зону** для наступного напису. Натисніть **Зберегти зони**, потім **Почати переклад**. Розташування відновиться після перезапуску. Щоб повернутися до одного рядка, скористайтеся звичайним вибором області субтитрів.
+
+Після оновлення перезавантажте файл `OBS/PS5-Subtitles.lua` у скриптах OBS і натисніть його кнопку додавання субтитрів до сцени. Під час перекладу з’явиться один прозорий шар із усіма зонами. Якщо у сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS. Для віртуальної камери виберіть вихід **Джерело** й укажіть гру.
+
+SubZir зчитує англійські субтитри з гри на ПК або з консолі, під’єднаної через карту захоплення, й показує переклад у сцені OBS. Один застосунок має 100 мов меню й 100 варіантів для субтитрів. Наприклад, можна залишити меню українською й показувати переклад польською. Обидва налаштування зберігаються.
 
 **Оновлення.** Зупиніть переклад, натисніть **Оновити** і підтвердьте нову версію. Якщо у вас v0.4.0, закрийте SubZir, запустіть інсталятор і виберіть папку, де вже лежить **SubZir.exe**. Встановлені моделі, область субтитрів і налаштування OBS збережуться.
 

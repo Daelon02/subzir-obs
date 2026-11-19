@@ -1,5 +1,6 @@
 mod dialogue;
 mod stability;
+mod zones;
 use dialogue::DialogueHistory;
 use serde_json::{json, Value};
 use stability::{Observation, Stabilizer};
@@ -647,6 +648,7 @@ fn run() -> Result<()> {
         ),
         Some("demo") => demo(&mut worker, &mut out),
         Some("live") => live(&mut worker, &mut out),
+        Some("zones") => zones::run(&mut worker, args.next()),
         _ => Err(AppError::Config("Use live or bench DIR".into())),
     };
     let _ = out.publish("");

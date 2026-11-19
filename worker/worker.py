@@ -242,9 +242,18 @@ def main():
     print(json.dumps({"device": "CPU", "model": selected_model,
                       "precision": model.compute_type, "beam": beam}), flush=True)
     dialogue = DialogueContext()
+    zones = {}
     for line in sys.stdin:
-        original = json.loads(line)
-        source = dialogue.resolve(original, time.monotonic())
+        request = json.loads(line)
+        if isinstance(request, dict):
+            original = request["text"]
+            key = request["zone"]
+            if key not in zones:
+                zones[key] = DialogueContext()
+            context = zones[key]
+        else:
+            original, context = request, dialogue
+        source = context.resolve(original, time.monotonic())
         print(json.dumps(render(original, source, target_language()), ensure_ascii=False), flush=True)
 
 if __name__ == "__main__":

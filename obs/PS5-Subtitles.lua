@@ -19,6 +19,69 @@ local function message(key, fallback)
 end
 local folder = script_path() .. "../runtime/"
 local last, pending = nil, nil
+local zone_title = "SubZir · Zones"
+local game_types = {game_capture=true, dshow_input=true, ffmpeg_source=true, window_capture=true, monitor_capture=true, vlc_source=true}
+local function place_layer(scene, current, layer)
+    local items = obs.obs_scene_enum_items(scene)
+    local game, count = nil, 0
+    for _,item in ipairs(items or {}) do
+        local source = obs.obs_sceneitem_get_source(item)
+        if obs.obs_sceneitem_visible(item) and game_types[obs.obs_source_get_unversioned_id(source)] then
+            game=item; count=count+1
+        end
+    end
+    local bounds=obs.vec2()
+    bounds.x=obs.obs_source_get_width(current); bounds.y=obs.obs_source_get_height(current)
+    if count==1 then
+        local source=obs.obs_sceneitem_get_source(game)
+        local w,h=obs.obs_source_get_width(source),obs.obs_source_get_height(source)
+        if w>0 and h>0 then
+            local info=obs.obs_transform_info()
+            obs.obs_sceneitem_get_info2(game,info)
+            info.scale.x=info.scale.x*w/1280; info.scale.y=info.scale.y*h/720
+            obs.obs_sceneitem_set_info2(layer,info)
+            local crop=obs.obs_sceneitem_crop()
+            obs.obs_sceneitem_get_crop(game,crop)
+            crop.left=math.floor(crop.left*1280/w); crop.right=math.floor(crop.right*1280/w)
+            crop.top=math.floor(crop.top*720/h); crop.bottom=math.floor(crop.bottom*720/h)
+            obs.obs_sceneitem_set_crop(layer,crop)
+            if items then obs.sceneitem_list_release(items) end
+            return
+        end
+    end
+    if items then obs.sceneitem_list_release(items) end
+    local info=obs.obs_transform_info()
+    info.scale.x=1; info.scale.y=1; info.alignment=5
+    info.bounds_type=obs.OBS_BOUNDS_STRETCH; info.bounds.x=bounds.x; info.bounds.y=bounds.y
+    obs.obs_sceneitem_set_info2(layer,info);obs.obs_sceneitem_set_crop(layer,obs.obs_sceneitem_crop())
+end
+local function zones_frame(slot)
+    local current=obs.obs_frontend_get_current_scene()
+    if not current then return false end
+    local scene=obs.obs_scene_from_source(current)
+    if not scene or not obs.obs_scene_find_source(scene,source_title()) then obs.obs_source_release(current);return false end
+    local item=obs.obs_scene_find_source(scene,zone_title)
+    local img=obs.obs_get_source_by_name(zone_title)
+    if slot then
+        local cfg=obs.obs_data_create()
+        if not img then img=obs.obs_source_create("image_source",zone_title,cfg,nil) end
+        if img then
+            if not item then item=obs.obs_scene_add(scene,img) end
+            obs.obs_data_set_string(cfg,"file","");obs.obs_source_update(img,cfg)
+            obs.obs_data_set_string(cfg,"file",folder.."zones-"..slot..".png");obs.obs_source_update(img,cfg)
+            if item then place_layer(scene,current,item);obs.obs_sceneitem_set_visible(item,true) end
+        end
+        obs.obs_data_release(cfg)
+    elseif item then obs.obs_sceneitem_set_visible(item,false) end
+    if img then obs.obs_source_release(img) end
+    obs.obs_source_release(current)
+    return slot==nil or item~=nil
+end
+function script_load(settings)
+    obs.obs_frontend_add_event_callback(function(event)
+        if event==obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then last=nil end
+    end)
+end
 local applied_style, style_elapsed = nil, 0
 
 function script_description()
@@ -140,6 +203,7 @@ function script_tick(seconds)
     if ok==0 then return end
     local id,text=ffi.string(buf,size[0]):match("^([^\n]+)\n(.*)$")
     if not id or id==last then return end
+    if not zones_frame(id:match("^zones%-([01])%-")) then return end
     local src=obs.obs_get_source_by_name(source_title())
     if not src then return end
     local cfg=obs.obs_data_create()

@@ -29,7 +29,7 @@ partial class Launcher : Form {
         status.Text = Ui.Get(key) + detail;
     }
     void RefreshLanguage() {
-        UpdateCaption();
+        UpdateCaption();ZoneCaptions();
         Text = "SubZir — " + Ui.Get(Msg.Window);
         language.Text = Ui.Get(Msg.Language) + (Ui.Language == "en" ? "" : " / Language");
         language.AccessibleName = Ui.Get(Msg.ChooseLanguages);
@@ -56,11 +56,13 @@ partial class Launcher : Form {
         } finally {refreshingModels=false;}
     }
     Process running;
+    EngineJob engineJob;
+    bool stopping;
     bool busy, closing;
     string roi;
     static readonly string CropFile = Path.Combine(Data,"area.txt");
     public Launcher() {
-        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,567);
+        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,596);
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
         BackColor=Color.White;
         Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
@@ -104,9 +106,10 @@ partial class Launcher : Form {
         update.SetBounds(482,65,200,34);Controls.Add(update);update.BringToFront();
         update.Click+=async delegate {await CheckUpdate();};
         Directory.CreateDirectory(Data);
+        ZoneButtons();
         roi=File.Exists(CropFile)?File.ReadAllText(CropFile).Trim():null;
         if(roi!=null && !System.Text.RegularExpressions.Regex.IsMatch(roi,@"^\d+:\d+:\d+:\d+$"))roi=null;
-        SetStatus(roi==null?Msg.ConnectFirst:Msg.AreaReady);
+        SetStatus(roi==null && layout==null?Msg.ConnectFirst:Msg.AreaReady);
         RefreshLanguage();
         FormClosing+=delegate {closing=true;StopOwned();};
     }
@@ -130,31 +133,33 @@ partial class Launcher : Form {
         if(roi!=null)s.EnvironmentVariables["SUB_CROP"]=roi;
         return s;
     }
-    void Lock(bool val){busy=val;models.Enabled=!val;update.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
+    void Lock(bool val){busy=val;editZones.Enabled=editRecording.Enabled=!val;models.Enabled=!val;update.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
     void StopOwned(){
         Process p=running;
-        if(p!=null && !p.HasExited){
+        stopping=true;
+        if(engineJob!=null){engineJob.Dispose();engineJob=null;}
+        else if(p!=null && !p.HasExited){
             using(var killer=Process.Start(new ProcessStartInfo(Path.Combine(Environment.SystemDirectory,"taskkill.exe"),"/PID "+p.Id+" /T /F"){UseShellExecute=false,CreateNoWindow=true})){killer.WaitForExit(4000);}
         }
         if(p!=null){File.WriteAllText(Path.Combine(Data,"caption.txt"),"stop-"+DateTime.UtcNow.Ticks+"\n",Utf8);line.Text="";SetStatus(Msg.Stopped);}
     }
     async Task Start(bool live){
         if(busy)return;
-        if(live && roi==null){await Choose();if(roi==null || busy || closing)return;}
-        Lock(true);line.Text="";SetStatus(live?Msg.Loading:Msg.Checking);
+        if(live && layout==null && roi==null){await Choose();if(roi==null || busy || closing)return;}
+        stopping=false;Lock(true);line.Text="";SetStatus(live?Msg.Loading:Msg.Checking);
         var err=new StringBuilder();bool got=false;
         try{
-            using(var p=new Process{StartInfo=Info(Path.Combine(App,"subtitle-rs.exe"),live?"live":"demo")}){
+            using(var p=new Process{StartInfo=Info(Path.Combine(App,"subtitle-rs.exe"),live?(layout==null?"live":"zones"+(recording==null?"":" "+Quote(recording))):"demo")}){
                 p.OutputDataReceived+=(o,e)=>{if(e.Data==null || closing)return;var message=e.Data;
-                    BeginInvoke((Action)(()=>{if(closing || running!=p)return;try{
+                    BeginInvoke((Action)(()=>{if(closing || stopping || running!=p)return;try{
                         var row=new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(message);
-                        line.Text=Convert.ToString(row["uk"]);got=true;
+                        line.Text=row.ContainsKey("captions")?PublishZones(row["captions"]):Convert.ToString(row["uk"]);got=true;
                         if(live)SetStatus(Msg.Active);
                         else SetStatus(Convert.ToBoolean(row["obs"])?Msg.TestSuccess:Msg.TestNoAck);
                     }catch(Exception ex){SetStatus(Msg.ResponseError,ex.Message);}}));};
                 p.ErrorDataReceived+=(o,e)=>{if(e.Data==null)return;lock(err){err.AppendLine(e.Data);if(err.Length>32000)err.Remove(0,err.Length-16000);}
                     if(live && e.Data.StartsWith("Worker ") && !closing)BeginInvoke((Action)(()=>{if(running==p)SetStatus(Msg.Waiting);}));};
-                p.Start();running=p;p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
+                p.Start();running=p;engineJob=EngineJob.Attach(p);p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
                 await Task.Run(()=>p.WaitForExit());
                 if(closing)return;
                 if(p.ExitCode!=0 && !(live && statusMessage==Msg.Stopped)){
@@ -163,10 +168,11 @@ partial class Launcher : Form {
                     bool modelFailure=Ui.IsGpuModel(Ui.Model) && (msg.Contains("hy_worker.py") || msg.Contains("Hy-MT2 server:") || msg.Contains("Hy-MT2 runtime:") || msg.Contains("Translation worker stopped"));
                     SetStatus(modelFailure?Msg.ModelError:msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
                 }else if(!got && !live){SetStatus(Msg.TestEmpty);}
+                else if(live && recording!=null && !stopping){SetStatus(Msg.Stopped," · "+Path.GetFileName(recording));}
                 running=null;
             }
         }catch(Exception ex){if(!closing)SetStatus(Msg.StartError,ex.Message);}
-        finally{running=null;if(!closing){Lock(false);Caption(play,Msg.Start);}}
+        finally{running=null;if(engineJob!=null){engineJob.Dispose();engineJob=null;}if(live && layout!=null)File.WriteAllText(Path.Combine(Data,"caption.txt"),"stop-"+DateTime.UtcNow.Ticks+"\n",Utf8);if(!closing){Lock(false);Caption(play,Msg.Start);}}
     }
     async Task Choose(){
         if(busy)return;Lock(true);SetStatus(Msg.GettingFrame);
@@ -181,7 +187,7 @@ partial class Launcher : Form {
             using(var img=new Bitmap(path))using(var picker=new Picker(img)){
                 if(picker.ShowDialog(this)!=DialogResult.OK){SetStatus(Msg.Cancelled);return;}
                 Rectangle a=picker.Area;roi=String.Format("{0}:{1}:{2}:{3}",a.Width,a.Height,a.X,a.Y);
-                File.WriteAllText(CropFile,roi,Utf8);SetStatus(Msg.Saved);
+                File.WriteAllText(CropFile,roi,Utf8);if(File.Exists(ZoneFile))File.Delete(ZoneFile);layout=null;recording=null;SetStatus(Msg.Saved);
             }
         }catch(Exception ex){if(!closing)SetStatus(Msg.FrameError,ex.Message);}
         finally{running=null;try{File.Delete(path);}catch(IOException){} if(!closing)Lock(false);}

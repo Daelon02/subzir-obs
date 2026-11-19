@@ -77,12 +77,23 @@ static class Install {
         using(var mutex=new Mutex(false,Channel.LauncherMutex)){
             try {if(!mutex.WaitOne(10000))throw new IOException("Close SubZir and retry.");}
             catch(AbandonedMutexException) {}
-            string tmp=Path.Combine(dir,".launcher-"+Guid.NewGuid().ToString("N"));
+            string scratch=Path.Combine(dir,".update-"+Guid.NewGuid().ToString("N"));
+            string[] resources={"engine","worker","obs","launcher"};
+            string[] paths={Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target};
+            int committed=0;
             try {
-                using(var input=Assembly.GetExecutingAssembly().GetManifestResourceStream("launcher"))
-                using(var dest=new FileStream(tmp,FileMode.CreateNew,FileAccess.Write,FileShare.None))input.CopyTo(dest);
-                File.Replace(tmp,target,null);
-            } finally {mutex.ReleaseMutex();if(File.Exists(tmp))File.Delete(tmp);}
+                Directory.CreateDirectory(scratch);
+                foreach(string name in resources){
+                    using(var input=Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
+                    using(var dest=File.Create(Path.Combine(scratch,name)))input.CopyTo(dest);
+                }
+                try{
+                    for(;committed<paths.Length;committed++)File.Replace(Path.Combine(scratch,resources[committed]),paths[committed],Path.Combine(scratch,resources[committed]+".bak"));
+                }catch{
+                    while(committed>0){int i=--committed;File.Replace(Path.Combine(scratch,resources[i]+".bak"),paths[i],null);}
+                    throw;
+                }
+            } finally {mutex.ReleaseMutex();if(Directory.Exists(scratch))Directory.Delete(scratch,true);}
         }
     }
     internal static void Fetch(Part part,string url,string path,Action<long> progress,CancellationToken cancel) {
