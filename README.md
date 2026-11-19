@@ -25,7 +25,7 @@ Requires Windows 10/11 x64, Windows English OCR and OBS Studio. The main ZIP inc
 
 ### Install your own translation model
 
-In the development build, Hy-MT2 and custom GGUF models receive up to two previous confirmed English subtitles, oldest first. Only the current translation appears in OBS. History is held in memory and resets after a gap of more than eight seconds between confirmations. The v0.3.0 release uses one previous subtitle.
+In the development build, Hy-MT2 and custom GGUF models receive up to two previous confirmed English subtitles, oldest first. Only the current translation appears in OBS. A subtitle stays in context while it is visible. History resets once more than eight seconds have passed since the last confirmed line was seen. If OCR consistently reads a different final period, question mark or exclamation mark for four frames, SubZir updates that line in place. The v0.3.0 release uses one previous subtitle.
 
 1. Extract the Windows ZIP and locate the **SubZir** folder containing **SubZir.exe**. For GPU translation, open the **GPU pack** linked above. Drag its **hy-runtime** folder into **SubZir/app**. You should now see `SubZir/app/hy-runtime/llama-server.exe`. This pack also includes the ready-to-use Hy-MT2 model.
 2. Close SubZir. Choose a single-file **GGUF text translation or instruction-tuned model** compatible with llama.cpp b11146. Check its model card for English input, your output language and support for user chat prompts. For a first test, try another quantization of Hy-MT2 1.8B, such as Q4_K_M. [Official Hy-MT2 GGUF files](https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF)
@@ -57,7 +57,7 @@ SubZir зчитує англійські субтитри з гри на ПК а
 
 ### Як встановити власну модель перекладу
 
-У збірці для тестування Hy-MT2 і власні GGUF отримують до двох попередніх підтверджених англійських реплік у порядку діалогу. В OBS з’являється лише переклад поточної репліки. Історія зберігається в пам’яті й скидається після паузи понад вісім секунд між підтвердженнями. У релізі v0.3.0 використовується одна попередня репліка.
+У збірці для тестування Hy-MT2 і власні GGUF отримують до двох попередніх підтверджених англійських реплік у порядку діалогу. В OBS з’являється лише переклад поточної репліки. Поки репліку видно на екрані, вона залишається в контексті. Історія скидається, коли від останнього розпізнавання підтвердженої репліки минає понад вісім секунд. Якщо чотири кадри поспіль закінчуються іншою крапкою, знаком питання чи оклику, SubZir оновлює ту саму репліку. У релізі v0.3.0 використовується одна попередня репліка.
 
 1. Розпакуйте основний ZIP і знайдіть папку **SubZir** з **SubZir.exe**. Для перекладу на відеокарті відкрийте **GPU-пакет** за посиланням угорі README. Перетягніть папку **hy-runtime** з архіву в **SubZir/app**. Перевірте, що з’явився файл `SubZir/app/hy-runtime/llama-server.exe`. Готова модель Hy-MT2 уже є в цьому пакеті.
 2. Закрийте SubZir. Завантажте **один файл .gguf** моделі для текстового перекладу або моделі, яка виконує текстові інструкції. Вона має працювати з llama.cpp b11146, приймати звичайний запит у чаті й підтримувати переклад з англійської на вашу мову. Для першої спроби підійде інший варіант Hy-MT2 1.8B, наприклад Q4_K_M. [Офіційні файли Hy-MT2 у форматі GGUF](https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF)

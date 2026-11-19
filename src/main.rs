@@ -2,7 +2,7 @@ mod dialogue;
 mod stability;
 use dialogue::DialogueHistory;
 use serde_json::{json, Value};
-use stability::Stabilizer;
+use stability::{Observation, Stabilizer};
 use std::{
     env, fs,
     io::{self, BufRead, BufReader, Read, Write},
@@ -410,15 +410,26 @@ fn capture(
             last_frame.clone_from(&pixels);
             held = unchanged;
         }
-        let event = stable
-            .observe(&reading, start)
-            .map(|text| (Stage::Confirmed, text))
-            .or_else(|| {
-                stable
-                    .first_candidate()
-                    .filter(|_| speculate)
-                    .map(|s| (Stage::Draft, s.to_owned()))
-            });
+        let event = match stable.observe(&reading, start) {
+            Observation::Held => {
+                if let Some(history) = history.as_mut() {
+                    history.visible(start);
+                }
+                None
+            }
+            Observation::Revised(text) => {
+                if let Some(history) = history.as_mut() {
+                    history.discard_last_version();
+                }
+                Some((Stage::Confirmed, text))
+            }
+            Observation::Confirmed(text) => Some((Stage::Confirmed, text)),
+            Observation::Cleared => Some((Stage::Confirmed, String::new())),
+            Observation::Pending if speculate => stable
+                .first_candidate()
+                .map(|s| (Stage::Draft, s.to_owned())),
+            Observation::Pending => None,
+        };
         if let Some((stage, text)) = event {
             let context = history.as_mut().map_or_else(String::new, |history| {
                 let context = history.previous(start);

@@ -9,17 +9,32 @@ const MAX_HISTORY_BYTES: usize = 384;
 #[derive(Default)]
 pub struct DialogueHistory {
     lines: VecDeque<String>,
-    last_confirmed: Option<Instant>,
+    last_visible: Option<Instant>,
 }
 
 impl DialogueHistory {
-    pub fn previous(&mut self, now: Instant) -> String {
-        if self
-            .last_confirmed
+    fn expired(&self, now: Instant) -> bool {
+        self.last_visible
             .is_some_and(|t| now.saturating_duration_since(t) > DIALOGUE_GAP)
-        {
+    }
+
+    pub fn visible(&mut self, now: Instant) {
+        if self.expired(now) {
+            // Following a capture stall, only the line seen again is still known.
+            let keep = self.lines.len().saturating_sub(1);
+            self.lines.drain(..keep);
+        }
+        self.last_visible = Some(now);
+    }
+
+    pub fn discard_last_version(&mut self) {
+        self.lines.pop_back();
+    }
+
+    pub fn previous(&mut self, now: Instant) -> String {
+        if self.expired(now) {
             self.lines.clear();
-            self.last_confirmed = None;
+            self.last_visible = None;
         }
         self.lines
             .iter()
@@ -32,7 +47,7 @@ impl DialogueHistory {
         if text.is_empty() {
             return;
         }
-        self.last_confirmed = Some(now);
+        self.last_visible = Some(now);
         if text.len() > MAX_HISTORY_BYTES {
             self.lines.clear();
             return;
@@ -71,6 +86,22 @@ mod tests {
         assert!(h
             .previous(t + DIALOGUE_GAP + Duration::from_millis(1))
             .is_empty());
+    }
+    #[test]
+    fn held_frames_refresh_the_gap_and_revisions_keep_the_previous_speaker() {
+        let mut h = DialogueHistory::default();
+        let t = Instant::now();
+        h.confirm("Meet me outside.", t);
+        h.confirm("You're coming.", t);
+        for second in 1..=10 {
+            h.visible(t + Duration::from_secs(second));
+        }
+        let revised_at = t + Duration::from_secs(10);
+        h.discard_last_version();
+        assert_eq!(h.previous(revised_at), "Meet me outside.");
+        h.confirm("You're coming?", revised_at);
+        assert_eq!(h.previous(revised_at), "Meet me outside.\nYou're coming?");
+        assert!(h.previous(revised_at + Duration::from_secs(9)).is_empty());
     }
     #[test]
     fn keeps_complete_lines_within_budget() {
