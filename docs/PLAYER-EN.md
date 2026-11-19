@@ -50,3 +50,19 @@ Open **SubZir-Setup.exe**, select **RTX 3080**, **RTX 5070**, **RTX 5070 Ti** or
 - **The test line never appeared.** Open the correct OBS scene. Make sure the subtitle source is visible and sits above the game source in the Sources list.
 - **The test worked but game dialogue is missing.** Check the virtual camera source. Draw the box again while a subtitle is visible. Repeat this after a game resolution change.
 - **7B fails to start.** Check that all parts match your GPU edition, update your NVIDIA driver and restart SubZir. Select **Automatic** to use CPU translation while troubleshooting. Details are in `runtime/diagnostics.txt`.
+
+## Set up separate zones
+
+Open **Zone setup guide** in the main SubZir window for the same instructions offline.
+
+1. Open the game scene in OBS. In Virtual Camera settings choose your game source and start the camera. Under Tools → Scripts, load OBS/PS5-Subtitles.lua from the SubZir folder and use its button to add subtitles to the current scene.
+
+2. Wait until the English text is visible in the game. Click “Zone editor · OBS” in SubZir. To practise with a recording, choose “Zone editor · video file”.
+
+3. Start with dialogue. Turn on “Draw OCR area” and drag a box around the English subtitles, leaving room for a second line. The yellow box marks the text to read. Turn drawing off and drag the sample translation to the position you want in OBS. “Width, %” controls wrapping.
+
+4. Click “Add zone” for an objective or a hint and draw its own reading area. For a short menu item, enable “HUD above original” for that zone. Keep the controller icon outside the yellow box. Leave HUD off for regular dialogue. Select an existing entry in the “Zone” list to adjust it.
+
+5. Click “Save zones”, then “Start translation”. All zones share one input frame and appear on one transparent layer in OBS. Their positions are saved for the next launch. You can add up to eight zones.
+
+![Game menu regions with the translation above the original in God of War](images/god-of-war-hud.jpg)

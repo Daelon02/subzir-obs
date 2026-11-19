@@ -18,9 +18,13 @@ static class Ui {
     public static string Language { get; private set; }
     public static string Target { get; private set; }
     public static string Model { get; private set; }
+    public static bool ConciseDialogue { get; private set; }
     static readonly Dictionary<string,string> HyLanguages;
     const string CustomPrefix = "gguf:";
     const string QualityModel = "Hy-MT2-7B-Q4_K_M.gguf";
+    public static bool CanUseConciseDialogue {
+        get { return Target=="uk" && String.Equals(Model,CustomPrefix+QualityModel,StringComparison.OrdinalIgnoreCase); }
+    }
     static readonly string CustomDirectory = Path.Combine(Root,"app","models");
     public static bool IsGpuModel(string model) {
         return model=="hy" || (model!=null && model.StartsWith(CustomPrefix,StringComparison.Ordinal));
@@ -62,6 +66,8 @@ static class Ui {
             ui = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
         }
         Language = Names.ContainsKey(ui) ? ui : "en";
+        string style;
+        ConciseDialogue = prefs.TryGetValue("dialogueStyle",out style) && style=="concise";
         Target = prefs.TryGetValue("target",out target) && Names.ContainsKey(target ?? "") ? target : "uk";
         HyLanguages = Read(Path.Combine(Root,"app","hy-languages.json")) ?? new Dictionary<string,string>();
         string model;
@@ -79,9 +85,11 @@ static class Ui {
     static Dictionary<string,string> Load(string code) {
         return Read(Path.Combine(Root,"app","locales",code + ".json")) ?? English;
     }
-    public static void Save(string ui,string target,string model) {
+    public static void Save(string ui,string target,string model,bool? concise=null) {
         if(!Names.ContainsKey(ui) || !Names.ContainsKey(target) || !Allows(model,target)) throw new ArgumentException();
-        WriteJson(Settings,new {ui=ui,target=target,model=model});
+        bool next=concise ?? ConciseDialogue;
+        WriteJson(Settings,new {ui=ui,target=target,model=model,dialogueStyle=next?"concise":"standard"});
+        ConciseDialogue=next;
         Language=ui; Target=target; Model=model; messages=Load(ui);
     }
     public static void WriteJson(string path,object value) {

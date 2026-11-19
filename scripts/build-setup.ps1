@@ -11,7 +11,7 @@ try {
     if ($repo.Scheme -ne 'https' -or ([uri]$LatestUrl).Scheme -ne 'https') {throw 'Set SUBZIR_REPOSITORY_URL and SUBZIR_LATEST_URL to HTTPS addresses.'}
     $channel = Join-Path $scratch 'channel.json'
     @{repository=$RepositoryUrl.TrimEnd('/');latest=$LatestUrl} | ConvertTo-Json | Set-Content $channel -Encoding UTF8
-    $version='0.5.0.0'
+    $version='0.6.0.0'
     $versionFile=Join-Path $scratch 'Version.cs'
     @"
 using System.Reflection;
@@ -24,7 +24,7 @@ using System.Reflection;
     $flags=@('/nologo','/target:winexe','/platform:x64','/optimize+','/codepage:65001','/r:System.Windows.Forms.dll','/r:System.Drawing.dll','/r:System.Web.Extensions.dll',"/resource:$channel,channel")
     $launcher=if($LauncherOnly){Join-Path $out 'SubZir.exe'}else{Join-Path $scratch 'SubZir.exe'}
     $sources=@(Get-ChildItem launcher/*.cs | ForEach-Object FullName)
-    & $csc @flags "/out:$launcher" '/resource:launcher/locales/en.json,SubZir.English.json' '/resource:launcher/update-labels.json,update-labels' $versionFile installer\Channel.cs @sources
+    & $csc @flags "/out:$launcher" '/resource:launcher/locales/en.json,SubZir.English.json' '/resource:launcher/update-labels.json,update-labels' '/resource:launcher/concise-labels.json,concise-labels' '/resource:docs/ZONES-EN.txt,zones-en' '/resource:docs/ZONES-UA.txt,zones-uk' '/resource:docs/images/god-of-war-hud.jpg,zones-example' $versionFile installer\Channel.cs @sources
     if ($LASTEXITCODE) {throw 'Launcher build failed.'}
     if (!$LauncherOnly){
         cargo build --release --locked

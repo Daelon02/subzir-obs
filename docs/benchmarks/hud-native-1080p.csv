@@ -1,0 +1,61 @@
+﻿crop,scene,zone,font_px,expected,first_ocr,emissions
+old,0,0,11,Runic Attacks,Runc Attacks,1
+old,0,1,11,Runic Attack Gems give Kratos access.,,0
+old,0,2,11,CLOSE,CLOSE,1
+new,0,0,11,Runic Attacks,Runic Attacks,1
+new,0,1,11,Runic Attack Gems give Kratos access.,Runt Attack Gems gwe KratoS access,1
+new,0,2,11,CLOSE,CLOSE,1
+new,1,0,13,The Huntress,The Huntress,1
+new,1,1,13,Aim for the glowing horns.,Aim for the glowing horns,1
+new,1,2,13,TRACK,TRACK,1
+old,1,0,13,The Huntress,Huntress,1
+old,1,1,13,Aim for the glowing horns.,Am the glowing hows,1
+old,1,2,13,TRACK,IRACK,1
+old,2,0,15,Return to the forge,Return to the focge,1
+old,2,1,15,Collect 2/3 artifacts.,Collect 2/3 artifacts,1
+old,2,2,15,OPEN,opEt1,1
+new,2,0,15,Return to the forge,Return to the forge,1
+new,2,1,15,Collect 2/3 artifacts.,Collect 213 artifacts,1
+new,2,2,15,OPEN,OPEN,1
+new,3,0,17,Find the hidden chamber,Find the hidden chamber,1
+new,3,1,17,Enter the Hall of Legends.,Enter the Hall of Legends.,1
+new,3,2,17,EXIT,EXIT,1
+old,3,0,17,Find the hidden chamber,Find the hidden chamber,1
+old,3,1,17,Enter the Hall of Legends.,Enter the Hall of eqends,1
+old,3,2,17,EXIT,EXIT,1
+old,4,0,19,A Path of Ashes,A Path of Ashes,1
+old,4,1,19,Bring the key to the gate.,Bring the key to the gate.,1
+old,4,2,19,READ,READ,1
+new,4,0,19,A Path of Ashes,A Path of Ashes,1
+new,4,1,19,Bring the key to the gate.,Bring the key to the gate.,1
+new,4,2,19,READ,READ,1
+new,5,0,11,Follow the river,Follow the nver,1
+new,5,1,11,Keep the bridge in sight.,Keep the todge 'n sight.,1
+new,5,2,11,MAP,MAP,1
+old,5,0,11,Follow the river,,0
+old,5,1,11,Keep the bridge in sight.,Keep,1
+old,5,2,11,MAP,,0
+old,6,0,13,Across the Realms,Across Realms,1
+old,6,1,13,Retrieve the second relic.,the second,1
+old,6,2,13,NEXT,next,1
+new,6,0,13,Across the Realms,Across the Realms,1
+new,6,1,13,Retrieve the second relic.,Retrieve the second relic.,1
+new,6,2,13,NEXT,NEXT,1
+new,7,0,15,Unlock the gate,Unlock the gate,1
+new,7,1,15,Collect 3/3 artifacts.,Collect 3/3 artifacts,1
+new,7,2,15,BACK,BACK,1
+old,7,0,15,Unlock the gate,Unlock the gate,1
+old,7,1,15,Collect 3/3 artifacts.,Collect 3.3 artifacts,1
+old,7,2,15,BACK,BACK,1
+old,8,0,17,The Broken Prison,The Broken Prison,1
+old,8,1,17,Search for a way across.,Search tor a way across,1
+old,8,2,17,EQUIP,EQUIP,1
+new,8,0,17,The Broken Prison,The Broken Prison,1
+new,8,1,17,Search for a way across.,Search for a way across.,1
+new,8,2,17,EQUIP,EQUIP,1
+new,9,0,19,Meet me outside,Meet me outside,1
+new,9,1,19,Speak to the dwarf at the forge.,Speak to the dwarf at the forge.,1
+new,9,2,19,CLOSE,CLOSE,1
+old,9,0,19,Meet me outside,Meet me outside,1
+old,9,1,19,Speak to the dwarf at the forge.,Speak to the dwarf at the forge.,1
+old,9,2,19,CLOSE,CLOSE,1

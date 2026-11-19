@@ -8,6 +8,29 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, ProxyHandler, build_opener
 
+MIN_ECHO_LENGTH = 8
+
+
+def words(text):
+    return " ".join(re.findall(r"[^\W_]+", text.casefold()))
+
+
+def echoes_history(result, text, previous, translations):
+    parts = [words(part) for part in re.split(r"[.!?…。！？؟\n]+", result)]
+    parts = [part for part in parts if part]
+    if len(parts) < 2:
+        return False
+    current = f" {words(text)} "
+    for source in previous.splitlines():
+        if f" {words(source)} " in current:
+            continue
+        for prior in (source, translations.get(source, "")):
+            normalized = words(prior)
+            if len(normalized) >= MIN_ECHO_LENGTH and normalized in parts:
+                return True
+    return False
+
+
 def main():
     sys.stdin.reconfigure(encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8")
@@ -16,9 +39,11 @@ def main():
     language = languages[target]
     model = os.environ.get("SUB_MODEL","hy").removeprefix("gguf:")
     label = "Hy-MT2-1.8B Q6_K" if model == "hy" else model
+    ukrainian_7b = target == "uk" and model.casefold() == "hy-mt2-7b-q4_k_m.gguf"
+    concise_dialogue = ukrainian_7b and os.environ.get("SUB_DIALOGUE_STYLE") == "concise"
     instruction = (
         f"Translate this line of game dialogue into natural, conversational {language}. Preserve the intended meaning and tone. Output only the translated line."
-        if target == "uk" and model.casefold() == "hy-mt2-7b-q4_k_m.gguf"
+        if ukrainian_7b
         else f"Translate the following segment into {language}, without additional explanation."
     )
     endpoint = os.environ["SUB_HY_URL"]
@@ -47,29 +72,51 @@ def main():
             raise ValueError(f"{label} did not finish the subtitle")
         return result
 
-    def translate(text, previous, hud=False):
+    recent_by_zone = {}
+
+    def translate(text, previous, hud=False, zone=None):
         if hud:
             prompt = (f"Localize the following video game interface text into {language}. "
                       "For a menu action use a concise button label. Keep instructions clear. "
                       "Output only the translation.\n\n" + text)
             return complete([{"role":"user","content":prompt}])
         current = {"role":"user","content":f"{instruction}\n\n{text}"}
+        # Limit comparisons to the context selected by this zone's Rust stabilizer.
+        recent = {}
+        if concise_dialogue:
+            known = recent_by_zone.get(zone, {})
+            recent = {line: known[line] for line in previous.splitlines() if line in known}
+        result = None
         if previous:
-            earlier = " ".join(previous.splitlines())
-            conversation = [{"role":"user","content":f"Previous dialogue: {earlier}"},
-                            {"role":"assistant","content":"OK."}, current]
+            if concise_dialogue:
+                background = f"Previous dialogue:\n{previous}"
+                prompt = f"Translate only this subtitle into concise, natural {language}. Keep the meaning and tone."
+                contextual_line = {"role": "user", "content": f"{prompt}\n\n{text}"}
+            else:
+                background = "Previous dialogue: " + " ".join(previous.splitlines())
+                contextual_line = current
+            conversation = [
+                {"role": "user", "content": background},
+                {"role": "assistant", "content": "OK."},
+                contextual_line,
+            ]
             try:
-                result = complete(conversation)
-                # Some models repeat a background sentence or question in the caption.
-                # Retry the current line alone rather than trimming away dialogue.
-                if sentence_count(result) <= sentence_count(text) and "\n" not in result:
-                    return result
+                contextual = complete(conversation)
+                if concise_dialogue and not echoes_history(contextual, text, previous, recent):
+                    result = " ".join(contextual.splitlines())
+                elif not concise_dialogue and "\n" not in contextual and sentence_count(contextual) <= sentence_count(text):
+                    result = contextual
             except HTTPError as error:
                 if error.code != 400:
                     raise
             except ValueError:
                 pass
-        return complete([current])
+        if result is None:
+            result = complete([current])
+        if concise_dialogue:
+            recent[text] = result
+            recent_by_zone[zone] = recent
+        return result
 
     translate("Ready.", "")
     print(json.dumps({"model":label,"target":language,"device":"CUDA"}),flush=True)
@@ -82,7 +129,7 @@ def main():
             previous, last = obj, now
         else:
             try:
-                result = translate(obj["text"], obj["previous"], obj.get("hud", False))
+                result = translate(obj["text"], obj["previous"], obj.get("hud", False), obj.get("zone"))
             except ValueError:
                 if not obj.get("draft"):
                     raise

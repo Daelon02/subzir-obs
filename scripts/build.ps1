@@ -19,7 +19,7 @@ try {
     Copy-Item docs/PLAYER-EN.txt "$bundle/README.en.txt"
     Copy-Item docs/START-HERE.txt "$bundle/"
     $guideDir = New-Item -ItemType Directory -Path "$bundle/docs/images" -Force
-    Copy-Item docs/images/launcher-7b-*.png,docs/images/obs-*.jpg,docs/images/god-of-war-obs.jpg $guideDir.FullName
+    Copy-Item docs/images/launcher-7b-*.png,docs/images/obs-*.jpg,docs/images/god-of-war-obs.jpg,docs/images/god-of-war-hud.jpg $guideDir.FullName
     Copy-Item docs/PLAYER-EN.md,docs/PLAYER-UA.md "$bundle/docs/"
     if (Get-Command ConvertFrom-Markdown -ErrorAction SilentlyContinue) {
         foreach ($code in 'EN','UA') {

@@ -40,6 +40,16 @@ partial class Launcher : Form {
         SetStatus(statusMessage, statusDetail);
     }
     readonly ComboBox models = new ComboBox();
+    readonly CheckBox concise = new CheckBox();
+    readonly Button zoneGuide = new Button();
+    static readonly Dictionary<string,string> ConciseLabels=Channel.Json.Deserialize<Dictionary<string,string>>(Channel.Resource("concise-labels"));
+    void RefreshDialogue() {
+        string label;
+        concise.Text=(ConciseLabels.TryGetValue(Ui.Language,out label)?label:ConciseLabels["en"])+"  ·  7B / EN → UK";
+        concise.Checked=Ui.CanUseConciseDialogue && Ui.ConciseDialogue;
+        concise.Enabled=!busy && Ui.CanUseConciseDialogue;
+        zoneGuide.Text=Editor.T("Як налаштувати зони","Zone setup guide");
+    }
     bool refreshingModels;
     void RefreshModels() {
         refreshingModels=true;
@@ -54,6 +64,7 @@ partial class Launcher : Form {
             models.SelectedValue=Ui.Model;
             models.AccessibleName=Ui.Get(Msg.Model);
         } finally {refreshingModels=false;}
+        RefreshDialogue();
     }
     Process running;
     EngineJob engineJob;
@@ -62,7 +73,7 @@ partial class Launcher : Form {
     string roi;
     static readonly string CropFile = Path.Combine(Data,"area.txt");
     public Launcher() {
-        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,596);
+        Text=Ui.Get(Msg.Window); Font=new Font("Segoe UI",10); ClientSize=new Size(710,633);
         AutoScaleMode=AutoScaleMode.Dpi; FormBorderStyle=FormBorderStyle.FixedDialog; MaximizeBox=false; StartPosition=FormStartPosition.CenterScreen;
         BackColor=Color.White;
         Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
@@ -90,12 +101,19 @@ partial class Launcher : Form {
         Controls.Add(models);
         models.SelectionChangeCommitted+=delegate {
             if(refreshingModels)return;
-            try {Ui.Save(Ui.Language,Ui.Target,(string)models.SelectedValue);}
+            try {Ui.Save(Ui.Language,Ui.Target,(string)models.SelectedValue);RefreshDialogue();}
             catch(Exception ex) {RefreshModels();MessageBox.Show(this,ex.Message,Ui.Get(Msg.Model));}
         };
         var appearance=new Button();
         ButtonAt(appearance,Msg.Appearance,444,490,238);
         appearance.Click+=delegate {using(var dialog=new StyleDialog())dialog.ShowDialog(this);};
+        concise.SetBounds(26,535,408,34); Controls.Add(concise);
+        concise.Click+=delegate {
+            try {Ui.Save(Ui.Language,Ui.Target,Ui.Model,concise.Checked);}
+            catch(Exception ex){RefreshDialogue();MessageBox.Show(this,ex.Message,Ui.Get(Msg.SettingsError));}
+        };
+        zoneGuide.SetBounds(444,536,238,32);Controls.Add(zoneGuide);
+        zoneGuide.Click+=delegate {using(var dialog=new ZoneGuide())dialog.ShowDialog(this);};
         language.SetBounds(482,21,200,38);
         language.Click += delegate {
             try { using(var dialog = new LanguageDialog(busy && Ui.Model!="auto")) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
@@ -129,11 +147,12 @@ partial class Launcher : Form {
         s.EnvironmentVariables["SUB_DEVICE"]="OBS Virtual Camera";s.EnvironmentVariables["SUB_DEMO"]=Path.Combine(App,"demo");
         s.EnvironmentVariables["SUB_QUICK_DEVICE"]="cpu";s.EnvironmentVariables["SUB_BEAM"]="3";
         s.EnvironmentVariables["SUB_MODEL"]=Ui.Model;
+        s.EnvironmentVariables["SUB_DIALOGUE_STYLE"]=Ui.CanUseConciseDialogue && Ui.ConciseDialogue?"concise":"standard";
         if(Ui.Model!="auto")s.EnvironmentVariables["SUB_TARGET"]=Ui.Target;
         if(roi!=null)s.EnvironmentVariables["SUB_CROP"]=roi;
         return s;
     }
-    void Lock(bool val){busy=val;editZones.Enabled=editRecording.Enabled=!val;models.Enabled=!val;update.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
+    void Lock(bool val){busy=val;editZones.Enabled=editRecording.Enabled=!val;models.Enabled=!val;concise.Enabled=!val && Ui.CanUseConciseDialogue;update.Enabled=!val;connect.Enabled=demo.Enabled=select.Enabled=!val;play.Enabled=!val;}
     void StopOwned(){
         Process p=running;
         stopping=true;

@@ -1,0 +1,19 @@
+﻿variant,case,source,uk,frame_to_obs_ack_ms
+A,0,We are robbing this bank.,Ми грабуємо цей банк.,236.05
+A,1,"Listen up, everyone.","Слухайте уважно, всі!",209.38
+A,2,This is a stick-up!,Це пограбування банку!,203.77
+A,156,Here is the money I owed you.,"Ось гроші, які я вам був зобов’язаний.",309.23
+A,157,Count it.,Підрахуй.,145.47
+A,158,Are we square?,"Усе, тепер між нами рівно?",227.56
+A,159,I'm sorry about our fight.,"Вибач, що ми посварилися.",236.84
+A,160,I forgive you.,Я тобі пробачила.,157.65
+A,161,Are we square?,Усе гаразд між нами?,193.65
+D,0,We are robbing this bank.,Ми грабуємо цей банк.,216.73
+D,1,"Listen up, everyone.",Увага всім!,163.74
+D,2,This is a stick-up!,Це пограбування!,172.62
+D,156,Here is the money I owed you.,"Ось гроші, які я вам був завдячний.",311.62
+D,157,Count it.,Підрахуйте.,163.15
+D,158,Are we square?,Усе врегульовано?,191.02
+D,159,I'm sorry about our fight.,Вибач за нашу сварку.,179.14
+D,160,I forgive you.,Я прощаю тебе.,157.06
+D,161,Are we square?,Усе гаразд?,135.23

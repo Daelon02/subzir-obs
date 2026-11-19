@@ -20,7 +20,7 @@ partial class Launcher {
         editRecording.Text=Editor.T("Редактор зон · відеофайл","Zone editor · video file");
     }
     void ZoneButtons(){
-        editZones.SetBounds(26,545,300,36);editRecording.SetBounds(342,545,340,36);
+        editZones.SetBounds(26,581,300,36);editRecording.SetBounds(342,581,340,36);
         Controls.Add(editZones);Controls.Add(editRecording);
         editZones.Click+=async delegate{await EditZones(null);};
         editRecording.Click+=async delegate{

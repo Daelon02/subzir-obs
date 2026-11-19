@@ -110,6 +110,10 @@ Open **Translation model** before starting translation. **Automatic** uses Quick
 
 Відкрийте **Модель перекладу** перед початком гри. В автоматичному режимі для української працює QuickMT. Вручну можна вибрати M2M100 або комплектну Hy-MT2 7B у GPU-збірках. Щоб змінити модель під час гри, зупиніть переклад. Кнопка **Вигляд субтитрів** дозволяє під час перекладу змінювати шрифт, розмір, колір, тло, непрозорість і контур. Для цього завантажте в OBS скрипт Lua з папки цієї збірки. [Порівняння на RTX 3080 і приклади перекладу](docs/benchmarks/RTX3080-UK.md)
 
+With Ukrainian subtitle output and **Hy-MT2 7B Q4_K_M**, tick **Concise dialogue** in the main window before starting translation. Clear it for standard dialogue. SubZir remembers your choice. **Zone setup guide** walks you through positioning separate dialogue, objective and menu regions. [Dialogue and HUD benchmarks](docs/benchmarks/CONTEXT-HUD-EN.md)
+
+Виберіть українську мову субтитрів і **Hy-MT2 7B Q4_K_M**. Перед запуском перекладу ввімкніть **Стислий діалог** у головному вікні. Зніміть позначку для звичайного режиму. SubZir запам’ятає вибір. Кнопка **Як налаштувати зони** показує, як окремо розмістити діалог, завдання та підказки меню. [Заміри діалогів і HUD](docs/benchmarks/CONTEXT-HUD-UK.md)
+
 ### Build on Windows
 
 Rust runs the capture, OCR, stability filter and overlay timing. The WinForms launcher writes both language choices to `runtime/languages.json`. The Python worker checks the target on each new input. It reuses the loaded CTranslate2 model across lines. The OBS Lua script updates a text source. Set `SUB_TARGET` to a code from `launcher/languages.json` to override the subtitle language when running the worker directly.

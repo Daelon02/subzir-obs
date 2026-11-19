@@ -79,16 +79,25 @@ impl Zone {
     }
 }
 fn filter(zones: &[Zone]) -> String {
-    let mut graph = format!(
-        "fps=10,scale={CANVAS_W}:{CANVAS_H},format=gray,split={}",
-        zones.len()
-    );
+    let mut graph = format!("fps=10,split={}", zones.len());
     for i in 0..zones.len() {
         let _ = write!(graph, "[r{i}]");
     }
     for (i, zone) in zones.iter().enumerate() {
         let [w, h, x, y] = zone.crop;
-        let _=write!(graph,";[r{i}]crop={w}:{h}:{x}:{y},scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=decrease,pad={WIDTH}:{HEIGHT}:0:0,setsar=1[o{i}]");
+        // Round both edges on the input grid so adjacent editor rectangles meet.
+        let left = format!("round(iw*{x}/{CANVAS_W})");
+        let top = format!("round(ih*{y}/{CANVAS_H})");
+        let right = format!("round(iw*{}/{CANVAS_W})", x + w);
+        let bottom = format!("round(ih*{}/{CANVAS_H})", y + h);
+        // The editor stretches its preview to 1280x720 even for non-16:9 input.
+        let ratio = (f64::from(WIDTH) / f64::from(w)).min(f64::from(HEIGHT) / f64::from(h));
+        let scaled_w = (f64::from(w) * ratio).round();
+        let scaled_h = (f64::from(h) * ratio).round();
+        let _ = write!(
+            graph,
+            ";[r{i}]crop=w='max(1,{right}-{left})':h='max(1,{bottom}-{top})':x={left}:y={top}:exact=1,format=gray,scale={scaled_w}:{scaled_h},pad={WIDTH}:{HEIGHT}:0:0,setsar=1[o{i}]"
+        );
     }
     graph.push(';');
     for i in 0..zones.len() {
@@ -209,8 +218,10 @@ mod tests {
         let zones = rows.iter().map(Zone::load).collect::<Result<Vec<_>>>()?;
         let graph = filter(&zones);
         assert!(graph.contains("split=2[r0][r1]"));
-        assert!(graph.contains("[r0]crop=254:36:515:4"));
-        assert!(graph.contains("[r1]crop=350:105:923:220"));
+        assert!(graph.starts_with("fps=10,split=2"));
+        assert!(graph.contains("round(iw*769/1280)-round(iw*515/1280)"));
+        assert!(graph.contains("round(ih*325/720)-round(ih*220/720)"));
+        assert!(graph.contains("exact=1,format=gray,scale=480:144"));
         assert!(graph.ends_with("[o0][o1]vstack=inputs=2"));
         assert!(filter(&zones[..1]).ends_with("[o0]null"));
         Ok(())
