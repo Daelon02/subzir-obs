@@ -49,6 +49,20 @@ static class Install {
     internal class Part { public string name{get;set;} public string sha256{get;set;} public long size{get;set;} }
     internal class Manifest { public string baseline{get;set;} public string launcher{get;set;} public Dictionary<string,Part[]> editions{get;set;} }
     internal static readonly Manifest Base=Channel.Json.Deserialize<Manifest>(Channel.Resource("baseline"));
+    internal static string Destination(string selected,bool updating) {
+        try {
+            string root=Path.GetPathRoot(selected);
+            if(String.IsNullOrEmpty(root) || root.Length<3)return "";
+            string full=Path.GetFullPath(selected);
+            root=Path.GetPathRoot(full);
+            string dir=full.Length>root.Length?full.TrimEnd(Path.DirectorySeparatorChar):full;
+            if(updating || String.Equals(Path.GetFileName(dir),"SubZir",StringComparison.OrdinalIgnoreCase) || Existing(dir))return dir;
+            return Path.Combine(dir,"SubZir");
+        } catch(ArgumentException){return "";}
+        catch(NotSupportedException){return "";}
+        catch(IOException){return "";}
+        catch(UnauthorizedAccessException){return "";}
+    }
     internal static bool Existing(string dir) {
         string file=Path.Combine(dir,"SubZir.exe");
         if(!File.Exists(file) || !File.Exists(Path.Combine(dir,@"app\subtitle-rs.exe")) || !File.Exists(Path.Combine(dir,@"app\worker.py")))return false;
@@ -101,6 +115,7 @@ static class Install {
         progress(have);
     }
     internal static void Fresh(string dir,string edition,string cache,Action<int> progress,CancellationToken cancel) {
+        if(File.Exists(dir))throw new IOException("A file already exists at "+dir);
         if(Directory.Exists(dir) && Directory.EnumerateFileSystemEntries(dir).Any())throw new IOException("Choose an empty folder or your existing SubZir folder.");
         var parent=Directory.GetParent(dir);
         if(parent==null)throw new IOException("Select an application folder.");
