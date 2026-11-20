@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 sealed class Setup : Form {
-    readonly ComboBox gpu=new ComboBox();
+    readonly ComboBox models=new ComboBox();
     readonly TextBox folder=new TextBox();
     readonly TextBox destination=new TextBox{ReadOnly=true,TabStop=false};
     readonly Button browse=new Button(),go=new Button();
@@ -29,19 +29,31 @@ sealed class Setup : Form {
         } finally {Marshal.FinalReleaseComObject(shell);}
     }
     void Place(Control c,string text,int x,int y,int w,int h){c.Text=text;c.SetBounds(x,y,w,h);Controls.Add(c);}
+    static string CudaWarning(CudaDevice[] devices) {
+        string reason=T("The NVIDIA driver reported no available CUDA device.","Драйвер NVIDIA не надав жодного доступного пристрою CUDA.");
+        if(Array.Exists(devices,d=>d.Unavailable==CudaDevice.Limitation.Driver))
+            reason=T("Update the NVIDIA driver to use this GPU.","Для цієї відеокарти потрібно оновити драйвер NVIDIA.");
+        else if(Array.Exists(devices,d=>d.Unavailable==CudaDevice.Limitation.Memory))
+            reason=T("The detected GPU has less than 5 GiB of video memory.","У виявленої відеокарти менше ніж 5 ГіБ відеопам’яті.");
+        else if(devices.Length>0)
+            reason=T("The available CUDA packages do not support this GPU architecture.","Наявні пакети CUDA не підтримують архітектуру цієї відеокарти.");
+        return T("⚠ CUDA unavailable for Hy-MT2 7B","⚠ CUDA недоступна для Hy-MT2 7B")+Environment.NewLine+
+            reason+Environment.NewLine+T("QuickMT and M2M100 can run on the CPU.","QuickMT і M2M100 можуть працювати на процесорі.");
+    }
     Setup(string existing) {
         Text="SubZir "+Channel.Version.ToString(3);Font=new Font("Segoe UI",10);
         ClientSize=new Size(542,345);FormBorderStyle=FormBorderStyle.FixedDialog;
         MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;AutoScaleMode=AutoScaleMode.Dpi;
-        var gpuTitle=new Label();
-        Place(gpuTitle,T("Graphics card","Відеокарта"),18,16,490,24);
-        Place(gpu,"",18,41,506,30);gpu.DropDownStyle=ComboBoxStyle.DropDownList;
-        gpu.DisplayMember="Key";
-        gpu.Items.Add(new KeyValuePair<string,string>("RTX 3080  ·  Hy-MT2 7B  ·  6.28 GB","3080"));
-        gpu.Items.Add(new KeyValuePair<string,string>("RTX 5070  ·  Hy-MT2 7B  ·  6.10 GB","5070-Ti"));
-        gpu.Items.Add(new KeyValuePair<string,string>("RTX 5070 Ti  ·  Hy-MT2 7B  ·  6.10 GB","5070-Ti"));
-        gpu.Items.Add(new KeyValuePair<string,string>("CPU  ·  QuickMT / M2M100  ·  0.85 GB","cpu"));
-        gpu.SelectedIndex=0;
+        var modelTitle=new Label();
+        Place(modelTitle,T("Local translation model","Локальна модель перекладу"),18,16,490,24);
+        Place(models,"",18,41,506,30);models.DropDownStyle=ComboBoxStyle.DropDownList;
+        models.DisplayMember="Key";
+        var devices=CudaDevice.Detect();
+        var card=CudaDevice.Best(devices,null);
+        if(card!=null)models.Items.Add(new KeyValuePair<string,string>("Hy-MT2 7B",Install.HyModel));
+        models.Items.Add(new KeyValuePair<string,string>("QuickMT · EN → UK","quickmt"));
+        models.Items.Add(new KeyValuePair<string,string>("M2M100 · "+T("multilingual","багатомовна"),"m2m100"));
+        models.SelectedIndex=0;
         Place(new Label(),T("Choose a folder for SubZir","Виберіть папку для SubZir"),18,85,488,25);
         Place(folder,existing??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Programs"),18,112,395,31);
         Place(browse,T("Browse…","Вибрати…"),421,110,103,31);
@@ -51,27 +63,38 @@ sealed class Setup : Form {
         Place(status,"",18,210,506,45);
         Place(bar,"",18,258,506,16);
         Place(go,"",329,292,195,38);
+        if(card==null) {
+            const int space=94;
+            ClientSize=new Size(ClientSize.Width,ClientSize.Height+space);
+            foreach(Control control in Controls)if(control.Top>=85)control.Top+=space;
+            var warning=new Label{Name="cudaWarning",BackColor=Color.LemonChiffon,ForeColor=Color.FromArgb(80,49,0),
+                BorderStyle=BorderStyle.FixedSingle,Padding=new Padding(8,4,8,4),AccessibleRole=AccessibleRole.Alert};
+            Place(warning,CudaWarning(devices),18,79,506,88);
+        }
         Action refresh=delegate {
             destination.Text=Install.Destination(folder.Text,existing!=null);
             bool update=existing!=null || (destination.TextLength!=0 && File.Exists(Path.Combine(destination.Text,"SubZir.exe")));
-            gpu.Visible=gpuTitle.Visible=!update;
-            gpu.Enabled=!update;
+            models.Visible=modelTitle.Visible=!update;
+            models.Enabled=!update;
+            bool hy=((KeyValuePair<string,string>)models.SelectedItem).Value==Install.HyModel;
             status.Text=update?T("Update this installation and keep its models and settings.","Оновіть програму зі збереженням моделей і налаштувань."):
-                T("Setup downloads the selected model and installs SubZir.","Інсталятор завантажить вибрану модель та встановить SubZir.");
+                hy?card.Name+" · CUDA "+(card.Edition==CudaDevice.Cuda13?"13 · 6.10 GB":"12 · 6.28 GB"):
+                T("CPU · QuickMT and M2M100 share a 0.85 GB download.","CPU · Спільне завантаження QuickMT і M2M100 — 0,85 ГБ.");
             go.Text=update?T("Update","Оновити"):T("Install","Встановити");
             go.Enabled=destination.TextLength!=0;
             if(!go.Enabled)status.Text=T("Choose a folder or enter its full path.","Виберіть папку або введіть повний шлях.");
         };
-        refresh();folder.TextChanged+=delegate {refresh();};
+        refresh();folder.TextChanged+=delegate {refresh();};models.SelectedIndexChanged+=delegate {refresh();};
         if(existing!=null){folder.ReadOnly=true;browse.Enabled=false;}
         go.Click+=async delegate {
             if(installedDirectory!=null){try{Process.Start(Path.Combine(installedDirectory,"SubZir.exe"));Close();}catch(Exception ex){MessageBox.Show(this,ex.Message,Text);}return;}
             if(active!=null){active.Cancel();return;}
             string dir=destination.Text;
-            string edition=((KeyValuePair<string,string>)gpu.SelectedItem).Value;
+            string model=((KeyValuePair<string,string>)models.SelectedItem).Value;
+            string edition=model==Install.HyModel?card.Edition:"cpu";
             bool update=existing!=null || File.Exists(Path.Combine(dir,"SubZir.exe"));
             var token=new CancellationTokenSource();active=token;
-            gpu.Enabled=false;folder.Enabled=false;browse.Enabled=false;
+            models.Enabled=false;folder.Enabled=false;browse.Enabled=false;
             go.Text=T("Cancel","Скасувати");go.Enabled=!update;
             int last=-1;
             IProgress<int> changed=new Progress<int>(n=>{
@@ -80,7 +103,7 @@ sealed class Setup : Form {
             });
             try {
                 if(update)await Task.Run(()=>Install.Upgrade(dir));
-                else await Task.Run(()=>Install.Fresh(dir,edition,Path.Combine(Path.GetTempPath(),"SubZir-downloads",Install.Base.baseline),n=>{
+                else await Task.Run(()=>Install.Fresh(dir,edition,model,Path.Combine(Path.GetTempPath(),"SubZir-downloads",Install.Base.baseline),n=>{
                     if(n!=last){last=n;changed.Report(n);}
                 },token.Token));
                 installedDirectory=dir;bar.Value=100;go.Text=T("Open SubZir","Відкрити SubZir");

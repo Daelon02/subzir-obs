@@ -6,7 +6,7 @@ Translate English subtitles from a game running on your Windows PC or from a con
 
 [Multiple zones and HUD (English)](#multiple-zones-and-hud-above-original) · [Кілька зон і HUD (українською)](#кілька-зон-і-hud-над-оригіналом)
 
-Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070** or **RTX 5070 Ti** (6.10 GB each) or **CPU** (0.85 GB), then click **Install**. Setup downloads and checks the files for your selection. All GPU options include Hy-MT2 7B and the matching CUDA runtime. Choose a parent folder such as `D:\Games`. Setup shows the final path and installs SubZir in `D:\Games\SubZir`. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
+Open **SubZir-Setup.exe**, choose **Hy-MT2 7B**, **QuickMT** or **M2M100**, then click **Install**. Setup downloads and checks the files for your selection. Setup detects compatible NVIDIA hardware for Hy-MT2 7B and downloads its CUDA package automatically (6.10–6.28 GB). QuickMT and M2M100 share the 0.85 GB CPU download. The model you choose is active on first launch. Choose a parent folder such as `D:\Games`. Setup shows the final path and installs SubZir in `D:\Games\SubZir`. Open SubZir from the Start menu after installation. [Offline packages](https://github.com/Daelon02/subzir-obs/releases/tag/v0.4.0)
 
 ![God of War Ragnarök in OBS with the boss name on the left and the separate combat hint near the bottom](docs/images/god-of-war-zones.jpg)
 
@@ -59,7 +59,7 @@ The GPU menu is available for the [target languages configured for this backend]
 
 ## Перший запуск
 
-1. Запустіть **SubZir-Setup.exe**, виберіть **RTX 3080** (6,28 ГБ), **RTX 5070** чи **RTX 5070 Ti** (по 6,10 ГБ) або **CPU** (0,85 ГБ) і натисніть **Встановити**. Виберіть папку, наприклад `D:\Ігри`. Інсталятор покаже повний шлях і встановить програму в `D:\Ігри\SubZir`. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
+1. Запустіть **SubZir-Setup.exe**, виберіть **Hy-MT2 7B**, **QuickMT** або **M2M100** і натисніть **Встановити**. Для Hy-MT2 7B інсталятор автоматично визначає сумісну NVIDIA та завантажує пакет CUDA (6,10–6,28 ГБ). QuickMT і M2M100 мають спільний пакет для CPU (0,85 ГБ). Вибрана модель буде активна при першому запуску. Виберіть папку, наприклад `D:\Ігри`. Інсталятор покаже повний шлях і встановить програму в `D:\Ігри\SubZir`. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
 2. У грі ввімкніть **англійські субтитри**. Додайте зображення гри до сцени OBS.
    - **Гра на цьому ПК.** Запустіть гру. В OBS відкрийте **Джерела → + → Захоплення гри**, виберіть режим захоплення окремого вікна, а потім вікно гри. Для цього достатньо самого ПК.
    - **Консоль.** Додайте карту захоплення як **Пристрій захоплення відео**.

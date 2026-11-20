@@ -148,6 +148,7 @@ partial class Launcher : Form {
         MessageBox.Show(this,Ui.Get(Msg.Help),Ui.Get(Msg.ConnectTitle),MessageBoxButtons.OK,MessageBoxIcon.Information);
     }
     static string Quote(string path){return "\""+path+"\"";}
+    static readonly Lazy<CudaDevice[]> CudaCards=new Lazy<CudaDevice[]>(CudaDevice.Detect);
     ProcessStartInfo Info(string exe,string args){
         var s=new ProcessStartInfo(exe,args){WorkingDirectory=App,UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true,StandardOutputEncoding=Utf8,StandardErrorEncoding=Utf8};
         s.EnvironmentVariables["PATH"]=Path.Combine(App,"bin")+";"+s.EnvironmentVariables["PATH"];
@@ -156,6 +157,14 @@ partial class Launcher : Form {
         s.EnvironmentVariables["SUB_DEVICE"]="OBS Virtual Camera";s.EnvironmentVariables["SUB_DEMO"]=Path.Combine(App,"demo");
         s.EnvironmentVariables["SUB_QUICK_DEVICE"]="cpu";s.EnvironmentVariables["SUB_BEAM"]="3";
         s.EnvironmentVariables["SUB_MODEL"]=Ui.Model;
+        if(Ui.IsGpuModel(Ui.Model) && Path.GetFileName(exe).Equals("subtitle-rs.exe",StringComparison.OrdinalIgnoreCase)
+            && s.EnvironmentVariables["CUDA_VISIBLE_DEVICES"]==null){
+            string runtime=Path.Combine(App,"hy-runtime");
+            string edition=File.Exists(Path.Combine(runtime,"cudart64_13.dll"))?CudaDevice.Cuda13:
+                File.Exists(Path.Combine(runtime,"cudart64_12.dll"))?CudaDevice.Cuda12:null;
+            var card=edition==null?null:CudaDevice.Best(CudaCards.Value,edition);
+            if(card!=null)s.EnvironmentVariables["CUDA_VISIBLE_DEVICES"]=card.Uuid;
+        }
         s.EnvironmentVariables["SUB_DIALOGUE_STYLE"]=Ui.CanUseConciseDialogue && Ui.ConciseDialogue?"concise":"standard";
         if(Ui.Model!="auto")s.EnvironmentVariables["SUB_TARGET"]=Ui.Target;
         if(roi!=null)s.EnvironmentVariables["SUB_CROP"]=roi;
