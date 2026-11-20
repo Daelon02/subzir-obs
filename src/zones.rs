@@ -4,6 +4,9 @@ use std::fmt::Write as _;
 const CANVAS_W: u32 = 1280;
 const CANVAS_H: u32 = 720;
 const MAX_ZONES: usize = 8;
+// Persisted CaptionAnchor values. Both directions share OCR coordinates.
+const UNDER_EACH: u64 = 3;
+const ABOVE_EACH: u64 = 4;
 
 struct Zone {
     crop: [u32; 4],
@@ -37,10 +40,15 @@ impl Zone {
         Ok(Self {
             crop: [w, h, x, y],
             hud: row["Hud"].as_bool().unwrap_or_default(),
-            legend: row["Legend"]
-                .as_bool()
-                .unwrap_or_default()
-                .then(legend::Legend::default),
+            legend: if matches!(row["Anchor"].as_u64(), Some(UNDER_EACH | ABOVE_EACH))
+                && row["Output"].is_null()
+            {
+                Some(legend::Legend::panel())
+            } else if row["Legend"] == true {
+                Some(legend::Legend::default())
+            } else {
+                None
+            },
             stable: Stabilizer::default(),
             history: DialogueHistory::default(),
             shown: ShownCaption::default(),
@@ -52,7 +60,15 @@ impl Zone {
     }
     fn scaled(&self) -> [i32; 2] {
         let [w, h, _, _] = self.crop;
-        let max_height = if self.legend.is_some() { 1080 } else { HEIGHT };
+        let max_height = if self.legend.is_some() {
+            1080
+        } else if self.hud {
+            // A whole menu panel can contain small labels separated by artwork.
+            // Keep their native canvas resolution rather than shrinking the entire panel to one subtitle strip.
+            HEIGHT.max(h as i32)
+        } else {
+            HEIGHT
+        };
         let ratio = (f64::from(WIDTH) / f64::from(w)).min(f64::from(max_height) / f64::from(h));
         let ratio = if self.legend.is_some() {
             ratio.min(3.)
@@ -68,7 +84,7 @@ impl Zone {
         if self.legend.is_some() {
             self.scaled()[1]
         } else {
-            HEIGHT
+            self.scaled()[1].max(HEIGHT)
         }
     }
     fn observe(
@@ -78,7 +94,13 @@ impl Zone {
         now: Instant,
     ) -> Result<Option<(String, Card)>> {
         let changed = self.previous != pixels;
-        if changed || self.recheck_mask {
+        let tile_height = self.tile_height();
+        if tile_height > HEIGHT {
+            // HUD panels can mix dark text on gold and white text on black.
+            if changed {
+                self.reading = recognized_text(&recognize_tile(ocr, pixels, tile_height)?)?;
+            }
+        } else if changed || self.recheck_mask {
             let prior = if self.previous.len() == pixels.len() {
                 self.previous.as_slice()
             } else {
@@ -116,10 +138,10 @@ impl Zone {
             if self.reading.trim().is_empty() {
                 self.reading = retry_short(ocr, &high)?;
             }
-            if changed {
-                self.previous.clear();
-                self.previous.extend_from_slice(pixels);
-            }
+        }
+        if changed {
+            self.previous.clear();
+            self.previous.extend_from_slice(pixels);
         }
         match self.stable.observe(&self.reading, self.upper_end, now) {
             Observation::Confirmed(text) => Ok(Some((text, Card::New))),
@@ -165,7 +187,12 @@ fn filter(zones: &[Zone]) -> String {
     }
     graph
 }
-pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<()> {
+#[derive(Clone, Copy, PartialEq)]
+pub(super) enum Mode {
+    Live,
+    Snapshot,
+}
+pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode) -> Result<()> {
     let path = PathBuf::from(setting("SUB_RUNTIME")?).join("zones.json");
     let config: Value = serde_json::from_slice(&fs::read(path)?)?;
     let rows = config
@@ -183,7 +210,10 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
         "1",
     ]);
     if let Some(file) = &recording {
-        cmd.args(["-re", "-i", file]);
+        if mode == Mode::Live {
+            cmd.arg("-re");
+        }
+        cmd.args(["-i", file]);
     } else {
         cmd.args([
             "-rtbufsize",
@@ -193,6 +223,9 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
             "-i",
             &format!("video={}", setting("SUB_DEVICE")?),
         ]);
+    }
+    if mode == Mode::Snapshot {
+        cmd.args(["-frames:v", "1"]);
     }
     let mut capture = OwnedChild(
         cmd.args([
@@ -255,8 +288,27 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
         })
         .collect();
     order.sort_by_key(|(i, _)| zones[*i].legend.is_some());
-    for frame in frames {
-        let frame = frame?;
+    let snapshot = if mode == Mode::Snapshot {
+        Some(
+            frames
+                .recv_timeout(Duration::from_secs(12))
+                .map_err(|_| AppError::Config("No frame from the selected source".into()))??,
+        )
+    } else {
+        None
+    };
+    let mut confirmed_frame = false;
+    loop {
+        let live_frame;
+        let frame = if let Some(frame) = &snapshot {
+            frame
+        } else {
+            let Ok(next) = frames.recv() else {
+                break;
+            };
+            live_frame = next?;
+            &live_frame
+        };
         let now = Instant::now();
         for &(i, ref span) in &order {
             let zone = &mut zones[i];
@@ -267,7 +319,9 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
                     legend.observe(&ocr, pixels, scaled, zone.crop, worker, i)?
                 {
                     captions[i] = snapshot;
-                    println!("{}", json!({"zone":i,"captions":captions}));
+                    if mode == Mode::Live {
+                        println!("{}", json!({"zone":i,"captions":captions}));
+                    }
                 }
                 continue;
             }
@@ -277,7 +331,7 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
                 _ => None,
             };
             let ready = match observed {
-                Some((raw, _)) if zone.hud => Some((raw, String::new())),
+                Some((raw, _)) if zone.hud || mode == Mode::Snapshot => Some((raw, String::new())),
                 Some((raw, kind)) => zone.history.present(raw, now, kind),
                 None => zone.history.due(&zone.reading, now),
             };
@@ -293,12 +347,26 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
             };
             let uk = zone.shown.assemble(target, &en, translated);
             captions[i] = json!(uk);
-            println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
+            if mode == Mode::Live {
+                println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
+            }
             zone.shown.remember(en, uk);
+        }
+        if mode == Mode::Snapshot {
+            if confirmed_frame
+                && !zones
+                    .iter()
+                    .filter_map(|z| z.legend.as_ref())
+                    .any(legend::Legend::has_pending_items)
+            {
+                println!("{}", json!({"captions":captions}));
+                break;
+            }
+            confirmed_frame = true;
         }
     }
     let status = capture.0.wait()?;
-    if !status.success() || recording.is_none() {
+    if !status.success() || (mode == Mode::Live && recording.is_none()) {
         return Err(AppError::Config(format!("Capture ended ({status})")));
     }
     Ok(())
@@ -307,6 +375,19 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>) -> Result<
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tall_hud_keeps_panel_text_at_native_size_and_small_zones_keep_their_strip() -> Result<()> {
+        let mut row = json!({"Left":857,"Top":163,"W":423,"H":397,"Hud":true});
+        let panel = Zone::load(&row)?;
+        assert_eq!(panel.scaled(), [423, 397]);
+        assert_eq!(panel.tile_height(), 397);
+        row["Hud"] = json!(false);
+        assert_eq!(Zone::load(&row)?.tile_height(), HEIGHT);
+        row["Hud"] = json!(true);
+        row["H"] = json!(38);
+        assert_eq!(Zone::load(&row)?.tile_height(), HEIGHT);
+        Ok(())
+    }
     #[test]
     fn crops_share_one_frame_and_keep_editor_order() -> Result<()> {
         let rows = [

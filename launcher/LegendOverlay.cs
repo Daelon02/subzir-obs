@@ -19,8 +19,10 @@ static class LegendOverlay {
     public static void Protect(Zone zone,LegendSnapshot snapshot,List<RectangleF> occupied){
         foreach(var b in snapshot.bands){
             // A controller glyph may be taller than its label or invisible to OCR.
-            occupied.Add(new RectangleF(zone.Left-3,b[1]-1,zone.W+6,b[3]+2));
+            occupied.Add(zone.AttachedPanel?new RectangleF(b[0]-2,b[1]-1,b[2]+4,b[3]+2):
+                new RectangleF(zone.Left-3,b[1]-1,zone.W+6,b[3]+2));
         }
+        if(zone.AttachedPanel)return;
         foreach(var row in snapshot.rows){
             var b=row.bounds;
             float extra=Math.Max(4,b[3]*.55f);
@@ -32,13 +34,40 @@ static class LegendOverlay {
 
     public static void Draw(Graphics g,Zone zone,LegendSnapshot snapshot,SubtitleStyle style,
                             List<RectangleF> occupied,List<string> display){
+        style=zone.Style??style;
+        if(zone.Output!=null){
+            var rows=snapshot.rows.Where(row=>!String.IsNullOrWhiteSpace(row.text))
+                .OrderBy(row=>row.bounds[1]).ThenBy(row=>row.bounds[0]).Select(row=>row.text).ToArray();
+            zone.Output.Paint(g,zone,String.Join("\n",rows),style);
+            display.AddRange(rows);
+            return;
+        }
         foreach(var row in snapshot.rows){
             var b=row.bounds;
             if(!String.IsNullOrWhiteSpace(row.text) && !PaintLabel(g,zone,
                 new RectangleF(b[0],b[1],b[2],b[3]),row.text,style,occupied).IsEmpty)display.Add(row.text);
         }
     }
-    static IEnumerable<PointF> Positions(Zone z,RectangleF source,SizeF size,bool side){
+    static IEnumerable<PointF> Positions(Zone z,RectangleF source,SizeF size,bool side,List<RectangleF> occupied){
+        if(z.AttachedPanel){
+            float centered=Math.Max(0,Math.Min(CanvasW-size.Width,source.Left+(source.Width-size.Width)/2));
+            float gap=source.Height>32?4:Math.Max(4,Math.Min(14,source.Height*.55f+2));
+            bool above=z.Anchor==CaptionAnchor.AboveEach;
+            float edge=above?source.Top-size.Height:source.Bottom;
+            int sign=above?-1:1;
+            if(!side){
+                yield return new PointF(centered,edge+sign*gap);
+            }
+            // Walk the actual obstacle edges. A fixed stride can skip the only
+            // free pixels between two controller glyphs in a tight menu.
+            var position=new RectangleF(centered,edge+sign,size.Width,size.Height);
+            var blocks=occupied.Where(r=>r.Right>centered && r.Left<position.Right);
+            foreach(var block in above?blocks.OrderByDescending(r=>r.Bottom):blocks.OrderBy(r=>r.Top)){
+                if(position.IntersectsWith(block))position.Y=above?block.Top-position.Height:block.Bottom;
+            }
+            if(side || Math.Abs(position.Y-edge)<=gap+4)yield return position.Location;
+            yield break;
+        }
         float left=Math.Max(0,Math.Min(CanvasW-size.Width,source.Right-size.Width));
         float pad=Math.Max(4,source.Height*.55f)+2;
         if(!side){
@@ -51,20 +80,20 @@ static class LegendOverlay {
     }
     static RectangleF PaintLabel(Graphics g,Zone zone,RectangleF source,string text,SubtitleStyle style,
                                  List<RectangleF> occupied){
-        int initial=(int)Math.Max(11,Math.Min(Math.Min(20,style.size*.5),source.Height));
+        int initial=(int)(zone.Style==null?Math.Max(11,Math.Min(style.ZoneFontSize(zone),source.Height)):style.ZoneFontSize(zone));
         using(var format=(StringFormat)StringFormat.GenericTypographic.Clone()){
             format.Alignment=StringAlignment.Center;
             for(int pass=0;pass<2;pass++){
-                for(int px=initial;px>=9;px--){
-                    using(var font=new Font(style.face,px,FontStyle.Bold,GraphicsUnit.Pixel)){
+                for(int px=initial;px>=Math.Min(9,initial);px--){
+                    using(var font=new Font(style.face,px,zone.Style==null?FontStyle.Bold:(FontStyle)(style.flags&15),GraphicsUnit.Pixel)){
                         int limit=Math.Min(CanvasW-10,Math.Max(160,zone.W));
                         var m=g.MeasureString(text,font,limit,format);
                         var size=new SizeF((float)Math.Ceiling(m.Width)+8,(float)Math.Ceiling(m.Height)+2);
-                        foreach(var point in Positions(zone,source,size,pass==1)){
+                        foreach(var point in Positions(zone,source,size,pass==1,occupied)){
                             var r=new RectangleF(point,size);
                             if(!Canvas.Contains(r) || occupied.Any(o=>o.IntersectsWith(r)))continue;
-                            using(var bg=new SolidBrush(Color.FromArgb(242,17,21,23)))
-                            using(var fg=new SolidBrush(Color.Gold)){
+                            using(var bg=new SolidBrush(zone.Style==null?Color.FromArgb(242,17,21,23):Color.FromArgb(style.opacity*255/100,SubtitleStyle.Decode(style.background))))
+                            using(var fg=new SolidBrush(zone.Style==null?Color.Gold:SubtitleStyle.Decode(style.color))){
                                 g.FillRectangle(bg,r);
                                 g.TextRenderingHint=TextRenderingHint.AntiAliasGridFit;
                                 style.DrawText(g,text,font,fg,new RectangleF(r.X+4,r.Y+1,r.Width-8,r.Height-2),format,1);
@@ -79,6 +108,7 @@ static class LegendOverlay {
         return RectangleF.Empty;
     }
     public static RectangleF Preview(Graphics g,Zone z,string text,SubtitleStyle style){
+        if(z.Output!=null)return z.Output.Paint(g,z,text+"\n"+Editor.T("Вийти","Exit"),style);
         var occupied=new List<RectangleF>();
         var area=new RectangleF(z.Left,z.Top,z.W,z.H);
         foreach(var item in new[]{text,Editor.T("Вийти","Exit")}){

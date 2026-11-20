@@ -78,8 +78,9 @@ static class Install {
             try {if(!mutex.WaitOne(10000))throw new IOException("Close SubZir and retry.");}
             catch(AbandonedMutexException) {}
             string scratch=Path.Combine(dir,".update-"+Guid.NewGuid().ToString("N"));
-            string[] resources={"engine","worker","hyworker","obs","launcher"};
-            string[] paths={Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"app\hy_worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target};
+            var resources=new List<string>{"engine","worker","hyworker","obs","launcher","overlay"};
+            string overlay=Path.Combine(dir,@"OBS\SubZir-overlay.lua");
+            var paths=new List<string>{Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"app\hy_worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target,overlay};
             int committed=0;
             try {
                 Directory.CreateDirectory(scratch);
@@ -87,10 +88,22 @@ static class Install {
                     using(var input=Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
                     using(var dest=File.Create(Path.Combine(scratch,name)))input.CopyTo(dest);
                 }
+                if(File.Exists(overlay) && Channel.HashFile(overlay)!=Channel.HashFile(Path.Combine(scratch,"overlay"))){
+                    File.Copy(overlay,Path.Combine(scratch,"previous"));
+                    resources.Insert(resources.Count-1,"previous");
+                    paths.Insert(paths.Count-1,Path.Combine(dir,@"OBS\SubZir-overlay.previous.lua"));
+                }
                 try{
-                    for(;committed<paths.Length;committed++)File.Replace(Path.Combine(scratch,resources[committed]),paths[committed],Path.Combine(scratch,resources[committed]+".bak"));
+                    for(;committed<paths.Count;committed++){
+                        string name=resources[committed],from=Path.Combine(scratch,name),to=paths[committed];
+                        if((name=="overlay" || name=="previous") && !File.Exists(to))File.Move(from,to);
+                        else File.Replace(from,to,Path.Combine(scratch,name+".bak"));
+                    }
                 }catch{
-                    while(committed>0){int i=--committed;File.Replace(Path.Combine(scratch,resources[i]+".bak"),paths[i],null);}
+                    while(committed>0){
+                        int i=--committed;string backup=Path.Combine(scratch,resources[i]+".bak");
+                        if(File.Exists(backup))File.Replace(backup,paths[i],null);else File.Delete(paths[i]);
+                    }
                     throw;
                 }
             } finally {mutex.ReleaseMutex();if(Directory.Exists(scratch))Directory.Delete(scratch,true);}

@@ -7,6 +7,31 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 partial class Launcher {
+    void WatchObsModule() {
+        var request=Path.Combine(Data,"obs-module-check.txt");
+        var response=Path.Combine(Data,"obs-module-ack.txt");
+        var timer=new Timer{Interval=750};
+        var age=new Stopwatch();
+        string nonce=null;
+        Action poll=delegate{
+            try{
+                if(nonce!=null){
+                    var reply=ReadMarker(response);
+                    if(reply==nonce+" ready")obsHint.Text=Editor.T("OBS підтвердив поточну версію скрипта.","OBS confirmed the current script.");
+                    else if(reply==nonce+" fallback")obsHint.Text=Editor.T("OBS використовує попередній модуль. Повторіть встановлення оновлення.","OBS is using the previous module. Reinstall the update.");
+                    else if(reply==nonce+" failed")obsHint.Text=Editor.T("OBS не зміг завантажити модуль субтитрів. Повторіть встановлення.","OBS could not load the overlay module. Reinstall the update.");
+                    else if(age.ElapsedMilliseconds>=3500)obsHint.Text=Editor.T("Відкрийте OBS. Якщо скрипт уже додано, перезавантажте його в меню Інструменти → Скрипти.","Open OBS. If the script is already installed, reload it under Tools → Scripts.");
+                    if(age.ElapsedMilliseconds<8000)return;
+                }
+                nonce=Guid.NewGuid().ToString("N");
+                Ui.WriteText(request,nonce);age.Restart();
+            }catch(IOException){nonce=null;obsHint.Text=Ui.Get(Msg.ConnectHint);}
+            catch(UnauthorizedAccessException){nonce=null;obsHint.Text=Ui.Get(Msg.ConnectHint);}
+        };
+        timer.Tick+=delegate{poll();};
+        Shown+=delegate{poll();timer.Start();};
+        Disposed+=delegate{timer.Dispose();};
+    }
     readonly Button update=new Button();
     static readonly Dictionary<string,string> UpdateLabels=Channel.Json.Deserialize<Dictionary<string,string>>(Channel.Resource("update-labels"));
     string UpdateText(string en,string uk,string other) {return Ui.Language=="uk"?uk:Ui.Language=="en"?en:other;}

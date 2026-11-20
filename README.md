@@ -17,7 +17,7 @@ Open **SubZir-Setup.exe**, choose **RTX 3080** (6.28 GB), **RTX 5070** or **RTX 
    - **Game running on this PC.** Launch the game. In OBS, go to **Sources → + → Game Capture**, choose **Capture specific window**, then select the game window. This works without a console or capture card.
    - **Console.** Add the capture card as a **Video Capture Device**.
 3. Click **1. Connect OBS** in SubZir. In OBS, open **Tools → Scripts → +**, paste the copied path and open the Lua file. Click the button in its settings to add subtitles to the scene.
-4. Click **2. Test translation**. A translation of “Open the gate.” appears in OBS for four seconds. You can try this before connecting the console.
+4. Click **2. Test translation**. With saved zones, SubZir reads one game frame and shows the translations in OBS. Before setting up zones you can try the demo line “Open the gate.” without a console.
 5. In OBS, open the settings beside **Start Virtual Camera**. Set the output to **Source**, select the Game Capture or capture-card source you added in step 2, then start the virtual camera. SubZir now sees the original game picture.
 6. When dialogue appears, click **3. Select subtitle area**. Draw a box around the English text, leave room for two lines and save. Click **Start translation**. To switch the output while playing, use **Language**. The next new line uses your selection.
 
@@ -31,10 +31,10 @@ Requires Windows 10/11 x64, Windows English OCR and OBS Studio. The main ZIP inc
 
 ### Multiple zones and HUD above original
 
-1. In OBS, select your game source as the **Virtual Camera** output and start the camera. If you upgraded, open **Tools → Scripts**, reload the installed `OBS/PS5-Subtitles.lua`, and use its button to add subtitles to the current scene.
+1. In OBS, select your game source as the **Virtual Camera** output and start the camera. Under **Tools → Scripts**, add the installed `OBS/PS5-Subtitles.lua` and use its button to add subtitles to the current scene. When upgrading from v0.9.0, reload this script once or restart OBS. Subsequent overlay updates load automatically while OBS is open. SubZir shows confirmation beside **Connect OBS**.
 2. In SubZir, click **Zone editor · OBS** while the English text is visible. To practise on a recording, choose **Zone editor · video file** instead.
-3. Select **Draw OCR area** and draw the yellow box around one English text block. Turn drawing off and drag the sample translation to where you want it in OBS. Use **Width, %** to adjust line wrapping.
-4. Click **Add zone** for another text block. For a map legend, enable **Map legend · automatic entries** and draw one box around all labels and their buttons. SubZir reads the rows separately and positions each translation above its label. In a tight layout it can place a label beside the legend. For a single HUD item use **HUD above original**. Keep game dialogue in its own regular zone.
+3. Select **Draw OCR area** and draw the yellow box around one English text block. Drag inside the blue output box to move it. Drag its edges or corners to resize. **Text and outline…** sets the font, text color and outline for the selected zone.
+4. Click **Add zone** for a menu, a map legend or a message. Draw one yellow box around the group and choose **Above each text block** or **Below each text block**. SubZir positions each translation relative to the detected label, including commands arranged side by side. Keep game dialogue in its own regular zone.
 5. Click **Save zones**, then **Start translation**. OBS displays one transparent layer with all the translations. The layout is saved for the next launch. To return to one subtitle area, use the original single-area picker.
 
 If the scene contains one visible top-level game, capture-card or video source, the layer follows that source. In other scenes, positions use the full OBS canvas.
@@ -64,7 +64,7 @@ The GPU menu is available for the [target languages configured for this backend]
    - **Гра на цьому ПК.** Запустіть гру. В OBS відкрийте **Джерела → + → Захоплення гри**, виберіть режим захоплення окремого вікна, а потім вікно гри. Для цього достатньо самого ПК.
    - **Консоль.** Додайте карту захоплення як **Пристрій захоплення відео**.
 3. У SubZir натисніть **1. Під’єднати OBS**. В OBS відкрийте **Інструменти → Скрипти → +**, вставте скопійований шлях і відкрийте файл. Натисніть кнопку додавання субтитрів у налаштуваннях скрипту.
-4. Натисніть **2. Перевірити переклад**. На чотири секунди у сцені з’явиться переклад «Open the gate.» вибраною мовою. Для цього тесту консоль можна під’єднати пізніше.
+4. Натисніть **2. Перевірити переклад**. Якщо зони вже збережені, SubZir прочитає один кадр гри й покаже переклади в OBS. До налаштування зон можна перевірити демонстраційну фразу «Open the gate.» навіть без консолі.
 5. У налаштуваннях віртуальної камери OBS виберіть вихід **Джерело**, потім джерело з кроку 2 — захоплення гри або карту захоплення. Запустіть віртуальну камеру. Тепер SubZir бачить вихідне зображення гри.
 6. Коли з’явиться репліка, натисніть **3. Виділити субтитри**, обведіть область для двох рядків і збережіть її. Натисніть **Почати переклад**. Після перемикання мови наступна нова репліка з’явиться вибраною мовою.
 
@@ -78,10 +78,10 @@ The GPU menu is available for the [target languages configured for this backend]
 
 ### Кілька зон і HUD над оригіналом
 
-1. У налаштуваннях **віртуальної камери OBS** виберіть вихід **Джерело**, укажіть гру й запустіть камеру. Якщо оновили SubZir, відкрийте **Інструменти → Скрипти**, перезавантажте встановлений файл `OBS/PS5-Subtitles.lua` та натисніть його кнопку додавання субтитрів до поточної сцени.
+1. У налаштуваннях **віртуальної камери OBS** виберіть вихід **Джерело**, укажіть гру й запустіть камеру. Через **Інструменти → Скрипти** додайте встановлений `OBS/PS5-Subtitles.lua` й натисніть його кнопку додавання субтитрів до поточної сцени. При переході з v0.9.0 один раз перезавантажте цей скрипт або перезапустіть OBS. Наступні оновлення модуля застосовуються автоматично у відкритому OBS. Підтвердження з’являється в SubZir біля **Під’єднати OBS**.
 2. Коли англійський текст з’явиться на екрані, у SubZir натисніть **Редактор зон · OBS**. Щоб спробувати на записі, виберіть **Редактор зон · відеофайл**.
-3. Увімкніть **Виділити текст у грі** й обведіть жовтою рамкою один англійський напис. Вимкніть виділення й перетягніть зразок перекладу туди, де його побачить глядач. Поле **Ширина, %** визначає, як текст переноситься на наступний рядок.
-4. Натисніть **Додати зону** для наступного напису. Для легенди карти ввімкніть **Легенда карти · автоматичні пункти** й обведіть усі написи разом із кнопками однією рамкою. SubZir окремо перекладе кожен розпізнаний пункт і розташує підпис над ним. Якщо місця замало, підпис може з’явитися збоку. Для одного напису є **HUD над оригіналом**. Діалог залиште в окремій звичайній зоні.
+3. Увімкніть **Виділити текст у грі** й обведіть жовтою рамкою один англійський напис. Перетягніть синю рамку за середину, щоб перемістити переклад, або за край чи кут, щоб змінити розмір. Кнопка **Текст і контур…** задає шрифт, колір тексту й контур для вибраної зони.
+4. Натисніть **Додати зону** для меню, легенди карти або повідомлення. Обведіть усю групу однією жовтою рамкою та виберіть **Над кожним написом** або **Під кожним написом**. SubZir прив’яже переклад до відповідного напису, навіть коли кілька команд стоять в один ряд. Діалог залиште в окремій звичайній зоні.
 5. Натисніть **Зберегти зони**, потім **Почати переклад**. Усі переклади з’являться в одному прозорому шарі OBS, а розташування збережеться для наступного запуску. Щоб повернутися до однієї області, натисніть **3. Виділити субтитри**.
 
 Якщо в сцені є одне видиме ігрове, відео- або захоплювальне джерело верхнього рівня, шар повторює його положення. В інших сценах позиції відраховуються від усього полотна OBS.

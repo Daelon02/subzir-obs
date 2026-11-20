@@ -29,12 +29,31 @@ class SubtitleStyle {
     public SubtitleStyle() {
         face="Segoe UI"; size=36; color=0xffffff; outline=true;
     }
+    public SubtitleStyle Copy(){return (SubtitleStyle)MemberwiseClone();}
+    public bool Valid(){return !String.IsNullOrWhiteSpace(face) && size>=8 && size<=250 &&
+        opacity>=0 && opacity<=100 && flags>=0 && flags<=15;}
+    public float ZoneFontSize(Zone zone){
+        return zone.Style==null?DefaultFontSize(zone):size*2f/3;
+    }
+    float DefaultFontSize(Zone zone){
+        if(!zone.Hud && !zone.UsesEntries)return size*2f/3;
+        return zone.UsesEntries?Math.Max(11,Math.Min(20,size*.5f)):Math.Max(10,Math.Min(24,size*.4f));
+    }
+    public static SubtitleStyle DefaultForZone(Zone zone){
+        var style=Load();
+        if(zone.Hud||zone.UsesEntries){
+            style.size=(int)Math.Round(style.DefaultFontSize(zone)*1.5f);
+            style.flags=(int)FontStyle.Bold;
+            style.color=Encode(zone.UsesEntries?Color.Gold:Color.FromArgb(255,212,70));
+            style.background=Encode(Color.FromArgb(17,21,23));style.opacity=94;
+        }
+        return style;
+    }
     public static SubtitleStyle Load() {
         if(File.Exists(PathName)) {
             try {
                 var style = new JavaScriptSerializer().Deserialize<SubtitleStyle>(File.ReadAllText(PathName));
-                if(style!=null && !String.IsNullOrWhiteSpace(style.face) && style.size>=8 && style.size<=250 &&
-                    style.opacity>=0 && style.opacity<=100 && style.flags>=0 && style.flags<=15) return style;
+                if(style!=null && style.Valid())return style;
             } catch(ArgumentException) {} catch(InvalidOperationException) {} catch(IOException) {}
         }
         return new SubtitleStyle();
@@ -47,22 +66,28 @@ class SubtitleStyle {
 }
 
 class StyleDialog : Form {
-    readonly SubtitleStyle style = SubtitleStyle.Load();
+    SubtitleStyle style;
+    public SubtitleStyle ResultStyle {get;private set;}
     readonly Panel preview = new Panel();
     readonly NumericUpDown opacity = new NumericUpDown();
     readonly CheckBox outline = new CheckBox();
     Font previewFont;
-    public StyleDialog() {
+    public StyleDialog():this(SubtitleStyle.Load(),null,null,false){}
+    public StyleDialog(SubtitleStyle settings,string sample,SubtitleStyle inherited,bool inheritOnMatch) {
+        bool forZone=inherited!=null;
+        var defaults=inherited??new SubtitleStyle();
+        style=settings;
         Font=new Font("Segoe UI",10); Text=Ui.Get(Msg.Appearance);
         RightToLeft=Ui.IsRtl?RightToLeft.Yes:RightToLeft.No;RightToLeftLayout=Ui.IsRtl;
         StartPosition=FormStartPosition.CenterParent; FormBorderStyle=FormBorderStyle.FixedDialog;
-        MinimizeBox=MaximizeBox=false;ClientSize=new Size(500,295);
+        if(forZone)Text=Editor.T("Вигляд тексту зони","Zone text appearance");
+        MinimizeBox=MaximizeBox=false;ClientSize=new Size(500,336);
         preview.SetBounds(16,16,468,90);
         preview.Paint+=delegate(object sender,PaintEventArgs e){
             using(var fmt=new StringFormat{Alignment=StringAlignment.Center,LineAlignment=StringAlignment.Center})
             using(var ink=new SolidBrush(SubtitleStyle.Decode(style.color))){
                 e.Graphics.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-                style.DrawText(e.Graphics,Ui.Get(Msg.Title),previewFont,ink,preview.ClientRectangle,fmt,2);
+                style.DrawText(e.Graphics,String.IsNullOrWhiteSpace(sample)?Ui.Get(Msg.Title):sample,previewFont,ink,preview.ClientRectangle,fmt,2);
             }
         };
         Controls.Add(preview);
@@ -110,9 +135,20 @@ class StyleDialog : Form {
         var apply=ButtonAt(Msg.Apply,254,236,230);
         apply.Click+=delegate {
             style.outline=outline.Checked;
+            if(forZone){
+                ResultStyle=inheritOnMatch && Channel.Json.Serialize(style)==Channel.Json.Serialize(defaults)?null:style;
+                DialogResult=DialogResult.OK;return;
+            }
             try {style.Save();DialogResult=DialogResult.OK;}
             catch(IOException ex){MessageBox.Show(this,ex.Message,Ui.Get(Msg.Appearance));}
             catch(UnauthorizedAccessException ex){MessageBox.Show(this,ex.Message,Ui.Get(Msg.Appearance));}
+        };
+        var reset=new Button{Text=Editor.T("Відновити стандартний вигляд","Restore default appearance")};
+        reset.SetBounds(16,283,468,36);Controls.Add(reset);
+        reset.Click+=delegate{
+            style=defaults.Copy();inheritOnMatch=true;
+            opacity.Value=style.opacity;outline.Checked=style.outline;
+            updateSwatch();RefreshPreview();
         };
         AcceptButton=apply;CancelButton=cancel;RefreshPreview();
     }

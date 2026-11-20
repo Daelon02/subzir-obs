@@ -15,6 +15,13 @@ partial class Launcher : Form {
     static readonly UTF8Encoding Utf8 = new UTF8Encoding(false);
     readonly Button connect = new Button(), demo = new Button(), select = new Button(), play = new Button();
     readonly Label status = new Label(), line = new Label();
+    readonly Label testHint;
+    readonly Label obsHint;
+    void RefreshTestHint(){
+        testHint.Text=layout==null?Ui.Get(Msg.TestHint):Editor.T(
+            "Перевірити переклад з одного кадру в усіх активних зонах.",
+            "Test a single frame in all active zones.");
+    }
     readonly Button language = new Button();
     readonly Dictionary<Control,Msg> captions = new Dictionary<Control,Msg>();
     Msg statusMessage;
@@ -36,6 +43,7 @@ partial class Launcher : Form {
         RightToLeft = Ui.IsRtl ? RightToLeft.Yes : RightToLeft.No;
         RightToLeftLayout = Ui.IsRtl;
         foreach (var item in captions) item.Key.Text = Ui.Get(item.Value);
+        RefreshTestHint();
         RefreshModels();
         SetStatus(statusMessage, statusDetail);
     }
@@ -81,9 +89,9 @@ partial class Launcher : Form {
         Label title=LabelAt(Msg.Title,24,18,452,46);title.Font=new Font(Font.FontFamily,22,FontStyle.Bold);
         LabelAt(Msg.Subtitle,26,68,445,41);
         ButtonAt(connect,Msg.Connect,26,116,208);connect.Click+=delegate { HelpOBS(); };
-        LabelAt(Msg.ConnectHint,250,114,436,55);
+        obsHint=LabelAt(Msg.ConnectHint,250,114,436,55);
         ButtonAt(demo,Msg.Test,26,173,208);demo.Click+=async delegate {await Start(false);};
-        LabelAt(Msg.TestHint,250,174,436,52);
+        testHint=LabelAt(Msg.TestHint,250,174,436,52);
         ButtonAt(select,Msg.SelectArea,26,230,208);select.Click+=async delegate {await Choose();};
         LabelAt(Msg.SelectHint,250,231,436,52);
         ButtonAt(play,Msg.Start,26,289,251);play.BackColor=Color.FromArgb(23,78,103);play.ForeColor=Color.White;
@@ -118,7 +126,7 @@ partial class Launcher : Form {
         zoneGuide.Click+=delegate {using(var dialog=new ZoneGuide())dialog.ShowDialog(this);};
         language.SetBounds(482,21,200,38);
         language.Click += delegate {
-            try { using(var dialog = new LanguageDialog(busy && (Ui.Model!="auto" || (layout!=null && Array.Exists(layout,z=>z.Legend))))) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
+            try { using(var dialog = new LanguageDialog(busy && (Ui.Model!="auto" || (layout!=null && Array.Exists(layout,z=>z.UsesEntries))))) { if(dialog.ShowDialog(this) == DialogResult.OK) { Ui.Save(dialog.InterfaceCode, dialog.TargetCode, Ui.Allows(Ui.Model,dialog.TargetCode)?Ui.Model:"auto"); RefreshLanguage(); } } }
             catch (IOException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
             catch (UnauthorizedAccessException e) { MessageBox.Show(this, Ui.Get(Msg.SettingsError) + "\n" + e.Message, "SubZir"); }
         };
@@ -129,6 +137,7 @@ partial class Launcher : Form {
         ZoneButtons();
         LoadCaptureSettings();
         RefreshLanguage();
+        WatchObsModule();
         FormClosing+=delegate {closing=true;StopOwned();};
     }
     Label LabelAt(Msg text,int x,int y,int w,int h){var l=new Label{AutoEllipsis=true};Caption(l,text);l.SetBounds(x,y,w,h);Controls.Add(l);return l;}
@@ -165,10 +174,12 @@ partial class Launcher : Form {
     async Task Start(bool live){
         if(busy)return;
         if(live && layout==null && roi==null){await Choose();if(roi==null || busy || closing)return;}
+        bool testZones=!live && layout!=null;
+        string args=layout==null?(live?"live":"demo"):(live?"zones":"zones-test")+(recording==null?"":" "+Quote(recording));
         stopping=false;Lock(true);line.Text="";SetStatus(live?Msg.Loading:Msg.Checking);
         var err=new StringBuilder();bool got=false;
         try{
-            using(var p=new Process{StartInfo=Info(Path.Combine(App,"subtitle-rs.exe"),live?(layout==null?"live":"zones"+(recording==null?"":" "+Quote(recording))):"demo")}){
+            using(var p=new Process{StartInfo=Info(Path.Combine(App,"subtitle-rs.exe"),args)}){
                 p.OutputDataReceived+=(o,e)=>{if(e.Data==null || closing)return;var message=e.Data;
                     BeginInvoke((Action)(()=>{if(closing || stopping || running!=p)return;try{
                         var row=new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(message);
@@ -178,15 +189,19 @@ partial class Launcher : Form {
                     }catch(Exception ex){SetStatus(Msg.ResponseError,ex.Message);}}));};
                 p.ErrorDataReceived+=(o,e)=>{if(e.Data==null)return;lock(err){err.AppendLine(e.Data);if(err.Length>32000)err.Remove(0,err.Length-16000);}
                     if(live && e.Data.StartsWith("Worker ") && !closing)BeginInvoke((Action)(()=>{if(running==p)SetStatus(Msg.Waiting);}));};
-                p.Start();running=p;engineJob=EngineJob.Attach(p);p.BeginOutputReadLine();p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
+                p.Start();running=p;engineJob=EngineJob.Attach(p);
+                Task<string> snapshot=null;
+                if(testZones)snapshot=p.StandardOutput.ReadToEndAsync();else p.BeginOutputReadLine();
+                p.BeginErrorReadLine();if(live){Caption(play,Msg.Stop);play.Enabled=true;}
                 await Task.Run(()=>p.WaitForExit());
                 if(closing)return;
                 if(p.ExitCode!=0 && !(live && statusMessage==Msg.Stopped)){
                     File.WriteAllText(Path.Combine(Data,"diagnostics.txt"),err.ToString(),Utf8);
                     string msg=err.ToString();
                     bool modelFailure=Ui.IsGpuModel(Ui.Model) && (msg.Contains("hy_worker.py") || msg.Contains("Hy-MT2 server:") || msg.Contains("Hy-MT2 runtime:") || msg.Contains("Translation worker stopped"));
-                    SetStatus(modelFailure?Msg.ModelError:msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live?Msg.CheckCamera:Msg.TestFailed);
-                }else if(!got && !live){SetStatus(Msg.TestEmpty);}
+                    SetStatus(modelFailure?Msg.ModelError:msg.Contains("Windows OCR")||msg.Contains("DEMO_OCR")?Msg.OcrMissing:live||testZones?Msg.CheckCamera:Msg.TestFailed);
+                }else if(testZones){await ShowZoneTest(await snapshot);}
+                else if(!got && !live){SetStatus(Msg.TestEmpty);}
                 else if(live && recording!=null && !stopping){SetStatus(Msg.Stopped," · "+Path.GetFileName(recording));}
                 running=null;
             }

@@ -53,6 +53,39 @@ partial class Launcher {
         finally{running=null;try{File.Delete(path);}catch(IOException){}if(!closing)Lock(false);}
     }
     string PublishZones(object values){
+        string marker;
+        return WriteZones(values,out marker);
+    }
+    static string ReadMarker(string path){
+        try{
+            using(var file=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete))
+            using(var reader=new StreamReader(file))return reader.ReadLine();
+        }catch(IOException){return null;}
+    }
+    async Task ShowZoneTest(string output){
+        var row=new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(output);
+        string marker;
+        line.Text=WriteZones(row["captions"],out marker);
+        string captionFile=Path.Combine(Data,"caption.txt");
+        try{
+            if(String.IsNullOrWhiteSpace(line.Text)){SetStatus(Msg.TestEmpty);return;}
+            string ack=Path.Combine(Data,"ack.txt");
+            var elapsed=Stopwatch.StartNew();
+            bool shown=false;
+            while(!closing && elapsed.ElapsedMilliseconds<1000){
+                shown=ReadMarker(ack)==marker;
+                if(shown)break;
+                await Task.Delay(40);
+            }
+            if(closing)return;
+            SetStatus(shown?Msg.TestSuccess:Msg.TestNoAck);
+            await Task.Delay(4000);
+        }finally{
+            if(!closing && ReadMarker(captionFile)==marker)
+                Ui.WriteText(captionFile,"stop-"+DateTime.UtcNow.Ticks+"\n");
+        }
+    }
+    string WriteZones(object values,out string marker){
         var captions=(System.Collections.IList)values;
         if(layout==null || captions.Count!=layout.Length)throw new InvalidDataException("Zone count mismatch");
         int next=1-imageSlot;
@@ -61,9 +94,10 @@ partial class Launcher {
         var occupied=new List<RectangleF>();
         var json=new JavaScriptSerializer();
         for(int i=0;i<layout.Length;i++){
-            if(!layout[i].Legend || captions[i]==null)continue;
+            if(!layout[i].UsesEntries || captions[i]==null)continue;
             legends[i]=json.ConvertToType<LegendSnapshot>(captions[i]);
             LegendOverlay.Protect(layout[i],legends[i],occupied);
+            if(layout[i].Output!=null && legends[i].rows.Length>0)occupied.Add(layout[i].Output.Bounds());
         }
         string path=Path.Combine(Data,"zones-"+next+".png");
         string tmp=path+"."+Guid.NewGuid().ToString("N");
@@ -83,7 +117,8 @@ partial class Launcher {
                 bmp.Save(tmp,ImageFormat.Png);
             }
             ReplaceFile(tmp,path);
-            File.WriteAllText(tmp,"zones-"+next+"-"+Guid.NewGuid().ToString("N")+"\n",Utf8);
+            marker="zones-"+next+"-"+Guid.NewGuid().ToString("N");
+            File.WriteAllText(tmp,marker+"\n",Utf8);
             ReplaceFile(tmp,Path.Combine(Data,"caption.txt"));imageSlot=next;
         }finally{if(File.Exists(tmp))File.Delete(tmp);}
         return String.Join(Environment.NewLine,display);

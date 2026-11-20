@@ -56,6 +56,8 @@ partial class Launcher {
                     }
                 }
                 var z=json.ConvertToType<Zone>(fields);
+                if(z.Output!=null && !z.Output.Valid()){z.Output=null;changed=true;}
+                if(z.Style!=null && !z.Style.Valid()){z.Style=null;changed=true;}
                 if(z.Valid())zones.Add(z);else changed=true;
             } catch(Exception e) {
                 if(!InvalidProfile(e))throw;
@@ -103,6 +105,7 @@ partial class Launcher {
         if(!File.Exists(SingleModeFile))Ui.WriteText(SingleModeFile,"single");
         layout=null;
         recording=null;
+        RefreshTestHint();
     }
     void SaveZones(Zone[] zones,string video) {
         if(zones==null || zones.Length<1 || zones.Length>8 || !zones.All(z=>z!=null && z.Valid()))
@@ -113,5 +116,6 @@ partial class Launcher {
         File.Delete(SingleModeFile);
         layout=zones;
         recording=video;
+        RefreshTestHint();
     }
 }

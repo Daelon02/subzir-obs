@@ -115,7 +115,13 @@ def main():
 
     recent_by_zone = {}
 
-    def translate(text, previous, hud=False, zone=None, legend=False, nearby=""):
+    def translate(text, previous, hud=False, zone=None, legend=False, nearby="", panel=False):
+        if panel and text.isupper() and len(text.split()) <= 5:
+            controls = ", ".join(label for label in nearby.splitlines() if label.isupper())
+            prompt = (f"Other actions available to the player here: {controls}. Translate only the following "
+                      f"in-world player interaction into natural {language}. Use a short verb in the infinitive "
+                      "for actions and a noun for people or things. No explanations.\n\n" + text)
+            return complete([{"role":"user","content":prompt}])
         if legend:
             others = ", ".join(nearby.splitlines())
             prompt = (f"You are localizing a game's interactive map. Write the shortest clear {language} "
@@ -185,7 +191,8 @@ def main():
         else:
             try:
                 result = translate(obj["text"], obj["previous"], obj.get("hud", False),
-                                   obj.get("zone"), obj.get("legend", False), obj.get("nearby", ""))
+                                   obj.get("zone"), obj.get("legend", False), obj.get("nearby", ""),
+                                   obj.get("panel", False))
             except ValueError:
                 if not obj.get("draft"):
                     raise

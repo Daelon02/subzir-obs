@@ -14,7 +14,7 @@ try {
     & "$PSScriptRoot/build-setup.ps1" -Destination $bundle -LauncherOnly
     Copy-Item -LiteralPath (Join-Path $target 'release/subtitle-rs.exe') -Destination "$bundle/app/"
     Copy-Item worker/worker.py,worker/hy_worker.py,worker/hy-languages.json "$bundle/app/"
-    Copy-Item obs/PS5-Subtitles.lua "$bundle/OBS/"
+    Copy-Item obs/PS5-Subtitles.lua,obs/SubZir-overlay.lua "$bundle/OBS/"
     Copy-Item docs/PLAYER-UA.txt "$bundle/README.txt"
     Copy-Item docs/PLAYER-EN.txt "$bundle/README.en.txt"
     Copy-Item docs/START-HERE.txt "$bundle/"

@@ -2,10 +2,12 @@
 
 2. Wait until the English text is visible in the game. Click “Zone editor · OBS” in SubZir. To practise with a recording, choose “Zone editor · video file”.
 
-3. Start with dialogue. Turn on “Draw OCR area” and drag a box around the English subtitles, leaving room for a second line. The yellow box marks the text to read. Turn drawing off and drag the sample translation to the position you want in OBS. “Width, %” controls wrapping.
+3. Start with dialogue. Turn on “Draw OCR area” and drag a box around the English subtitles, leaving room for a second line. The yellow box marks the text to read. Drag inside the blue box to move the translation. Drag an edge or corner to resize it. Choose “Text and outline…” to set the font, text color and outline color for this zone. Moving a map legend groups its entries in the blue box. “Reset output box” restores automatic placement.
 
 4. Click “Add zone” for an objective or a hint and draw its own reading area. For a whole map legend, enable “Map legend · automatic entries” and draw one box around all the labels and their buttons. Each detected entry gets its own translation. For a single menu item, select “HUD above original” and draw around just the text. Leave HUD off for regular dialogue. Select an existing entry in the “Zone” list to adjust it.
 
 Choose “Above original” for dialogue and “Below original” for an objective. The translation is centered on its own reading area. Choose “Outline color” in the subtitle appearance settings to change the outline in OBS.
 
 5. Click “Save zones”, then “Start translation”. All zones share one input frame and appear on one transparent layer in OBS. Their positions are saved for the next launch. You can add up to eight zones.
+
+Draw one yellow box around a menu, a group of controls or a message. Choose “Above each text block” or “Below each text block”. Each detected label gets its own translation, including labels on the same line. Wrapped message text stays together. “Test translation” shows the current frame in all active zones. Use “Restore default appearance” and then “Apply” to reset the selected zone’s text styling.

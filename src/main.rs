@@ -201,8 +201,11 @@ fn engine() -> Result<OcrEngine> {
     )?)
 }
 fn recognize_result(engine: &OcrEngine, pixels: &[u8]) -> Result<OcrResult> {
+    recognize_tile(engine, pixels, HEIGHT)
+}
+fn recognize_tile(engine: &OcrEngine, pixels: &[u8], height: i32) -> Result<OcrResult> {
     let buf = CryptographicBuffer::CreateFromByteArray(pixels)?;
-    let bmp = SoftwareBitmap::CreateCopyFromBuffer(&buf, BitmapPixelFormat::Gray8, WIDTH, HEIGHT)?;
+    let bmp = SoftwareBitmap::CreateCopyFromBuffer(&buf, BitmapPixelFormat::Gray8, WIDTH, height)?;
     Ok(engine.RecognizeAsync(&bmp)?.join()?)
 }
 fn recognize(engine: &OcrEngine, pixels: &[u8]) -> Result<String> {
@@ -677,7 +680,8 @@ fn run() -> Result<()> {
         ),
         Some("demo") => demo(&mut worker, &mut out),
         Some("live") => live(&mut worker, &mut out),
-        Some("zones") => zones::run(&mut worker, args.next()),
+        Some("zones") => zones::run(&mut worker, args.next(), zones::Mode::Live),
+        Some("zones-test") => return zones::run(&mut worker, args.next(), zones::Mode::Snapshot),
         _ => Err(AppError::Config("Use live or bench DIR".into())),
     };
     let _ = out.publish("");

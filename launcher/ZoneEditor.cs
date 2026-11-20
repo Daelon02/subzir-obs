@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
-enum CaptionAnchor { Manual, Above, Below }
+enum CaptionAnchor { Manual, Above, Below, UnderEach, AboveEach }
 
 sealed class Zone {
     public string Name, Text;
@@ -15,8 +15,12 @@ sealed class Zone {
     public bool Legend;
     public CaptionAnchor Anchor;
     public float HudOffsetX,HudOffsetY;
+    public ZoneOutput Output;
+    public SubtitleStyle Style;
+    internal bool AttachedPanel {get{return (Anchor==CaptionAnchor.UnderEach || Anchor==CaptionAnchor.AboveEach) && Output==null;}}
+    internal bool UsesEntries {get{return Legend || AttachedPanel;}}
     public Zone(){}
-    public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f && Math.Abs(HudOffsetX)<=1 && Math.Abs(HudOffsetY)<=1;}
+    public bool Valid(){return !String.IsNullOrWhiteSpace(Name) && Text!=null && Text.Length<=240 && Left>=0 && Top>=0 && W>=8 && H>=8 && W<=1280-Left && H<=720-Top && X>=0 && X<=1 && Y>=0 && Y<=1 && Width>=.12f && Width<=.94f && Math.Abs(HudOffsetX)<=1 && Math.Abs(HudOffsetY)<=1 && (Output==null||Output.Valid()) && (Style==null||Style.Valid());}
     public Zone(string name,string text,float x,float y,float width) {
         Name=name; Text=text; X=x; Y=y; Width=width;
         Left=(int)(x*1280);Top=(int)(y*720);W=(int)(width*1280);H=62;
@@ -32,10 +36,12 @@ sealed class Stage : Control {
     Bitmap photo;
 
     PointF grab;
-    PointF hudOrigin,hudOffsets;
+    RectangleF dragStart;
+    BoxEdge edge;
+    public event Action DrawCompleted,OutputChanged;
     bool dragging;
     const float W=1280,H=720,Pad=12;
-    static readonly Color Accent=Color.FromArgb(115,235,207);
+    static readonly Color Accent=Color.DeepSkyBlue;
 
     readonly Font label=new Font("Segoe UI",15,FontStyle.Bold,GraphicsUnit.Pixel);
 
@@ -49,7 +55,9 @@ sealed class Stage : Control {
         var next=new Bitmap(image);if(photo!=null)photo.Dispose();photo=next;Invalidate();
     }
     public static RectangleF DrawCaption(Graphics g,Zone z,string text,SubtitleStyle style){
-        if(z.Legend)return LegendOverlay.Preview(g,z,text,style);
+        style=z.Style??style;
+        if(z.UsesEntries)return LegendOverlay.Preview(g,z,text,style);
+        if(z.Output!=null)return z.Output.Paint(g,z,text,style);
         if(z.Hud)return DrawHud(g,z,text,style);
         float w=z.Width*W;
         using(var font=new Font(style.face,style.size*2f/3f,(FontStyle)(style.flags & 15),GraphicsUnit.Pixel))
@@ -77,10 +85,10 @@ sealed class Stage : Control {
     static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style){
         const float px=5,py=1,gap=2;
         string caption=text.ToUpperInvariant();
-        using(var font=new Font(style.face,Math.Max(10,Math.Min(24,style.size*.4f)),FontStyle.Bold,GraphicsUnit.Pixel))
+        using(var font=new Font(style.face,style.ZoneFontSize(zone),zone.Style==null?FontStyle.Bold:(FontStyle)(style.flags&15),GraphicsUnit.Pixel))
         using(var fmt=(StringFormat)StringFormat.GenericTypographic.Clone())
-        using(var back=new SolidBrush(Color.FromArgb(240,17,21,23)))
-        using(var ink=new SolidBrush(Color.FromArgb(255,212,70))){
+        using(var back=new SolidBrush(zone.Style==null?Color.FromArgb(240,17,21,23):Color.FromArgb(style.opacity*255/100,SubtitleStyle.Decode(style.background))))
+        using(var ink=new SolidBrush(zone.Style==null?Color.FromArgb(255,212,70):SubtitleStyle.Decode(style.color))){
             fmt.Alignment=StringAlignment.Center;
             var measured=g.MeasureString(caption.Length==0?" ":caption,font,(int)(zone.Width*W-2*px),fmt);
             float width=Math.Min(zone.Width*W,(float)Math.Ceiling(measured.Width)+2*px);
@@ -131,6 +139,14 @@ sealed class Stage : Control {
                 using(var pen=new Pen(Color.Gold,3){DashStyle=DashStyle.Dash})g.DrawRectangle(pen,rect);
             }
         }
+        RectangleF active;
+        if(guides && !DrawInput && Selected!=null && hit.TryGetValue(Selected,out active)){
+            using(var pen=new Pen(Accent,2))g.DrawRectangle(pen,active.X,active.Y,active.Width,active.Height);
+            float middleX=active.X+active.Width/2,middleY=active.Y+active.Height/2;
+            foreach(float x in new[]{active.Left,middleX,active.Right})
+                foreach(float y in new[]{active.Top,middleY,active.Bottom})
+                    if(x!=middleX || y!=middleY)g.FillRectangle(Brushes.DeepSkyBlue,x-3,y-3,6,6);
+        }
     }
     float ScaleFactor {get{return Math.Min(ClientSize.Width/W,ClientSize.Height/H);}}
     PointF Origin {get{return new PointF((ClientSize.Width-W*ScaleFactor)/2,(ClientSize.Height-H*ScaleFactor)/2);}}
@@ -141,32 +157,46 @@ sealed class Stage : Control {
         e.Graphics.SetClip(new RectangleF(0,0,W,H));Render(e.Graphics,Guides);
     }
     protected override void OnMouseDown(MouseEventArgs e){
-        base.OnMouseDown(e);if(!Guides||e.Button!=MouseButtons.Left)return;
+        base.OnMouseDown(e);if(!Guides||e.Button!=MouseButtons.Left||ScaleFactor<=0)return;
         {
             var p=ScenePoint(e.Location);
             if(DrawInput){if(p.X<0||p.Y<0||p.X>=W||p.Y>=H)return;anchor=tip=p;drawing=true;Capture=true;Invalidate();return;}
-            for(int i=Zones.Count-1;i>=0;i--){
-                var z=Zones[i];RectangleF r;if(!hit.TryGetValue(z,out r)||!r.Contains(p))continue;
-                Selected=z;grab=new PointF(p.X-r.X,p.Y-r.Y);dragging=!z.Legend;Capture=dragging;
-                hudOrigin=r.Location;hudOffsets=new PointF(z.HudOffsetX,z.HudOffsetY);
-                if(SelectionChanged!=null)SelectionChanged();Invalidate();break;
+            var z=Target(p,out dragStart,out edge);
+            if(z!=null){
+                Selected=z;grab=p;dragging=true;Capture=true;
+                if(SelectionChanged!=null)SelectionChanged();Invalidate();
             }
         }
     }
-    protected override void OnMouseMove(MouseEventArgs e){
-        base.OnMouseMove(e);var p=ScenePoint(e.Location);
+    Zone Target(PointF p,out RectangleF rect,out BoxEdge border){
+        border=BoxEdge.None;rect=RectangleF.Empty;
+        if(Selected!=null && hit.TryGetValue(Selected,out rect)){
+            border=ZoneOutput.EdgeAt(rect,p,5/ScaleFactor);
+            if(border!=BoxEdge.None || rect.Contains(p))return Selected;
+        }
+        for(int i=Zones.Count-1;i>=0;i--)
+            if(hit.TryGetValue(Zones[i],out rect) && rect.Contains(p))return Zones[i];
+        return null;
+    }
+    void UpdateGesture(PointF p){
         if(drawing){tip=new PointF(Math.Max(0,Math.Min(W,p.X)),Math.Max(0,Math.Min(H,p.Y)));Invalidate();return;}
-        RectangleF r;if(!dragging||!hit.TryGetValue(Selected,out r))return;
-        float x=Math.Max(0,Math.Min(W-r.Width,p.X-grab.X));
-        float y=Math.Max(0,Math.Min(H-r.Height,p.Y-grab.Y));
-        if(Selected.Hud || Selected.Anchor!=CaptionAnchor.Manual){
-            Selected.HudOffsetX=Math.Max(-1,Math.Min(1,hudOffsets.X+(x-hudOrigin.X)/W));
-            Selected.HudOffsetY=Math.Max(-1,Math.Min(1,hudOffsets.Y+(y-hudOrigin.Y)/H));
-        }else{Selected.X=x/W;Selected.Y=y/H;}
+        if(!dragging || (Selected.Output==null && Math.Abs(p.X-grab.X)+Math.Abs(p.Y-grab.Y)<2))return;
+        Selected.Output=ZoneOutput.Drag(dragStart,edge,grab,p);
+        if(OutputChanged!=null)OutputChanged();
         Invalidate();
     }
+    protected override void OnMouseMove(MouseEventArgs e){
+        base.OnMouseMove(e);if(ScaleFactor<=0)return;
+        var p=ScenePoint(e.Location);
+        if(dragging||drawing){UpdateGesture(p);return;}
+        RectangleF r;BoxEdge border;
+        Cursor=!Guides?Cursors.Default:DrawInput?Cursors.Cross:
+            Target(p,out r,out border)==null?Cursors.Default:ZoneOutput.CursorFor(border);
+    }
     protected override void OnMouseUp(MouseEventArgs e){
-        if(drawing){var r=InputRect();if(r.Width>=8&&r.Height>=8){Selected.Left=r.X;Selected.Top=r.Y;Selected.W=r.Width;Selected.H=r.Height;}}
+        if(e.Button!=MouseButtons.Left)return;
+        if(ScaleFactor>0)UpdateGesture(ScenePoint(e.Location));
+        if(drawing){var r=InputRect();if(r.Width>=8&&r.Height>=8){Selected.Left=r.X;Selected.Top=r.Y;Selected.W=r.Width;Selected.H=r.Height;if(DrawCompleted!=null)DrawCompleted();}}
         drawing=dragging=false;Capture=false;Invalidate();base.OnMouseUp(e);
     }
     protected override void OnMouseCaptureChanged(EventArgs e){if(!Capture){drawing=dragging=false;}base.OnMouseCaptureChanged(e);}
@@ -193,6 +223,7 @@ sealed class Editor : Form {
         var bottom=new FlowLayoutPanel{Dock=DockStyle.Bottom,AutoSize=true,Padding=new Padding(5)};
         var draw=new CheckBox{Text=T("Виділити текст у грі","Draw OCR area"),Appearance=Appearance.Button,AutoSize=true};
         draw.CheckedChanged+=delegate{stage.DrawInput=draw.Checked;stage.Guides=true;stage.Invalidate();};top.Controls.Add(draw);
+        stage.DrawCompleted+=delegate{draw.Checked=false;};
         var add=Btn(T("Додати зону","Add zone"),delegate{
             if(stage.Zones.Count>=8)return;
             int n=1;string name;do{name=T("Зона ","Zone ")+(n++);}while(stage.Zones.Any(item=>item.Name==name));
@@ -210,35 +241,69 @@ sealed class Editor : Form {
         clean.CheckedChanged+=delegate{if(clean.Checked)draw.Checked=false;stage.Guides=!clean.Checked;stage.Invalidate();};top.Controls.Add(clean);
         draw.CheckedChanged+=delegate{if(draw.Checked)clean.Checked=false;};
         top.Controls.Add(Btn(T("Зберегти зони","Save zones"),delegate{DialogResult=DialogResult.OK;}));
-        top.Controls.Add(Caption(T("Жовта рамка зчитує текст. Вимкни виділення, щоб перетягнути переклад.","Yellow box reads text. Turn off drawing to drag a translation.")));
+        top.Controls.Add(Caption(T("Жовта рамка зчитує текст. Перетягни синю рамку за середину, а край чи кут — для зміни розміру.","Yellow reads the game. Drag inside the blue box to move it, or drag an edge or corner to resize.")));
         bottom.Controls.Add(Caption(T("Зона","Zone")));bottom.Controls.Add(zones);bottom.Controls.Add(Caption(T("Приклад","Sample")));bottom.Controls.Add(sample);
         bottom.Controls.Add(Caption(T("Ширина, %","Width, %")));bottom.Controls.Add(width);
         var hud=new CheckBox{Text=T("HUD над оригіналом","HUD above original"),AutoSize=true,Margin=new Padding(8,8,2,0)};
         bottom.Controls.Add(hud);
         var legend=new CheckBox{Text=T("Легенда карти · автоматичні пункти","Map legend · automatic entries"),AutoSize=true,Margin=new Padding(8,8,2,0)};
         bottom.Controls.Add(legend);
-        var anchor=new ComboBox{DropDownStyle=ComboBoxStyle.DropDownList,Width=160};
-        anchor.Items.AddRange(new object[]{T("Вільна позиція","Free position"),T("Над оригіналом","Above original"),T("Під оригіналом","Below original")});
+        var anchor=new ComboBox{DropDownStyle=ComboBoxStyle.DropDownList,Width=180};
+        anchor.Items.AddRange(new object[]{T("Вільна позиція","Free position"),T("Над оригіналом","Above original"),T("Під оригіналом","Below original"),T("Під кожним написом","Below each text block"),T("Над кожним написом","Above each text block")});
         bottom.Controls.Add(anchor);
+        var restore=new Button{Text=T("Скинути рамку","Reset output box"),Height=32,AutoSize=true};
+        bottom.Controls.Add(restore);
+        bottom.Controls.Add(Btn(T("Текст і контур…","Text and outline…"),delegate{
+            var z=stage.Selected;
+            var defaults=SubtitleStyle.DefaultForZone(z);
+            using(var dialog=new StyleDialog((z.Style??defaults).Copy(),z.Text,defaults,z.Style==null)){
+                if(dialog.ShowDialog(this)==DialogResult.OK){
+                    z.Style=dialog.ResultStyle;stage.Invalidate();
+                }
+            }
+        }));
+        Action syncOutput=delegate{
+            var z=stage.Selected;
+            bool manual=z.Output!=null;
+            bool prior=syncing;syncing=true;
+            width.Minimum=manual?2:12;width.Maximum=manual?100:94;
+            width.Value=manual?Math.Max(width.Minimum,Math.Round(z.Output.W*100m/ZoneOutput.CanvasWidth)):(decimal)Math.Round(z.Width*100);
+            width.Enabled=!z.UsesEntries||manual;anchor.Enabled=true;hud.Enabled=!z.UsesEntries;
+            anchor.SelectedIndex=manual?0:(int)z.Anchor;restore.Enabled=manual;
+            syncing=prior;
+        };
+        restore.Click+=delegate{stage.Selected.Output=null;syncOutput();stage.Invalidate();};
+        stage.OutputChanged+=syncOutput;
         anchor.SelectedIndexChanged+=delegate{
             if(syncing || anchor.SelectedIndex<0)return;
+            stage.Selected.Output=null;
             stage.Selected.Anchor=(CaptionAnchor)anchor.SelectedIndex;
-            stage.Selected.HudOffsetX=stage.Selected.HudOffsetY=0;stage.Invalidate();
+            if(stage.Selected.Legend && stage.Selected.Anchor==CaptionAnchor.Above)stage.Selected.Anchor=CaptionAnchor.AboveEach;
+            if(stage.Selected.Legend && stage.Selected.Anchor==CaptionAnchor.Below)stage.Selected.Anchor=CaptionAnchor.UnderEach;
+            stage.Selected.HudOffsetX=stage.Selected.HudOffsetY=0;syncOutput();stage.Invalidate();
         };
         hud.CheckedChanged+=delegate{if(!syncing){stage.Selected.Hud=hud.Checked;stage.Invalidate();}};
         legend.CheckedChanged+=delegate{if(!syncing){
             stage.Selected.Legend=legend.Checked;
-            anchor.Enabled=hud.Enabled=width.Enabled=!legend.Checked;stage.Invalidate();
+            syncOutput();stage.Invalidate();
         }};
         foreach(var z in stage.Zones)zones.Items.Add(z);
         zones.SelectedIndexChanged+=delegate{
             var z=(Zone)zones.SelectedItem;stage.Selected=z;syncing=true;
-            sample.Text=z.Text;width.Value=(decimal)Math.Round(z.Width*100);hud.Checked=z.Hud;legend.Checked=z.Legend;
-            anchor.SelectedIndex=Enum.IsDefined(typeof(CaptionAnchor),z.Anchor)?(int)z.Anchor:0;
-            anchor.Enabled=hud.Enabled=width.Enabled=!z.Legend;syncing=false;stage.Invalidate();
+            sample.Text=z.Text;hud.Checked=z.Hud;legend.Checked=z.Legend;
+            syncOutput();syncing=false;stage.Invalidate();
         };
         sample.TextChanged+=delegate{if(!syncing){stage.Selected.Text=sample.Text;stage.Invalidate();}};
-        width.ValueChanged+=delegate{if(!syncing){stage.Selected.Width=(float)width.Value/100;stage.Invalidate();}};
+        width.ValueChanged+=delegate{
+            if(syncing)return;
+            var z=stage.Selected;
+            if(z.Output==null)z.Width=(float)width.Value/100;
+            else{
+                z.Output.W=(int)Math.Round(width.Value*ZoneOutput.CanvasWidth/100m);
+                z.Output.X=Math.Min(z.Output.X,ZoneOutput.CanvasWidth-z.Output.W);
+            }
+            stage.Invalidate();
+        };
         stage.SelectionChanged+=delegate{zones.SelectedItem=stage.Selected;};
         zones.SelectedIndex=0;stage.Dock=DockStyle.Fill;Controls.Add(stage);Controls.Add(top);Controls.Add(bottom);
     }
