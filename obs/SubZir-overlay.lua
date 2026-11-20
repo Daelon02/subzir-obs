@@ -69,8 +69,14 @@ local function zones_frame(slot)
         if not img then img=obs.obs_source_create("image_source",zone_title,cfg,nil) end
         if img then
             if not item then item=obs.obs_scene_add(scene,img) end
-            obs.obs_data_set_string(cfg,"file","");obs.obs_source_update(img,cfg)
-            obs.obs_data_set_string(cfg,"file",folder.."zones-"..slot..".png");obs.obs_source_update(img,cfg)
+            local name="zones-"..slot..".png"
+            local path=folder..name
+            -- OBS may skip a marker and see the same slot twice. Give the image
+            -- source a changed, valid path even then, without clearing its file.
+            local settings=obs.obs_source_get_settings(img)
+            if obs.obs_data_get_string(settings,"file")==path then path=folder.."./"..name end
+            obs.obs_data_release(settings)
+            obs.obs_data_set_string(cfg,"file",path);obs.obs_source_update(img,cfg)
             if item then place_layer(scene,current,item);obs.obs_sceneitem_set_visible(item,true) end
         end
         obs.obs_data_release(cfg)

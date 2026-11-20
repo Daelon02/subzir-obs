@@ -1,7 +1,8 @@
 use super::*;
 use std::collections::HashMap;
 
-const POSITION_SLOP: i32 = 3;
+const POSITION_SLOP: i32 = 6;
+const CLEAR_AFTER_MISSES: u8 = 3;
 const CACHE_LIMIT: usize = 256;
 const MAX_ITEMS: usize = 64;
 const NEW_LABELS_PER_FRAME: usize = 2;
@@ -48,6 +49,62 @@ struct Item {
 struct Scan {
     rows: Vec<Item>,
     bands: Vec<Bounds>,
+}
+
+impl Item {
+    fn matches(&self, other: &Self) -> bool {
+        self.text.eq_ignore_ascii_case(&other.text) && self.bounds.near(other.bounds)
+    }
+}
+
+// A single OCR miss must not erase a visible label. Keep the original bounds
+// while it is matched so OCR jitter cannot change the fitted font size.
+fn stable_rows(
+    shown: &[Item],
+    misses: &mut Vec<u8>,
+    current: &[Item],
+    previous: &[Item],
+) -> (Vec<Item>, bool, bool) {
+    let mut used = vec![false; current.len()];
+    let mut held = false;
+    let mut next = Vec::new();
+    for (old, count) in shown.iter().zip(misses.iter()) {
+        if let Some((index, _)) = current
+            .iter()
+            .enumerate()
+            .find(|(i, item)| !used[*i] && old.matches(item))
+        {
+            used[index] = true;
+            next.push((old.clone(), 0));
+        } else if count + 1 < CLEAR_AFTER_MISSES {
+            next.push((old.clone(), count + 1));
+        }
+    }
+    let mut partial = false;
+    for (_, item) in current.iter().enumerate().filter(|(i, _)| !used[*i]) {
+        if previous.iter().any(|p| p.matches(item)) {
+            // A confirmed replacement in this slot supersedes the held label.
+            next.retain(|(old, n)| *n == 0 || !old.bounds.overlaps_word(item.bounds));
+            next.push((item.clone(), 0));
+        } else {
+            partial = true;
+        }
+    }
+    next.sort_by_key(|(r, _)| (r.bounds.y, r.bounds.x));
+    misses.clear();
+    let rows = next
+        .into_iter()
+        .map(|(item, count)| {
+            held |= count > 0;
+            misses.push(count);
+            item
+        })
+        .collect();
+    (rows, partial, held)
+}
+
+fn similar_bands(left: &[Bounds], right: &[Bounds]) -> bool {
+    left.len() == right.len() && left.iter().all(|a| right.iter().any(|b| a.near(*b)))
 }
 
 fn is_button(word: &str) -> bool {
@@ -242,6 +299,7 @@ pub(super) struct Legend {
     previous_pixels: Vec<u8>,
     scan: Scan,
     shown: Vec<Item>,
+    misses: Vec<u8>,
     labels: Vec<String>,
     pending_context: bool,
     queued_labels: bool,
@@ -290,29 +348,23 @@ impl Legend {
             self.previous_pixels.extend_from_slice(pixels);
         }
         let current = if changed { &fresh } else { &self.scan };
-        let mut next = Vec::new();
-        for item in &current.rows {
-            let matches = |v: &&Item| v.text == item.text && v.bounds.near(item.bounds);
-            if let Some(old) = self.shown.iter().find(matches) {
-                next.push(old.clone());
-            } else if !changed || self.scan.rows.iter().any(|v| matches(&v)) {
-                next.push(item.clone());
-            }
-        }
-        let partial = next.len() != current.rows.len();
+        let (next, partial, held) = stable_rows(
+            &self.shown,
+            &mut self.misses,
+            &current.rows,
+            &self.scan.rows,
+        );
         let settled = self.pending_context && !partial;
         self.pending_context = partial;
-        let bands_changed = current.bands.len() != self.bands.len()
-            || current
-                .bands
-                .iter()
-                .zip(&self.bands)
-                .any(|(a, b)| !a.near(*b));
         let rows_changed = next.len() != self.shown.len()
             || next
                 .iter()
                 .zip(&self.shown)
                 .any(|(a, b)| a.text != b.text || a.bounds != b.bounds);
+        let bands_changed = !held
+            && !partial
+            && (rows_changed || similar_bands(&current.bands, &self.scan.bands))
+            && !similar_bands(&current.bands, &self.bands);
         if bands_changed {
             self.bands.clone_from(&current.bands);
         }
@@ -396,6 +448,34 @@ mod tests {
         }
     }
 
+    #[test]
+    fn hud_holds_geometry_and_short_dropouts_but_replaces_or_clears_confirmed_rows() {
+        let original = word("FLIP", 80, 30);
+        let shifted = word("Flip", 84, 31);
+        let new = word("READ", 80, 35);
+        let mut shown = vec![original.clone()];
+        let mut misses = vec![0];
+        let mut previous = vec![original.clone()];
+        for (frame, expected) in [
+            (vec![shifted], Some("FLIP")),
+            (vec![], Some("FLIP")),
+            (vec![], Some("FLIP")),
+            (vec![original.clone()], Some("FLIP")),
+            (vec![new.clone()], Some("FLIP")),
+            (vec![new], Some("READ")),
+            (vec![], Some("READ")),
+            (vec![], Some("READ")),
+            (vec![], None),
+        ] {
+            (shown, _, _) = stable_rows(&shown, &mut misses, &frame, &previous);
+            assert_eq!(shown.len(), usize::from(expected.is_some()));
+            assert_eq!(shown.first().map(|row| row.text.as_str()), expected);
+            if expected == Some("FLIP") {
+                assert_eq!(shown[0].bounds, original.bounds);
+            }
+            previous = frame;
+        }
+    }
     #[test]
     fn separates_columns_and_omits_buttons_while_retaining_words_and_numbers() {
         let mut scan = Scan::default();
