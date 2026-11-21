@@ -10,7 +10,7 @@ use std::{
     env, fs,
     io::{self, BufRead, BufReader, Read, Write},
     path::{Path, PathBuf},
-    process::{Child, ChildStdin, ChildStdout, Command, Stdio},
+    process::{Child, ChildStdin, Command, Stdio},
     sync::mpsc::{self, Receiver},
     thread,
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
@@ -86,7 +86,7 @@ fn gguf_path(app: &Path, model: &str) -> Result<PathBuf> {
     Ok(app.join("models").join(file))
 }
 
-fn start_hy(app: &Path, model: &str) -> Result<(OwnedChild, String, String)> {
+fn start_hy(app: &Path, model: &str, parallel: bool) -> Result<(OwnedChild, String, String)> {
     use std::net::{Ipv4Addr, TcpListener};
     let address = TcpListener::bind((Ipv4Addr::LOCALHOST, 0))?.local_addr()?;
     let key = CryptographicBuffer::EncodeToHexString(&CryptographicBuffer::GenerateRandom(32)?)?
@@ -112,9 +112,9 @@ fn start_hy(app: &Path, model: &str) -> Result<(OwnedChild, String, String)> {
             "-ngl",
             "99",
             "-c",
-            "1024",
+            if parallel { "2048" } else { "1024" },
             "-np",
-            "1",
+            if parallel { "2" } else { "1" },
             "--no-webui",
             "--no-warmup",
         ])
@@ -127,20 +127,35 @@ fn start_hy(app: &Path, model: &str) -> Result<(OwnedChild, String, String)> {
 struct Translator {
     _process: OwnedChild,
     hy_server: Option<OwnedChild>,
+    hud_worker: Option<Box<Translator>>,
+    hud_admission: Option<Receiver<()>>,
     input: ChildStdin,
-    output: BufReader<ChildStdout>,
+    output: Receiver<Result<Value>>,
+    preview_in_flight: bool,
+    early_zones: bool,
+    hud_batch: bool,
 }
 impl Translator {
-    fn start() -> Result<Self> {
+    fn start(parallel: bool) -> Result<Self> {
         let path = PathBuf::from(setting("SUB_WORKER")?);
-        let mut command = Command::new(setting("SUB_PYTHON")?);
+        let python = setting("SUB_PYTHON")?;
+        let mut command = Command::new(&python);
         command.arg("-u");
+        let mut hud = None;
         let model = env::var("SUB_MODEL").unwrap_or_default();
         let hy_server = if model == "hy" || model.starts_with(CUSTOM_PREFIX) {
             let app = path
                 .parent()
                 .ok_or_else(|| AppError::Config("Missing app directory".into()))?;
-            let (server, url, key) = start_hy(app, &model)?;
+            let (server, url, key) = start_hy(app, &model, parallel)?;
+            if parallel {
+                let mut side = Command::new(&python);
+                side.arg("-u")
+                    .arg(app.join("hy_worker.py"))
+                    .env("SUB_HY_URL", &url)
+                    .env("SUB_HY_KEY", &key);
+                hud = Some(Box::new(Self::connect(side, None)?));
+            }
             command
                 .arg(app.join("hy_worker.py"))
                 .env("SUB_HY_URL", url)
@@ -150,6 +165,11 @@ impl Translator {
             command.arg(path);
             None
         };
+        let mut main = Self::connect(command, hy_server)?;
+        main.hud_worker = hud;
+        Ok(main)
+    }
+    fn connect(mut command: Command, hy_server: Option<OwnedChild>) -> Result<Self> {
         let mut p = OwnedChild(
             command
                 .stdin(Stdio::piped())
@@ -157,23 +177,41 @@ impl Translator {
                 .spawn()?,
         );
         let input = pipe(p.0.stdin.take())?;
-        let output = BufReader::new(pipe(p.0.stdout.take())?);
+        let stream = BufReader::new(pipe(p.0.stdout.take())?);
+        let (send, output) = mpsc::sync_channel(1);
+        thread::spawn(move || {
+            for line in stream.lines() {
+                let response = line
+                    .map_err(AppError::from)
+                    .and_then(|s| Ok(serde_json::from_str(&s)?));
+                let failed = response.is_err();
+                if send.send(response).is_err() || failed {
+                    break;
+                }
+            }
+        });
+        let early_zones = hy_server.is_some() && env::var("SUB_EARLY").as_deref() != Ok("0");
         let mut worker = Self {
             _process: p,
             hy_server,
+            hud_worker: None,
+            hud_admission: None,
             input,
             output,
+            preview_in_flight: false,
+            early_zones,
+            hud_batch: false,
         };
         let meta = worker.line()?;
+        worker.hud_batch =
+            meta["hud_batch"] == true && env::var("SUB_HUD_BATCH").as_deref() != Ok("0");
         eprintln!("Worker {meta}");
         Ok(worker)
     }
     fn line(&mut self) -> Result<Value> {
-        let mut s = String::new();
-        if self.output.read_line(&mut s)? == 0 {
-            return Err(AppError::Config("Translation worker stopped".into()));
-        }
-        Ok(serde_json::from_str(&s)?)
+        self.output
+            .recv()
+            .map_err(|_| AppError::Config("Translation worker stopped".into()))?
     }
     fn translate(&mut self, s: &str) -> Result<String> {
         self.request(&json!(s))
@@ -186,10 +224,77 @@ impl Translator {
             .ok_or_else(|| AppError::Config("Empty translation".into()))
     }
     fn exchange(&mut self, message: &Value) -> Result<Value> {
+        self.exchange_progress(message, |_| Ok(()))
+    }
+    fn exchange_progress(
+        &mut self,
+        message: &Value,
+        mut progress: impl FnMut(&Value) -> Result<()>,
+    ) -> Result<Value> {
+        if let Some(admission) = self.hud_admission.take() {
+            // Dialogue releases this frame when it has published its updates.
+            // Long speech must not monopolize both inference slots.
+            const MAX_DIALOGUE_HEAD_START: Duration = Duration::from_millis(200);
+            let _ = admission.recv_timeout(MAX_DIALOGUE_HEAD_START);
+        }
+        if self.preview_in_flight {
+            if message["accept_preview"] == true {
+                self.read_progress(message, &mut progress)?;
+            } else {
+                self.read_progress(message, &mut |_| Ok(()))?;
+            }
+            self.preview_in_flight = false;
+        }
+        self.send(message)?;
+        self.read_progress(message, &mut progress)
+    }
+    fn read_progress(
+        &mut self,
+        message: &Value,
+        progress: &mut impl FnMut(&Value) -> Result<()>,
+    ) -> Result<Value> {
+        loop {
+            let value = self.line()?;
+            if value.get("sentence").is_some() {
+                if message["stream_sentence"] == true
+                    && ["zone", "text", "previous"]
+                        .iter()
+                        .all(|key| value[key] == message[key])
+                {
+                    progress(&value)?;
+                }
+            } else if value.get("row").is_some() {
+                progress(&value)?;
+            } else {
+                return Ok(value);
+            }
+        }
+    }
+    fn start_zone_preview(&mut self, message: &Value) -> Result<bool> {
+        if self.preview_in_flight {
+            loop {
+                match self.output.try_recv() {
+                    Ok(reply) => {
+                        if reply?.get("sentence").is_none() {
+                            break;
+                        }
+                    }
+                    Err(mpsc::TryRecvError::Empty) => return Ok(false),
+                    Err(mpsc::TryRecvError::Disconnected) => {
+                        return Err(AppError::Config("Translation worker stopped".into()))
+                    }
+                }
+            }
+        }
+        self.send(message)?;
+        self.preview_in_flight = true;
+        Ok(true)
+    }
+    fn send(&mut self, message: &Value) -> Result<()> {
         serde_json::to_writer(&mut self.input, message)?;
         writeln!(self.input)?;
         self.input.flush()?;
-        self.line()
+        Ok(())
     }
 }
 fn engine() -> Result<OcrEngine> {
@@ -666,7 +771,10 @@ fn run() -> Result<()> {
     let mut args = env::args().skip(1);
     let mode = args.next();
     let mut out = Overlay::new()?;
-    let mut worker = Translator::start()?;
+    let parallel = mode.as_deref() == Some("zones")
+        && env::var("SUB_PARALLEL_ZONES").as_deref() == Ok("1")
+        && zones::mixed_layout()?;
+    let mut worker = Translator::start(parallel)?;
     out.publish("")?;
     let result = match mode.as_deref() {
         Some("bench") => bench(

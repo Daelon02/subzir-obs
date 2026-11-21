@@ -1,5 +1,8 @@
 use super::*;
 use std::fmt::Write as _;
+use std::ops::Range;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
 
 const CANVAS_W: u32 = 1280;
 const CANVAS_H: u32 = 720;
@@ -19,6 +22,7 @@ struct Zone {
     recheck_mask: bool,
     reading: String,
     upper_end: Option<usize>,
+    preview_reading: Option<String>,
 }
 impl Zone {
     fn load(row: &Value) -> Result<Self> {
@@ -56,6 +60,7 @@ impl Zone {
             recheck_mask: false,
             reading: String::new(),
             upper_end: None,
+            preview_reading: None,
         })
     }
     fn scaled(&self) -> [i32; 2] {
@@ -156,6 +161,116 @@ impl Zone {
         }
     }
 }
+
+impl Zone {
+    fn dialogue(&self) -> bool {
+        !self.hud && self.legend.is_none()
+    }
+    fn update(
+        &mut self,
+        ocr: &OcrEngine,
+        pixels: &[u8],
+        worker: &mut Translator,
+        i: usize,
+        timing: (Mode, Instant),
+        mut progress: impl FnMut(Value) -> Result<()>,
+    ) -> Result<Option<Value>> {
+        let (mode, now) = timing;
+        let scaled = self.scaled();
+        if let Some(legend) = self.legend.as_mut() {
+            return legend.observe(
+                ocr,
+                pixels,
+                (scaled, self.crop),
+                worker,
+                (i, mode == Mode::Live),
+                &mut progress,
+            );
+        }
+        let observed = self.observe(ocr, pixels, now)?;
+        if self
+            .preview_reading
+            .as_ref()
+            .is_some_and(|text| text != &self.reading)
+        {
+            self.preview_reading = None;
+        }
+        let upper_end = match &observed {
+            Some((_, Card::Appended(end))) => Some(*end),
+            _ => None,
+        };
+        let ready = match observed {
+            Some((raw, _)) if self.hud || mode == Mode::Snapshot => Some((raw, String::new())),
+            Some((raw, kind)) => self.history.present(raw, now, kind),
+            None => self.history.due(&self.reading, now),
+        };
+        let Some((en, previous)) = ready else {
+            let early = mode == Mode::Live
+                && !self.hud
+                && worker.early_zones
+                && self.preview_reading.is_none();
+            if let Some(raw) = self
+                .stable
+                .first_candidate()
+                .filter(|s| early && *s == self.reading)
+            {
+                let append = self
+                    .upper_end
+                    .filter(|&end| raw.get(..end) == self.stable.shown_text());
+                let pair = match append {
+                    Some(end) => Some((raw.to_owned(), self.history.append_context(raw, end, now))),
+                    None => self.history.present(raw.to_owned(), now, Card::Draft),
+                };
+                if let Some((source, context)) = pair {
+                    let target = self.shown.target(&source, append);
+                    if worker.start_zone_preview(
+                        &json!({"zone":i,"text":target,"previous":context,"zone_preview":true,"stream_sentence":target==source}),
+                    )? {
+                        self.preview_reading = Some(raw.to_owned());
+                    }
+                }
+            }
+            return Ok(None);
+        };
+        let allow_preview = self.preview_reading.take().is_some();
+        let target = self.shown.target(&en, upper_end);
+        let mut first = None;
+        let translated = if target.is_empty() {
+            String::new()
+        } else if mode == Mode::Live && self.dialogue() && target == en {
+            let reply = worker.exchange_progress(
+                &json!({"zone":i,"text":target,"previous":previous,
+                "stream_sentence":true,"accept_preview":allow_preview}),
+                |packet| {
+                    if let Some(prefix) = packet["sentence"].as_str() {
+                        first = Some(prefix.to_owned());
+                        progress(json!({"first":prefix,"rest":""}))?;
+                    }
+                    Ok(())
+                },
+            )?;
+            reply
+                .as_str()
+                .filter(|s| !s.is_empty())
+                .map(str::to_owned)
+                .ok_or_else(|| AppError::Config("Empty translation".into()))?
+        } else {
+            worker.request(&json!({"zone":i,"text":target,"previous":previous,"hud":self.hud,"accept_preview":allow_preview}))?
+        };
+        let uk = self.shown.assemble(target, &en, translated);
+
+        let caption = first
+            .as_deref()
+            .and_then(|prefix| {
+                uk.strip_prefix(prefix)
+                    .map(|tail| json!({"first":prefix,"rest":tail.trim_start()}))
+            })
+            .unwrap_or_else(|| json!(uk));
+        self.shown.remember(en, uk);
+        Ok(Some(caption))
+    }
+}
+
 fn filter(zones: &[Zone]) -> String {
     let mut graph = format!("fps={},split={}", capture_fps(), zones.len());
     for i in 0..zones.len() {
@@ -192,14 +307,162 @@ pub(super) enum Mode {
     Live,
     Snapshot,
 }
-pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode) -> Result<()> {
+fn publish(i: usize, captions: &[Value], zone: &Zone) {
+    if zone.legend.is_some() {
+        println!("{}", json!({"zone":i,"captions":captions}));
+    } else {
+        println!(
+            "{}",
+            json!({"zone":i,"en":zone.shown.source(),"uk":zone.shown.translation(),"captions":captions})
+        );
+    }
+}
+struct LaneZone {
+    index: usize,
+    pixels: Range<usize>,
+    zone: Zone,
+}
+struct LaneFrame {
+    pixels: Arc<Vec<u8>>,
+    priority: Priority,
+}
+// Suppress intermediate lines when a newer capture already shows a different panel.
+fn panel_stamp(pixels: &[u8]) -> u64 {
+    pixels.iter().step_by(13).fold(1u64, |hash, p| {
+        hash.wrapping_mul(31).wrapping_add((p >> 5) as u64)
+    })
+}
+enum Priority {
+    Dialogue(mpsc::SyncSender<()>),
+    Hud(Receiver<()>),
+}
+fn process_lane(
+    mut zones: Vec<LaneZone>,
+    frames: Receiver<LaneFrame>,
+    worker: &mut Translator,
+    captions: &Mutex<Vec<Value>>,
+    latest: &[AtomicU64],
+) -> Result<()> {
+    let ocr = engine()?;
+    for frame in frames {
+        let release = match frame.priority {
+            Priority::Dialogue(tx) => Some(tx),
+            Priority::Hud(rx) => {
+                worker.hud_admission = Some(rx);
+                None
+            }
+        };
+        for z in &mut zones {
+            if let Some(value) = z.zone.update(
+                &ocr,
+                &frame.pixels[z.pixels.clone()],
+                worker,
+                z.index,
+                (Mode::Live, Instant::now()),
+                |partial| {
+                    if panel_stamp(&frame.pixels[z.pixels.clone()])
+                        == latest[z.index].load(Ordering::Relaxed)
+                    {
+                        let mut snapshot = captions
+                            .lock()
+                            .map_err(|_| AppError::Config("Zone publisher stopped".into()))?;
+                        snapshot[z.index] = partial;
+                        println!("{}", json!({"zone":z.index,"captions":*snapshot}));
+                    }
+                    Ok(())
+                },
+            )? {
+                let mut snapshot = captions
+                    .lock()
+                    .map_err(|_| AppError::Config("Zone publisher stopped".into()))?;
+                snapshot[z.index] = value;
+                publish(z.index, &snapshot, &z.zone);
+            }
+        }
+        if let Some(release) = release {
+            let _ = release.try_send(());
+        }
+    }
+    Ok(())
+}
+fn run_lanes(
+    zones: Vec<Zone>,
+    frames: Receiver<io::Result<Vec<u8>>>,
+    dialogue: &mut Translator,
+    hud: &mut Translator,
+    captions: Vec<Value>,
+    latest: &[AtomicU64],
+) -> Result<()> {
+    let captions = Mutex::new(captions);
+    let mut offset = 0;
+    let (speech, controls) = zones
+        .into_iter()
+        .enumerate()
+        .map(|(index, zone)| {
+            let start = offset;
+            offset += (WIDTH * zone.tile_height()) as usize;
+            LaneZone {
+                index,
+                pixels: start..offset,
+                zone,
+            }
+        })
+        .partition(|z| z.zone.dialogue());
+    let (to_dialogue, dialogue_frames) = mpsc::sync_channel(1);
+    let (to_hud, hud_frames) = mpsc::sync_channel(1);
+    thread::scope(|scope| {
+        let front =
+            scope.spawn(|| process_lane(speech, dialogue_frames, dialogue, &captions, latest));
+        let background = scope.spawn(|| process_lane(controls, hud_frames, hud, &captions, latest));
+        for frame in frames {
+            let frame = match frame {
+                Ok(f) => Arc::new(f),
+                Err(e) => {
+                    drop((to_dialogue, to_hud));
+                    return Err(e.into());
+                }
+            };
+            // A full HUD queue must never slow capture or block a ready dialogue frame.
+            let (release, admission) = mpsc::sync_channel(1);
+            if matches!(
+                to_dialogue.try_send(LaneFrame {
+                    pixels: Arc::clone(&frame),
+                    priority: Priority::Dialogue(release)
+                }),
+                Err(mpsc::TrySendError::Disconnected(_))
+            ) || matches!(
+                to_hud.try_send(LaneFrame {
+                    pixels: frame,
+                    priority: Priority::Hud(admission)
+                }),
+                Err(mpsc::TrySendError::Disconnected(_))
+            ) {
+                break;
+            }
+        }
+        drop((to_dialogue, to_hud));
+        for task in [front, background] {
+            task.join()
+                .map_err(|_| AppError::Config("Zone worker stopped".into()))??;
+        }
+        Ok(())
+    })
+}
+fn load_zones() -> Result<Vec<Zone>> {
     let path = PathBuf::from(setting("SUB_RUNTIME")?).join("zones.json");
     let config: Value = serde_json::from_slice(&fs::read(path)?)?;
     let rows = config
         .as_array()
         .filter(|a| (1..=MAX_ZONES).contains(&a.len()))
         .ok_or_else(|| AppError::Config("Choose 1–8 zones".into()))?;
-    let mut zones = rows.iter().map(Zone::load).collect::<Result<Vec<_>>>()?;
+    rows.iter().map(Zone::load).collect()
+}
+pub(super) fn mixed_layout() -> Result<bool> {
+    let zones = load_zones()?;
+    Ok(zones.iter().any(Zone::dialogue) && zones.iter().any(|z| !z.dialogue()))
+}
+pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode) -> Result<()> {
+    let mut zones = load_zones()?;
     let mut cmd = Command::new("ffmpeg");
     cmd.args([
         "-nostdin",
@@ -249,6 +512,25 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode
         .iter()
         .map(|z| (WIDTH * z.tile_height()) as usize)
         .sum();
+    let latest: Arc<Vec<AtomicU64>> =
+        Arc::new(zones.iter().map(|_| AtomicU64::default()).collect());
+    let stamps = Arc::clone(&latest);
+    let mut start = 0;
+    let panels: Vec<_> = zones
+        .iter()
+        .enumerate()
+        .filter_map(|(i, z)| {
+            let end = start + (WIDTH * z.tile_height()) as usize;
+            let span = start..end;
+            start = end;
+            (mode == Mode::Live
+                && (z.dialogue()
+                    || (z.legend.is_some()
+                        && worker.hud_batch
+                        && env::var("SUB_HUD_STREAM").as_deref() != Ok("0"))))
+            .then_some((i, span))
+        })
+        .collect();
     // Drain the device even while inference is busy. Each message contains every ROI from one frame.
     thread::spawn(move || {
         let mut buffer = vec![0; bytes];
@@ -258,6 +540,9 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode
                     let _ = send.send(Err(e));
                 }
                 break;
+            }
+            for (i, span) in &panels {
+                stamps[*i].store(panel_stamp(&buffer[span.clone()]), Ordering::Relaxed);
             }
             match send.try_send(Ok(buffer)) {
                 Ok(()) => buffer = vec![0; bytes],
@@ -287,7 +572,16 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode
             (i, start..offset)
         })
         .collect();
-    order.sort_by_key(|(i, _)| zones[*i].legend.is_some());
+    order.sort_by_key(|(i, _)| (!zones[*i].dialogue(), zones[*i].legend.is_some()));
+    if let Some(mut hud) = worker.hud_worker.take() {
+        run_lanes(zones, frames, worker, &mut hud, captions, &latest)?;
+        let status = capture.0.wait()?;
+        return if status.success() && recording.is_some() {
+            Ok(())
+        } else {
+            Err(AppError::Config(format!("Capture ended ({status})")))
+        };
+    }
     let snapshot = if mode == Mode::Snapshot {
         Some(
             frames
@@ -313,44 +607,18 @@ pub(super) fn run(worker: &mut Translator, recording: Option<String>, mode: Mode
         for &(i, ref span) in &order {
             let zone = &mut zones[i];
             let pixels = &frame[span.start..span.end];
-            let scaled = zone.scaled();
-            if let Some(legend) = zone.legend.as_mut() {
-                if let Some(snapshot) =
-                    legend.observe(&ocr, pixels, scaled, zone.crop, worker, i)?
-                {
-                    captions[i] = snapshot;
-                    if mode == Mode::Live {
-                        println!("{}", json!({"zone":i,"captions":captions}));
-                    }
+            if let Some(value) = zone.update(&ocr, pixels, worker, i, (mode, now), |partial| {
+                if panel_stamp(pixels) == latest[i].load(Ordering::Relaxed) {
+                    captions[i] = partial;
+                    println!("{}", json!({"zone":i,"captions":captions}));
                 }
-                continue;
+                Ok(())
+            })? {
+                captions[i] = value;
+                if mode == Mode::Live {
+                    publish(i, &captions, zone);
+                }
             }
-            let observed = zone.observe(&ocr, pixels, now)?;
-            let upper_end = match &observed {
-                Some((_, Card::Appended(end))) => Some(*end),
-                _ => None,
-            };
-            let ready = match observed {
-                Some((raw, _)) if zone.hud || mode == Mode::Snapshot => Some((raw, String::new())),
-                Some((raw, kind)) => zone.history.present(raw, now, kind),
-                None => zone.history.due(&zone.reading, now),
-            };
-            let Some((en, previous)) = ready else {
-                continue;
-            };
-            let target = zone.shown.target(&en, upper_end);
-            let translated = if target.is_empty() {
-                String::new()
-            } else {
-                worker
-                    .request(&json!({"zone":i,"text":target,"previous":previous,"hud":zone.hud}))?
-            };
-            let uk = zone.shown.assemble(target, &en, translated);
-            captions[i] = json!(uk);
-            if mode == Mode::Live {
-                println!("{}", json!({"zone":i,"en":en,"uk":uk,"captions":captions}));
-            }
-            zone.shown.remember(en, uk);
         }
         if mode == Mode::Snapshot {
             if confirmed_frame

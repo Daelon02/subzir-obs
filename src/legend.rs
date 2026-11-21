@@ -6,6 +6,9 @@ const CLEAR_AFTER_MISSES: u8 = 3;
 const CACHE_LIMIT: usize = 256;
 const MAX_ITEMS: usize = 64;
 const NEW_LABELS_PER_FRAME: usize = 2;
+const MAX_BATCH_LABELS: usize = 4;
+const MAX_LABEL_WORDS: usize = 5;
+const MAX_LABEL_BYTES: usize = 64;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct Bounds {
@@ -321,11 +324,13 @@ impl Legend {
         &mut self,
         ocr: &OcrEngine,
         pixels: &[u8],
-        tile: [i32; 2],
-        crop: [u32; 4],
+        geometry: ([i32; 2], [u32; 4]),
         worker: &mut Translator,
-        zone: usize,
+        publication: (usize, bool),
+        progress: &mut impl FnMut(Value) -> Result<()>,
     ) -> Result<Option<Value>> {
+        let (tile, crop) = geometry;
+        let (zone, live) = publication;
         let changed = self.previous_pixels != pixels;
         let mut fresh = Scan::default();
         if changed {
@@ -375,8 +380,7 @@ impl Legend {
             return Ok(None);
         }
         self.queued_labels = false;
-        let mut budget = NEW_LABELS_PER_FRAME;
-        let mut rows = Vec::new();
+        let mut pending = Vec::new();
         let mut labels = Vec::with_capacity(next.len());
         for (i, item) in next.iter().enumerate() {
             let previous_label = self
@@ -391,9 +395,6 @@ impl Legend {
             // Keep unaffected labels on screen while a changed control is being confirmed.
             if partial && !previous_label.is_empty() {
                 labels.push(previous_label.to_owned());
-                rows.push(
-                    json!({"bounds":item.bounds.array(),"source":item.text,"text":previous_label}),
-                );
                 continue;
             }
             let nearby = next[i.saturating_sub(2)..(i + 3).min(next.len())]
@@ -408,28 +409,84 @@ impl Legend {
             let key = (item.text.to_owned(), nearby);
             let label = if let Some(value) = self.cache.get(&key) {
                 value.to_owned()
-            } else if budget == 0 {
-                self.queued_labels = true;
-                previous_label.to_owned()
             } else {
-                budget -= 1;
-                let request = json!({"zone":zone,"text":item.text,"previous":"","hud":true,"legend":!self.panel,"panel":self.panel,"nearby":key.1});
-                let translated = worker.request(&request)?;
-                if self.cache.len() >= CACHE_LIMIT {
-                    self.cache.clear();
-                }
-                self.cache.insert(key, translated.to_owned());
-                translated
+                pending.push((i, key));
+                previous_label.to_owned()
             };
-            rows.push(json!({"bounds":item.bounds.array(),"source":item.text,"text":label}));
             labels.push(label);
+        }
+        let count = if worker.hud_batch {
+            pending
+                .iter()
+                .take(MAX_BATCH_LABELS)
+                .take_while(|(_, (s, _))| {
+                    s.len() <= MAX_LABEL_BYTES
+                        && s.split_whitespace().count() <= MAX_LABEL_WORDS
+                        && !s.ends_with(['.', '!', '?'])
+                })
+                .count()
+        } else {
+            0
+        };
+        let batch: Option<Vec<String>> = if count >= 2 {
+            let sources: Vec<_> = pending[..count].iter().map(|(_, (s, _))| s).collect();
+            let contexts: Vec<_> = pending[..count].iter().map(|(_, (_, ctx))| ctx).collect();
+            let mut provisional = labels.clone();
+            let mut displayed = false;
+            let response = worker.exchange_progress(
+                &json!({"hud_labels":sources,"map":!self.panel,"zone":zone,"contexts":contexts,"stream":live}),
+                |event| {
+                    if let (Some(index), Some(text)) = (event["row"].as_u64().and_then(|n| usize::try_from(n).ok()),
+                                                        event["text"].as_str().filter(|s| !s.is_empty())) {
+                        if let Some((i, _)) = pending[..count].get(index) {
+                            provisional[*i] = text.to_owned();
+                            progress(overlay(&next, &provisional, &self.bands))?;
+                            displayed = true;
+                        }
+                    }
+                    Ok(())
+                })?;
+            if response.is_null() && displayed {
+                progress(overlay(&next, &labels, &self.bands))?;
+            }
+            serde_json::from_value(response)
+                .ok()
+                .filter(|out: &Vec<String>| {
+                    out.len() == count && out.iter().all(|s| !s.trim().is_empty())
+                })
+        } else {
+            None
+        };
+        let limit = batch.as_ref().map(Vec::len).unwrap_or(NEW_LABELS_PER_FRAME);
+        self.queued_labels = pending.len() > limit;
+        for (n, (i, key)) in pending.into_iter().take(limit).enumerate() {
+            let translated = if let Some(out) = &batch {
+                out[n].to_owned()
+            } else if let Some(value) = self.cache.get(&key) {
+                value.to_owned()
+            } else {
+                worker.request(&json!({"zone":zone,"text":key.0,"previous":"","hud":true,
+                    "legend":!self.panel,"panel":self.panel,"nearby":key.1}))?
+            };
+            if self.cache.len() >= CACHE_LIMIT {
+                self.cache.clear();
+            }
+            labels[i].clone_from(&translated);
+            self.cache.insert(key, translated);
         }
         self.shown = next;
         self.labels = labels;
-        Ok(Some(
-            json!({"rows":rows,"bands":self.bands.iter().map(|b|b.array()).collect::<Vec<_>>()}),
-        ))
+        Ok(Some(overlay(&self.shown, &self.labels, &self.bands)))
     }
+}
+
+fn overlay(items: &[Item], labels: &[String], bands: &[Bounds]) -> Value {
+    let rows: Vec<_> = items
+        .iter()
+        .zip(labels)
+        .map(|(item, label)| json!({"bounds":item.bounds.array(),"source":item.text,"text":label}))
+        .collect();
+    json!({"rows":rows,"bands":bands.iter().map(|b|b.array()).collect::<Vec<_>>()})
 }
 
 #[cfg(test)]

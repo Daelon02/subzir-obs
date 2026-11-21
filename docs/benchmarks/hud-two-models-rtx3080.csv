@@ -1,0 +1,37 @@
+﻿scenario,round,hud_model,source_hud,translated_hud,hud_first_ms,hud_full_ms,dialogue_first_ms,dialogue_full_ms
+concurrent,0,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,150.9,330.0,364.0,504.3
+concurrent,0,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,187.2,444.8,512.8,626.9
+concurrent,1,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,140.5,355.8,477.3,593.4
+concurrent,1,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,164.3,415.1,338.8,467.0
+concurrent,2,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,144.8,317.3,307.4,432.2
+concurrent,2,1.8B,DEFUSE | WARN | LOCALS,Відключення зарядки | Попередження | Місцевості,194.9,350.7,449.8,563.3
+concurrent,3,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,134.0,385.1,492.9,606.7
+concurrent,3,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,105.3,268.8,303.3,419.6
+concurrent,4,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,113.6,386.9,313.6,456.9
+concurrent,4,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,140.5,382.4,499.5,623.5
+concurrent,5,1.8B,DEFUSE | WARN | LOCALS,Відключення сигналізації | Попередження | Місцевості,179.9,358.5,493.5,613.4
+concurrent,5,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,148.8,318.7,290.2,412.9
+concurrent,6,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,128.5,287.8,287.9,407.8
+concurrent,6,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,134.6,391.9,484.3,597.7
+concurrent,7,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,94.4,310.1,451.1,565.0
+concurrent,7,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,125.5,370.1,294.7,421.6
+concurrent,8,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,145.8,315.2,296.6,419.1
+concurrent,8,1.8B,DEFUSE | WARN | LOCALS,Відключення сигналізації | Попередження | Місцевості,175.7,344.7,451.9,571.3
+hud_only,0,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,91.2,243.7,,
+hud_only,0,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,66.3,175.3,,
+hud_only,1,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,52.8,142.4,,
+hud_only,1,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,102.0,332.4,,
+hud_only,2,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,133.9,290.5,,
+hud_only,2,1.8B,DEFUSE | WARN | LOCALS,Відключення сигналізації | Попередження | Місцевості,67.7,139.7,,
+hud_only,3,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,78.2,186.6,,
+hud_only,3,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,112.5,266.8,,
+hud_only,4,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,116.2,345.4,,
+hud_only,4,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,65.4,153.6,,
+hud_only,5,1.8B,DEFUSE | WARN | LOCALS,Відключення сигналізації | Попередження | Місцевості,70.5,144.3,,
+hud_only,5,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,124.2,302.2,,
+hud_only,6,7B,INSPECT | PUT IN BAG | BACK,Оглянути | Покласти в сумку | Назад,98.4,269.0,,
+hud_only,6,1.8B,INSPECT | PUT IN BAG | BACK,ОСНОВАТИ | ПОДАТИ ДО САКУНИ | НАЗаду,52.4,164.6,,
+hud_only,7,1.8B,RECENTER | ADD MARKER | SET DESTINATION,Перенести на центр | Додай маркер | Встанови пункт призначення,51.0,147.8,,
+hud_only,7,7B,RECENTER | ADD MARKER | SET DESTINATION,Перенести центр | Додати позначку | Встановити пункт призначення,102.2,335.0,,
+hud_only,8,7B,DEFUSE | WARN | LOCALS,Розблокувати | Попередити | Місцеві,127.7,292.1,,
+hud_only,8,1.8B,DEFUSE | WARN | LOCALS,Відключення сигналізації | Попередження | Місцевості,86.3,156.9,,

@@ -17,6 +17,7 @@ sealed class Zone {
     public float HudOffsetX,HudOffsetY;
     public ZoneOutput Output;
     public SubtitleStyle Style;
+    internal readonly Dictionary<Rectangle,LegendOverlay.Placement> Placements=new Dictionary<Rectangle,LegendOverlay.Placement>();
     internal bool AttachedPanel {get{return (Anchor==CaptionAnchor.UnderEach || Anchor==CaptionAnchor.AboveEach) && Output==null;}}
     internal bool UsesEntries {get{return Legend || AttachedPanel;}}
     public Zone(){}
@@ -54,11 +55,11 @@ sealed class Stage : Control {
     public void ReplacePhoto(Bitmap image){
         var next=new Bitmap(image);if(photo!=null)photo.Dispose();photo=next;Invalidate();
     }
-    public static RectangleF DrawCaption(Graphics g,Zone z,string text,SubtitleStyle style){
+    public static RectangleF DrawCaption(Graphics g,Zone z,string text,SubtitleStyle style,NativeFrame frame=null){
         style=z.Style??style;
         if(z.UsesEntries)return LegendOverlay.Preview(g,z,text,style);
-        if(z.Output!=null)return z.Output.Paint(g,z,text,style);
-        if(z.Hud)return DrawHud(g,z,text,style);
+        if(z.Output!=null)return z.Output.Paint(g,z,text,style,frame);
+        if(z.Hud)return DrawHud(g,z,text,style,frame);
         float w=z.Width*W;
         using(var font=new Font(style.face,style.size*2f/3f,(FontStyle)(style.flags & 15),GraphicsUnit.Pixel))
         using(var fmt=new StringFormat{Alignment=StringAlignment.Center})
@@ -69,9 +70,10 @@ sealed class Stage : Control {
             if(z.Anchor!=CaptionAnchor.Manual)r.Location=AnchoredPosition(z,r.Size,0);
             if(text.Length==0)return r;
             g.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-            g.FillRectangle(back,r);
             var body=new RectangleF(r.X+Pad,r.Y+Pad,w-2*Pad,h-2*Pad);
-            style.DrawText(g,text,font,ink,body,fmt,2);return r;
+            if(frame!=null)frame.Add(g,text,font,style,ink.Color,back.Color,body,r,fmt,2,false);
+            else {g.FillRectangle(back,r);style.DrawText(g,text,font,ink,body,fmt,2);}
+            return r;
         }
     }
     static PointF AnchoredPosition(Zone z,SizeF size,float gap){
@@ -82,7 +84,35 @@ sealed class Stage : Control {
         return new PointF(Math.Max(0,Math.Min(W-size.Width,z.Left+(z.W-size.Width)/2+z.HudOffsetX*W)),
             Math.Max(0,Math.Min(H-size.Height,(useAbove?above:below)+z.HudOffsetY*H)));
     }
-    static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style){
+    public static RectangleF DrawSentences(Graphics g,Zone z,string first,string rest,SubtitleStyle style){
+        style=z.Style??style;
+        var box=z.Output;
+        int width=box==null?(int)(z.Width*W):box.W;
+        int pad=Math.Min(12,width/8);
+        float size=style.ZoneFontSize(z);
+        using(var font=new Font(style.face,size,(FontStyle)(style.flags&15),GraphicsUnit.Pixel))
+        using(var fmt=new StringFormat{Alignment=StringAlignment.Center}){
+            int firstHeight=(int)Math.Ceiling(g.MeasureString(first,font,width-2*pad,fmt).Height)+2*(int)Pad;
+            if(box==null){
+                int reserved=Math.Min((int)H,firstHeight+Math.Max(firstHeight,(int)Math.Ceiling(font.GetHeight(g)*3)+2*(int)Pad));
+                var area=new SizeF(width,reserved);
+                var point=z.Anchor==CaptionAnchor.Manual?
+                    new PointF(Math.Min(W-width,z.X*W),Math.Min(H-reserved,z.Y*H)):AnchoredPosition(z,area,0);
+                box=new ZoneOutput{X=(int)point.X,Y=(int)point.Y,W=width,H=reserved};
+            }
+            int head=Math.Min(firstHeight,box.H/2);
+            var top=new ZoneOutput{X=box.X,Y=box.Y,W=box.W,H=head};
+            top.Paint(g,z,first,style);
+            // Reserve the tail for collision checks from the first frame as well.
+            if(String.IsNullOrEmpty(rest))return box.Bounds();
+            int remaining=box.H-head;
+            int used=Math.Min(remaining,(int)Math.Ceiling(g.MeasureString(rest,font,width-2*pad,fmt).Height)+2*(int)Pad);
+            var tail=new ZoneOutput{X=box.X,Y=box.Y+head,W=width,H=used};
+            tail.Paint(g,z,rest,style);
+            return box.Bounds();
+        }
+    }
+    static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style,NativeFrame frame){
         const float px=5,py=1,gap=2;
         string caption=text.ToUpperInvariant();
         using(var font=new Font(style.face,style.ZoneFontSize(zone),zone.Style==null?FontStyle.Bold:(FontStyle)(style.flags&15),GraphicsUnit.Pixel))
@@ -102,6 +132,11 @@ sealed class Stage : Control {
                 r.Location=AnchoredPosition(zone,r.Size,gap);x=r.X;y=r.Y;
             }
             if(caption.Length==0)return r;
+            var body=new RectangleF(x+px,y+py,width-2*px,height-2*py);
+            if(frame!=null){
+                frame.Add(g,caption,font,style,ink.Color,back.Color,body,r,fmt,1,true);
+                return r;
+            }
             var state=g.Save();
             try{
                 g.SmoothingMode=SmoothingMode.AntiAlias;
@@ -112,7 +147,7 @@ sealed class Stage : Control {
                     path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(x,r.Bottom-d,d,d,90,90);
                     path.CloseFigure();g.FillPath(back,path);
                 }
-                style.DrawText(g,caption,font,ink,new RectangleF(x+px,y+py,width-2*px,height-2*py),fmt,1);
+                style.DrawText(g,caption,font,ink,body,fmt,1);
             }finally{g.Restore(state);}
             return r;
         }

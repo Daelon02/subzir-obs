@@ -40,6 +40,12 @@ pub struct ShownCaption {
 }
 
 impl ShownCaption {
+    pub fn source(&self) -> &str {
+        &self.source
+    }
+    pub fn translation(&self) -> &str {
+        &self.translation
+    }
     pub fn target<'a>(&self, source: &'a str, upper_end: Option<usize>) -> &'a str {
         match upper_end.and_then(|end| source.split_at_checked(end)) {
             Some((upper, rest)) if upper == self.source && !self.translation.is_empty() => rest

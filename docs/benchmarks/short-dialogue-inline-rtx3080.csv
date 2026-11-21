@@ -1,0 +1,41 @@
+﻿block,scene,variant,source,translation,tokens,requests,obs_ms,renderer
+1,maya,inline,Maya: I paid you back. Are we square?,Я тобі повернула. Усе врегульовано?,23,1,307.4,layers
+1,maya,base,Maya: I paid you back. Are we square?,Я тобі повернув. Усе врегульовано?,23,1,303.8,layers
+1,nina,base,Nina: I called his bluff.,Я розкрив його обман.,14,1,175.0,layers
+1,nina,inline,Nina: I called his bluff.,Я розкрила його обман.,14,1,185.9,layers
+1,mattia,inline,Mattia: Just stopped for a refuel.,"Щойно зупинився, щоб заправитися.",20,1,257.8,layers
+1,mattia,base,Mattia: Just stopped for a refuel.,"Щойно зупинився, щоб заправитися.",20,1,263.5,layers
+1,holdout,base,Maya: I was just messing with you.,Я просто жартував з тобою.,16,1,213.4,layers
+1,holdout,inline,Maya: I was just messing with you.,Я просто жартував з тобою.,16,1,227.1,layers
+1,plural,inline,Tess: We bailed on the deal.,Ми відмовилися від угоди.,19,1,246.3,layers
+1,plural,base,Tess: We bailed on the deal.,Ми просто кинули цю справу.,16,1,231.9,layers
+1,lucia,base,"Lucia: Wanna get home, lie down.","Хочу вже додому, лягти.",16,1,234.8,layers
+1,lucia,inline,"Lucia: Wanna get home, lie down.",Хочу додому — лягти.,14,1,197.7,layers
+1,ray,inline,Ray: You're pulling my leg.,Ти жартуєш.,10,1,154.7,layers
+1,ray,base,Ray: You're pulling my leg.,Ти ж жартуєш!,11,1,163.0,layers
+1,tess,base,Tess: We got played.,Нас обдурили.,9,1,165.2,layers
+1,tess,inline,Tess: We got played.,Нас обдурили.,9,1,155.1,layers
+1,jay,inline,Jay: Gonna take a while.,Займе трохи часу.,13,1,184.1,layers
+1,jay,base,Jay: Gonna take a while.,Це займе трохи часу.,15,1,222.1,layers
+2,jay,base,Jay: Gonna take a while.,Це займе трохи часу.,15,1,203.1,layers
+2,jay,inline,Jay: Gonna take a while.,Займе трохи часу.,13,1,199.6,layers
+2,nina,inline,Nina: I called his bluff.,Я розкрила його обман.,14,1,230.9,layers
+2,nina,base,Nina: I called his bluff.,Я розкрив його обман.,14,1,189.5,layers
+2,tess,inline,Tess: We got played.,Нас обдурили.,9,1,167.7,layers
+2,tess,base,Tess: We got played.,Нас обдурили.,9,1,170.7,layers
+2,mattia,base,Mattia: Just stopped for a refuel.,"Щойно зупинився, щоб заправитися.",20,1,272.2,layers
+2,mattia,inline,Mattia: Just stopped for a refuel.,"Щойно зупинився, щоб заправитися.",20,1,242.5,layers
+2,maya,base,Maya: I paid you back. Are we square?,Я тобі повернув. Усе врегульовано?,23,1,288.3,layers
+2,maya,inline,Maya: I paid you back. Are we square?,Я тобі повернула. Усе врегульовано?,23,1,318.1,layers
+2,ray,base,Ray: You're pulling my leg.,Ти ж жартуєш!,11,1,168.4,layers
+2,ray,inline,Ray: You're pulling my leg.,Ти жартуєш.,10,1,173.0,layers
+2,plural,base,Tess: We bailed on the deal.,Ми просто кинули цю справу.,16,1,212.5,layers
+2,plural,inline,Tess: We bailed on the deal.,Ми відмовилися від угоди.,19,1,246.8,layers
+2,holdout,inline,Maya: I was just messing with you.,Я просто жартував з тобою.,16,1,208.4,layers
+2,holdout,base,Maya: I was just messing with you.,Я просто жартував з тобою.,16,1,196.7,layers
+2,lucia,inline,"Lucia: Wanna get home, lie down.",Хочу додому — лягти.,14,1,201.7,layers
+2,lucia,base,"Lucia: Wanna get home, lie down.","Хочу вже додому, лягти.",16,1,206.9,layers
+3,maya,inline,Maya: I paid you back. Are we square?,Я тобі повернула. Усе врегульовано?,23,1,315.3,layers
+3,maya,base,Maya: I paid you back. Are we square?,Я тобі повернув. Усе врегульовано?,23,1,282.7,layers
+4,maya,base,Maya: I paid you back. Are we square?,Я тобі повернув. Усе врегульовано?,23,1,289.3,layers
+4,maya,inline,Maya: I paid you back. Are we square?,Я тобі повернула. Усе врегульовано?,23,1,297.6,layers

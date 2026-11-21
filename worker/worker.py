@@ -4,6 +4,8 @@ import re
 import sys
 import time
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hud_cache import HudCache
 
 import ctranslate2
 import sentencepiece as spm
@@ -239,25 +241,32 @@ def main():
         return tokenizer.decode(result[0].hypotheses[0][1:]).strip()
 
     render("Ready.", "Ready.", target_language())
+    hud_cache = HudCache([selected_model, beam], [root/"model.bin", app/"m2m100"/"model.bin"])
     print(json.dumps({"device": "CPU", "model": selected_model,
                       "precision": model.compute_type, "beam": beam}), flush=True)
     dialogue = DialogueContext()
     zones = {}
-    for line in sys.stdin:
-        request = json.loads(line)
-        if isinstance(request, dict):
-            original = request["text"]
-            if request.get("legend") or request.get("panel"):
-                print(json.dumps(render(original, original, target_language()), ensure_ascii=False), flush=True)
-                continue
-            key = request["zone"]
-            if key not in zones:
-                zones[key] = DialogueContext()
-            context = zones[key]
-        else:
-            original, context = request, dialogue
-        source = context.resolve(original, time.monotonic())
-        print(json.dumps(render(original, source, target_language()), ensure_ascii=False), flush=True)
+    try:
+        for line in sys.stdin:
+            request = json.loads(line)
+            if isinstance(request, dict):
+                original = request["text"]
+                if request.get("hud") or request.get("legend") or request.get("panel"):
+                    code = target_language()
+                    kind = "map" if request.get("legend") else "panel" if request.get("panel") else "hud"
+                    key = hud_cache.key(code, request["zone"], kind, original, request.get("nearby", ""))
+                    print(json.dumps(hud_cache.single(key, lambda: render(original, original, code)), ensure_ascii=False), flush=True)
+                    continue
+                key = request["zone"]
+                if key not in zones:
+                    zones[key] = DialogueContext()
+                context = zones[key]
+            else:
+                original, context = request, dialogue
+            source = context.resolve(original, time.monotonic())
+            print(json.dumps(render(original, source, target_language()), ensure_ascii=False), flush=True)
+    finally:
+        hud_cache.close()
 
 if __name__ == "__main__":
     main()

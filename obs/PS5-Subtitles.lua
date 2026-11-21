@@ -58,7 +58,14 @@ local function warn(reason)
 end
 local function activate(source)
     local ok, candidate=pcall(load_module,source)
-    if ok then previous,active=active,candidate;return true end
+    if ok then
+        if active and active.module.unload then
+            pcall(active.module.unload)
+            pcall(candidate.module.scene_changed)
+        end
+        previous,active=active,candidate
+        return true
+    end
     warn(candidate)
     return false
 end
@@ -67,6 +74,7 @@ local function dispatch(name,...)
     local ok,value=pcall(active.module[name],...)
     if ok then return value end
     warn(value)
+    if active.module.unload then pcall(active.module.unload) end
     active,previous=previous,nil
     if active then
         -- Force the restored renderer to refresh the current scene.
@@ -98,6 +106,7 @@ function script_load(settings)
     obs.timer_add(refresh,1000)
 end
 function script_unload()
+    if active and active.module.unload then pcall(active.module.unload) end
     obs.timer_remove(refresh)
     obs.obs_frontend_remove_event_callback(scene_event)
 end

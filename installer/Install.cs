@@ -79,9 +79,9 @@ static class Install {
             try {if(!mutex.WaitOne(10000))throw new IOException("Close SubZir and retry.");}
             catch(AbandonedMutexException) {}
             string scratch=Path.Combine(dir,".update-"+Guid.NewGuid().ToString("N"));
-            var resources=new List<string>{"engine","worker","hyworker","obs","launcher","overlay"};
+            var resources=new List<string>{"engine","worker","hyworker","hudcache","obs","launcher","overlay"};
             string overlay=Path.Combine(dir,@"OBS\SubZir-overlay.lua");
-            var paths=new List<string>{Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"app\hy_worker.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target,overlay};
+            var paths=new List<string>{Path.Combine(dir,@"app\subtitle-rs.exe"),Path.Combine(dir,@"app\worker.py"),Path.Combine(dir,@"app\hy_worker.py"),Path.Combine(dir,@"app\hud_cache.py"),Path.Combine(dir,@"OBS\PS5-Subtitles.lua"),target,overlay};
             int committed=0;
             try {
                 Directory.CreateDirectory(scratch);
@@ -97,7 +97,7 @@ static class Install {
                 try{
                     for(;committed<paths.Count;committed++){
                         string name=resources[committed],from=Path.Combine(scratch,name),to=paths[committed];
-                        if((name=="overlay" || name=="previous") && !File.Exists(to))File.Move(from,to);
+                        if((name=="overlay" || name=="previous" || name=="hudcache") && !File.Exists(to))File.Move(from,to);
                         else File.Replace(from,to,Path.Combine(scratch,name+".bak"));
                     }
                 }catch{

@@ -51,7 +51,7 @@ sealed class ZoneOutput {
             default:return Cursors.SizeAll;
         }
     }
-    public RectangleF Paint(Graphics g,Zone zone,string text,SubtitleStyle style){
+    public RectangleF Paint(Graphics g,Zone zone,string text,SubtitleStyle style,NativeFrame frame=null){
         var box=Bounds();
         if(String.IsNullOrEmpty(text))return box;
         bool hud=zone.Hud||zone.Legend;
@@ -78,8 +78,8 @@ sealed class ZoneOutput {
                                 bg.Height=Math.Min(box.Height,(int)Math.Ceiling(measured.Height)+2*padY);
                                 bg.Offset((box.Width-bg.Width)/2,(box.Height-bg.Height)/2);
                             }
-                            g.FillRectangle(back,bg);
-                            style.DrawText(g,text,font,ink,body,fmt,hud?1:2);
+                            if(frame!=null)frame.Add(g,text,font,style,ink.Color,back.Color,body,bg,fmt,hud?1:2,false);
+                            else {g.FillRectangle(back,bg);style.DrawText(g,text,font,ink,body,fmt,hud?1:2);}
                             return box;
                         }
                         size=Math.Max(1,Math.Min(size-1,size*Math.Min(body.Height/measured.Height,body.Width/measured.Width)));
