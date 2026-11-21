@@ -56,10 +56,8 @@ partial class Launcher {
                 if(p.ExitCode!=0 || !File.Exists(path)){SetStatus(Msg.NoFrame);return;}
             }
             using(var photo=new Bitmap(path))using(var editor=new Editor(photo,ZonesForEditor())){
+                editor.PersistZones=zones=>SaveZones(zones,video);
                 if(editor.ShowDialog(this)!=DialogResult.OK){SetStatus(Msg.Cancelled);return;}
-                try {SaveZones(editor.LayoutZones,video);}
-                catch(IOException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
-                catch(UnauthorizedAccessException e){SetStatus(Msg.CaptureSaveError,e.Message);return;}
                 SetStatus(Msg.Saved," · "+(video==null?"OBS":Path.GetFileName(video)));
             }
         }catch(Exception e){if(!closing)SetStatus(Msg.FrameError,e.Message);}

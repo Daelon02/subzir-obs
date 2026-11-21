@@ -12,7 +12,7 @@ Open **SubZir-Setup.exe**, choose **Hy-MT2 7B**, **QuickMT** or **M2M100**, then
 
 ## First launch
 
-**Update from an earlier installation.** Click **Update** in SubZir and follow the installer. Version 0.12.0 uses the installed Hy-MT2 7B for dialogue and HUD. For English-to-Ukrainian dialogue in the zone editor, a completed first sentence can appear while the next one is being translated. It keeps its position and font as the next sentence appears below it. Repeated HUD labels can be served from the local cache.
+**Update from an earlier installation.** Click **Update** in SubZir and follow the installer. In v0.13.0, HUD translations stay attached to their original labels as the background changes. Under **Text and outline…**, choose an outline color and an automatic width or 1–8 px for the selected zone. The editor keeps your font through repeated edits and lets you retry a failed save. SubZir uses the installed Hy-MT2 7B for dialogue and HUD. For English-to-Ukrainian dialogue in the zone editor, a completed first sentence can appear while the next one is being translated. It keeps its position and font as the next sentence appears below it. Repeated HUD labels can be served from the local cache.
 
 1. Click **Open SubZir** when setup finishes. Click **Language** to choose the **interface language** and **subtitle language** independently. Both lists have 100 languages. English subtitle output shows the original recognized line.
 2. Enable **English subtitles** in the game. Choose how to bring its picture into your OBS scene.
@@ -61,7 +61,7 @@ The GPU menu is available for the [target languages configured for this backend]
 
 ## Перший запуск
 
-**Оновлення зі встановленої версії.** Натисни **Оновити** в SubZir і пройди кроки інсталятора. У версії 0.12.0 вибрана Hy-MT2 7B перекладає і діалоги, і HUD. Для перекладу з англійської на українську в зоні діалогу перше завершене речення може з’явитися, поки модель перекладає наступне. Друге з’являється нижче, а перше зберігає шрифт і позицію. Повторні написи HUD беруться з локального кешу. [Заміри в OBS на RTX 3080](docs/benchmarks/STABLE-DIALOGUE-HUD-UK.md)
+**Оновлення зі встановленої версії.** Натисни **Оновити** в SubZir і пройди кроки інсталятора. У v0.13.0 переклад HUD тримається біля свого напису, навіть коли змінюється фон. У меню **Текст і контур…** вибери для зони колір контуру й товщину від 1 до 8 пікселів або залиш автоматичну. Редактор зберігає шрифт після повторних змін і дозволяє повторити невдале збереження. Вибрана Hy-MT2 7B перекладає і діалоги, і HUD. Для перекладу з англійської на українську в зоні діалогу перше завершене речення може з’явитися, поки модель перекладає наступне. Друге з’являється нижче, а перше зберігає шрифт і позицію. Повторні написи HUD беруться з локального кешу. [Заміри в OBS на RTX 3080](docs/benchmarks/STABLE-DIALOGUE-HUD-UK.md)
 
 1. Запустіть **SubZir-Setup.exe**, виберіть **Hy-MT2 7B**, **QuickMT** або **M2M100** і натисніть **Встановити**. Для Hy-MT2 7B інсталятор автоматично визначає сумісну NVIDIA та завантажує пакет CUDA (6,10–6,28 ГБ). QuickMT і M2M100 мають спільний пакет для CPU (0,85 ГБ). Вибрана модель буде активна при першому запуску. Виберіть папку, наприклад `D:\Ігри`. Інсталятор покаже повний шлях і встановить програму в `D:\Ігри\SubZir`. Коли програма завантажить і перевірить файли, натисніть **Відкрити SubZir**. Натисніть **Мова / Language** та виберіть окремо мову інтерфейсу й мову субтитрів.
 2. У грі ввімкніть **англійські субтитри**. Додайте зображення гри до сцени OBS.

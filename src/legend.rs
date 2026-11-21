@@ -1,4 +1,6 @@
+mod anchor;
 use super::*;
+use anchor::GlyphAnchor;
 use std::collections::HashMap;
 
 const POSITION_SLOP: i32 = 6;
@@ -9,8 +11,9 @@ const NEW_LABELS_PER_FRAME: usize = 2;
 const MAX_BATCH_LABELS: usize = 4;
 const MAX_LABEL_WORDS: usize = 5;
 const MAX_LABEL_BYTES: usize = 64;
+const DISCOVERY_INTERVAL: Duration = Duration::from_millis(200);
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct Bounds {
     x: i32,
     y: i32,
@@ -87,7 +90,21 @@ fn stable_rows(
     for (_, item) in current.iter().enumerate().filter(|(i, _)| !used[*i]) {
         if previous.iter().any(|p| p.matches(item)) {
             // A confirmed replacement in this slot supersedes the held label.
-            next.retain(|(old, n)| *n == 0 || !old.bounds.overlaps_word(item.bounds));
+            let moved = current
+                .iter()
+                .filter(|r| r.text.eq_ignore_ascii_case(&item.text))
+                .count()
+                == 1
+                && shown
+                    .iter()
+                    .filter(|r| r.text.eq_ignore_ascii_case(&item.text))
+                    .count()
+                    == 1;
+            next.retain(|(old, n)| {
+                *n == 0
+                    || !(old.bounds.overlaps_word(item.bounds)
+                        || moved && old.text.eq_ignore_ascii_case(&item.text))
+            });
             next.push((item.clone(), 0));
         } else {
             partial = true;
@@ -133,6 +150,31 @@ fn is_button(word: &str) -> bool {
 }
 
 impl Scan {
+    fn split_controls(&mut self, alternate: &Self) {
+        let mut rows = Vec::new();
+        for item in self.rows.drain(..) {
+            let parts: Vec<_> = alternate
+                .rows
+                .iter()
+                .filter(|r| {
+                    item.bounds.overlaps_word(r.bounds)
+                        && r.text.len() >= 2
+                        && item.text.contains(&r.text)
+                        && r.text.bytes().all(|c| c.is_ascii_uppercase() || c == b' ')
+                })
+                .collect();
+            let separated = parts.len() >= 2
+                && parts
+                    .windows(2)
+                    .all(|p| p[1].bounds.x - p[0].bounds.r >= item.bounds.b - item.bounds.y);
+            if separated {
+                rows.extend(parts.into_iter().cloned());
+            } else {
+                rows.push(item);
+            }
+        }
+        self.rows = rows;
+    }
     fn read(
         ocr: &OcrEngine,
         pixels: &[u8],
@@ -307,6 +349,8 @@ pub(super) struct Legend {
     pending_context: bool,
     queued_labels: bool,
     bands: Vec<Bounds>,
+    anchors: HashMap<Bounds, (String, GlyphAnchor)>,
+    last_scan: Option<Instant>,
     cache: HashMap<(String, String), String>,
 }
 
@@ -334,7 +378,40 @@ impl Legend {
         let changed = self.previous_pixels != pixels;
         let mut fresh = Scan::default();
         if changed {
+            let visible: Vec<_> = self
+                .shown
+                .iter()
+                .filter(|item| {
+                    self.anchors
+                        .get(&item.bounds)
+                        .is_some_and(|(_, a)| a.visible(pixels, tile, crop))
+                })
+                .collect();
+            if !self.shown.is_empty()
+                && visible.len() == self.shown.len()
+                && !self.pending_context
+                && !self.queued_labels
+                && self.misses.iter().all(|&n| n == 0)
+                && self
+                    .last_scan
+                    .is_some_and(|t| t.elapsed() < DISCOVERY_INTERVAL)
+            {
+                return Ok(None);
+            }
             fresh = Scan::read(ocr, pixels, tile, crop, self.panel)?;
+            if fresh.rows.iter().any(|r| {
+                r.text.contains(' ')
+                    && r.text.bytes().all(|c| c.is_ascii_uppercase() || c == b' ')
+                    && !visible.iter().any(|old| old.matches(r))
+            }) {
+                // A bright controller icon can be joined to the preceding word.
+                // Accept a split only if the second reading finds separated labels.
+                let binary: Vec<_> = pixels
+                    .iter()
+                    .map(|&p| if p > 155 { 255 } else { 0 })
+                    .collect();
+                fresh.split_controls(&Scan::read(ocr, &binary, tile, crop, self.panel)?);
+            }
             if self.panel {
                 if fresh.rows.len() <= 2 {
                     let enhanced: Vec<u8> = pixels
@@ -349,6 +426,35 @@ impl Legend {
                     .retain(|r| r.text.chars().any(char::is_alphabetic));
                 fresh.join_panel_paragraphs();
             }
+            for row in &mut fresh.rows {
+                let clean = row.text.trim_start_matches(['-', '—', '–']);
+                if clean.len() != row.text.len()
+                    && clean.len() >= 2
+                    && clean.bytes().all(|c| c.is_ascii_uppercase())
+                {
+                    row.text = clean.to_owned();
+                }
+            }
+            for old in visible {
+                // A separate new word can extend a heading. Let OCR confirm that
+                // replacement; a misread letter or attached controller glyph is noise.
+                let extended = fresh.rows.iter().any(|r| {
+                    old.bounds.overlaps_word(r.bounds)
+                        && !r.bounds.near(old.bounds)
+                        && r.text.split_whitespace().count() > old.text.split_whitespace().count()
+                        && r.text
+                            .split_whitespace()
+                            .last()
+                            .is_some_and(|s| s.chars().filter(|c| c.is_alphabetic()).count() > 1)
+                });
+                if !extended {
+                    fresh.rows.retain(|r| !old.bounds.overlaps_word(r.bounds));
+                    fresh.rows.push(old.clone());
+                }
+            }
+            fresh.rows.sort_by_key(|r| (r.bounds.y, r.bounds.x));
+            fresh.rows.truncate(MAX_ITEMS);
+            self.last_scan = Some(Instant::now());
             self.previous_pixels.clear();
             self.previous_pixels.extend_from_slice(pixels);
         }
@@ -366,12 +472,38 @@ impl Legend {
                 .iter()
                 .zip(&self.shown)
                 .any(|(a, b)| a.text != b.text || a.bounds != b.bounds);
-        let bands_changed = !held
+        let mut bands_changed = !held
             && !partial
             && (rows_changed || similar_bands(&current.bands, &self.scan.bands))
             && !similar_bands(&current.bands, &self.bands);
         if bands_changed {
-            self.bands.clone_from(&current.bands);
+            // Keep the collision geometry of an unchanged neighbour when a
+            // different control appears or its icon temporarily escapes OCR.
+            let bands: Vec<_> = current
+                .bands
+                .iter()
+                .map(|b| {
+                    self.bands
+                        .iter()
+                        .copied()
+                        .find(|old| {
+                            old.near(*b)
+                                || (!self.panel
+                                    && old.x <= b.x + POSITION_SLOP
+                                    && old.r >= b.r
+                                    && (old.y - b.y).abs() <= POSITION_SLOP
+                                    && (old.b - b.b).abs() <= POSITION_SLOP
+                                    && next.iter().any(|r| {
+                                        self.anchors.contains_key(&r.bounds)
+                                            && old.overlaps_word(r.bounds)
+                                            && b.overlaps_word(r.bounds)
+                                    }))
+                        })
+                        .unwrap_or(*b)
+                })
+                .collect();
+            bands_changed = self.bands != bands;
+            self.bands = bands;
         }
         if changed {
             self.scan = fresh;
@@ -393,7 +525,7 @@ impl Legend {
                 .map(|(_, label)| label.as_str())
                 .unwrap_or_default();
             // Keep unaffected labels on screen while a changed control is being confirmed.
-            if partial && !previous_label.is_empty() {
+            if !previous_label.is_empty() {
                 labels.push(previous_label.to_owned());
                 continue;
             }
@@ -474,6 +606,20 @@ impl Legend {
             labels[i].clone_from(&translated);
             self.cache.insert(key, translated);
         }
+        let mut previous_anchors = std::mem::take(&mut self.anchors);
+        for (item, misses) in next.iter().zip(&self.misses) {
+            if let Some(entry) = previous_anchors
+                .remove(&item.bounds)
+                .filter(|(text, _)| text == &item.text)
+            {
+                self.anchors.insert(item.bounds, entry);
+            } else if *misses == 0 {
+                if let Some(anchor) = GlyphAnchor::capture(pixels, tile, crop, item.bounds) {
+                    self.anchors
+                        .insert(item.bounds, (item.text.to_owned(), anchor));
+                }
+            }
+        }
         self.shown = next;
         self.labels = labels;
         Ok(Some(overlay(&self.shown, &self.labels, &self.bands)))
@@ -532,6 +678,22 @@ mod tests {
             }
             previous = frame;
         }
+    }
+    #[test]
+    fn a_confirmed_move_replaces_the_old_anchor_but_two_visible_copies_remain() {
+        let old = word("BACK", 10, 30);
+        let moved = word("BACK", 140, 30);
+        let both = [old.clone(), moved.clone()];
+        let (next, _, _) = stable_rows(
+            std::slice::from_ref(&old),
+            &mut vec![0],
+            std::slice::from_ref(&moved),
+            std::slice::from_ref(&moved),
+        );
+        assert_eq!(next.len(), 1);
+        assert_eq!(next[0].bounds, moved.bounds);
+        let (next, _, _) = stable_rows(std::slice::from_ref(&old), &mut vec![0], &both, &both);
+        assert_eq!(next.len(), 2);
     }
     #[test]
     fn separates_columns_and_omits_buttons_while_retaining_words_and_numbers() {

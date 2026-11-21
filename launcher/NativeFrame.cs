@@ -80,7 +80,7 @@ sealed class NativeFrame {
             background=(long)(uint)(SubtitleStyle.Encode(bg) | (bg.A<<24)), opacity=bg.A,
             cfg=new {text,font=new{face=font.Name,size=Math.Max(1,Px(font.GetHeight(g))),flags=(int)font.Style},
                      color=SubtitleStyle.Encode(ink),outline=style.outline,outline_color=style.outline_color,
-                     outline_size=stroke*2,align="center",bk_opacity=0}
+                     outline_size=style.OutlineRadius(stroke)*2,align="center",bk_opacity=0}
         });
     }
 }

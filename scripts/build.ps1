@@ -39,7 +39,7 @@ try {
     Copy-Item scripts/run20.py "$bundle/benchmarks/"
     Copy-Item scripts/Test-20.cmd "$bundle/"
     New-Item -ItemType Directory -Path "$bundle/app/models" -Force | Out-Null
-    Copy-Item src/*.rs "$bundle/app/source/src/"
+    Copy-Item src/* "$bundle/app/source/src/" -Recurse
     Copy-Item Cargo.toml,Cargo.lock,launcher/*.cs "$bundle/app/source/"
 } finally {
     Pop-Location

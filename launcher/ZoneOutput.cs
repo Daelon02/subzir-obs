@@ -56,7 +56,8 @@ sealed class ZoneOutput {
         if(String.IsNullOrEmpty(text))return box;
         bool hud=zone.Hud||zone.Legend;
         if(zone.Hud && !zone.Legend)text=text.ToUpperInvariant();
-        int padX=Math.Min(hud?5:12,box.Width/8),padY=Math.Min(hud?1:12,box.Height/8);
+        int edge=style.outline?style.outline_size:0;
+        int padX=Math.Min(Math.Max(edge,hud?5:12),box.Width/8),padY=Math.Min(Math.Max(edge,hud?1:12),box.Height/8);
         var body=Rectangle.Inflate(box,-padX,-padY);
         float size=style.ZoneFontSize(zone);
         var flags=hud && zone.Style==null?FontStyle.Bold:(FontStyle)(style.flags&15);

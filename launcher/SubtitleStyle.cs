@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Text;
 using System.Web.Script.Serialization;
@@ -14,8 +15,32 @@ class SubtitleStyle {
     public int opacity { get; set; }
     public bool outline { get; set; }
     public int outline_color { get; set; }
+    public const int MaxOutlineSize=8;
+    int outlineSize;
+    // Zero preserves the original per-renderer automatic width in existing profiles.
+    public int outline_size {
+        get{return outlineSize;}
+        set{outlineSize=Math.Max(0,Math.Min(MaxOutlineSize,value));}
+    }
+    public int OutlineRadius(int automatic){return outlineSize==0?automatic:outlineSize;}
 
     public void DrawText(Graphics g,string text,Font font,Brush ink,RectangleF body,StringFormat format,int stroke){
+        if(outline && outlineSize>0){
+            using(var path=new GraphicsPath())
+            using(var family=font.FontFamily)
+            using(var layout=(StringFormat)format.Clone())
+            using(var pen=new Pen(Decode(outline_color),outlineSize*2){LineJoin=LineJoin.Round}){
+                layout.FormatFlags &= ~StringFormatFlags.LineLimit;
+                path.AddString(text,family,(int)font.Style,font.Size,body,layout);
+                var state=g.Save();
+                try{
+                    g.SmoothingMode=SmoothingMode.AntiAlias;
+                    g.DrawPath(pen,path);
+                    g.FillPath(ink,path);
+                }finally{g.Restore(state);}
+            }
+            return;
+        }
         if(outline)using(var edge=new SolidBrush(Decode(outline_color))){
             for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){
                 if(x==0 && y==0)continue;
@@ -70,10 +95,11 @@ class StyleDialog : Form {
     public SubtitleStyle ResultStyle {get;private set;}
     readonly Panel preview = new Panel();
     readonly NumericUpDown opacity = new NumericUpDown();
+    readonly ComboBox thickness = new ComboBox{DropDownStyle=ComboBoxStyle.DropDownList};
     readonly CheckBox outline = new CheckBox();
     Font previewFont;
     public StyleDialog():this(SubtitleStyle.Load(),null,null,false){}
-    public StyleDialog(SubtitleStyle settings,string sample,SubtitleStyle inherited,bool inheritOnMatch) {
+    public StyleDialog(SubtitleStyle settings,string sample,SubtitleStyle inherited,bool inheritOnMatch,int automaticRadius=2) {
         bool forZone=inherited!=null;
         var defaults=inherited??new SubtitleStyle();
         style=settings;
@@ -81,13 +107,13 @@ class StyleDialog : Form {
         RightToLeft=Ui.IsRtl?RightToLeft.Yes:RightToLeft.No;RightToLeftLayout=Ui.IsRtl;
         StartPosition=FormStartPosition.CenterParent; FormBorderStyle=FormBorderStyle.FixedDialog;
         if(forZone)Text=Editor.T("Вигляд тексту зони","Zone text appearance");
-        MinimizeBox=MaximizeBox=false;ClientSize=new Size(500,336);
+        MinimizeBox=MaximizeBox=false;ClientSize=new Size(500,379);
         preview.SetBounds(16,16,468,90);
         preview.Paint+=delegate(object sender,PaintEventArgs e){
             using(var fmt=new StringFormat{Alignment=StringAlignment.Center,LineAlignment=StringAlignment.Center})
             using(var ink=new SolidBrush(SubtitleStyle.Decode(style.color))){
                 e.Graphics.TextRenderingHint=System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-                style.DrawText(e.Graphics,String.IsNullOrWhiteSpace(sample)?Ui.Get(Msg.Title):sample,previewFont,ink,preview.ClientRectangle,fmt,2);
+                style.DrawText(e.Graphics,String.IsNullOrWhiteSpace(sample)?Ui.Get(Msg.Title):sample,previewFont,ink,preview.ClientRectangle,fmt,automaticRadius);
             }
         };
         Controls.Add(preview);
@@ -114,10 +140,16 @@ class StyleDialog : Form {
         outline.SetBounds(16,163,224,30);Controls.Add(outline);
         var edgeColor=new Button{Text=Editor.T("Колір контуру","Outline color"),UseVisualStyleBackColor=false};
         edgeColor.SetBounds(16,195,224,34);Controls.Add(edgeColor);
+        var edgeWidth=new Label{Text=Editor.T("Товщина контуру","Outline width"),TextAlign=ContentAlignment.MiddleLeft};
+        edgeWidth.SetBounds(16,240,222,30);Controls.Add(edgeWidth);
+        thickness.Items.Add(Ui.Get(Msg.Automatic));
+        for(int px=1;px<=SubtitleStyle.MaxOutlineSize;px++)thickness.Items.Add(px+Editor.T(" пікс."," px"));
+        thickness.SetBounds(254,240,150,30);thickness.SelectedIndex=style.outline_size;Controls.Add(thickness);
+        thickness.SelectedIndexChanged+=delegate{style.outline_size=thickness.SelectedIndex;preview.Invalidate();};
         Action updateSwatch=delegate{
             var value=SubtitleStyle.Decode(style.outline_color);
             edgeColor.BackColor=value;edgeColor.ForeColor=value.GetBrightness()<.5f?Color.White:Color.Black;
-            edgeColor.Enabled=style.outline;preview.Invalidate();
+            edgeColor.Enabled=edgeWidth.Enabled=thickness.Enabled=style.outline;preview.Invalidate();
         };
         outline.CheckedChanged+=delegate{style.outline=outline.Checked;updateSwatch();};
         edgeColor.Click+=delegate{
@@ -131,8 +163,8 @@ class StyleDialog : Form {
         opacity.SetBounds(254,190,100,26);opacity.Maximum=100;opacity.Value=style.opacity;
         opacity.ValueChanged+=delegate{style.opacity=(int)opacity.Value;RefreshPreview();};
         Controls.Add(opacity);
-        var cancel=ButtonAt(Msg.Cancel,16,236,224); cancel.DialogResult=DialogResult.Cancel;
-        var apply=ButtonAt(Msg.Apply,254,236,230);
+        var cancel=ButtonAt(Msg.Cancel,16,279,224); cancel.DialogResult=DialogResult.Cancel;
+        var apply=ButtonAt(Msg.Apply,254,279,230);
         apply.Click+=delegate {
             style.outline=outline.Checked;
             if(forZone){
@@ -144,18 +176,22 @@ class StyleDialog : Form {
             catch(UnauthorizedAccessException ex){MessageBox.Show(this,ex.Message,Ui.Get(Msg.Appearance));}
         };
         var reset=new Button{Text=Editor.T("Відновити стандартний вигляд","Restore default appearance")};
-        reset.SetBounds(16,283,468,36);Controls.Add(reset);
+        reset.SetBounds(16,326,468,36);Controls.Add(reset);
         reset.Click+=delegate{
             style=defaults.Copy();inheritOnMatch=true;
-            opacity.Value=style.opacity;outline.Checked=style.outline;
+            opacity.Value=style.opacity;outline.Checked=style.outline;thickness.SelectedIndex=style.outline_size;
             updateSwatch();RefreshPreview();
         };
         AcceptButton=apply;CancelButton=cancel;RefreshPreview();
     }
     void RefreshPreview() {
-        var old=previewFont;
-        previewFont=new Font(style.face,style.size,(FontStyle)style.flags,GraphicsUnit.Pixel);
-        preview.Font=previewFont;if(old!=null)old.Dispose();
+        // Paint owns this font. WinForms can retain an equal Font assigned to Control.Font.
+        if(previewFont==null || previewFont.OriginalFontName!=style.face ||
+           previewFont.Size!=style.size || (int)previewFont.Style!=style.flags){
+            var old=previewFont;
+            previewFont=new Font(style.face,style.size,(FontStyle)style.flags,GraphicsUnit.Pixel);
+            if(old!=null)old.Dispose();
+        }
         preview.ForeColor=SubtitleStyle.Decode(style.color);
         var bg=SubtitleStyle.Decode(style.background);
         int alpha=style.opacity;

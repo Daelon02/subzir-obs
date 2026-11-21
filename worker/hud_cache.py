@@ -46,7 +46,9 @@ class HudCache:
                     game = self.scene_file.read_text("utf8")
                 except (OSError, UnicodeError):
                     pass
-            return json.dumps([self.scope, game, target, zone, kind, text, nearby], ensure_ascii=False)
+            # Map controls keep their meaning when a neighbouring action is disabled.
+            context = "" if kind == "map" else nearby
+            return json.dumps([self.scope, game, target, zone, kind, text, context], ensure_ascii=False)
 
     def get(self, key):
         if self.db is not None and key is not None:

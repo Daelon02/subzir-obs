@@ -113,7 +113,8 @@ sealed class Stage : Control {
         }
     }
     static RectangleF DrawHud(Graphics g,Zone zone,string text,SubtitleStyle style,NativeFrame frame){
-        const float px=5,py=1,gap=2;
+        const float gap=2;
+        int py=style.outline?style.OutlineRadius(1):1,px=Math.Max(5,py);
         string caption=text.ToUpperInvariant();
         using(var font=new Font(style.face,style.ZoneFontSize(zone),zone.Style==null?FontStyle.Bold:(FontStyle)(style.flags&15),GraphicsUnit.Pixel))
         using(var fmt=(StringFormat)StringFormat.GenericTypographic.Clone())
@@ -250,6 +251,7 @@ sealed class Editor : Form {
     static Label Caption(string text){return new Label{Text=text,AutoSize=true,Margin=new Padding(8,9,2,0)};}
     internal static string T(string uk,string en){return Ui.Language=="uk"?uk:en;}
     internal Zone[] LayoutZones {get{return stage.Zones.ToArray();}}
+    internal Action<Zone[]> PersistZones;
     public Editor(Bitmap frame,Zone[] initial){
         stage.ReplacePhoto(frame);stage.Zones.AddRange(initial);stage.Selected=initial[0];
         Text=T("SubZir · Редактор зон","SubZir · Zone editor");Font=new Font("Segoe UI",10);
@@ -275,7 +277,20 @@ sealed class Editor : Form {
         var clean=new CheckBox{Text=T("Без рамок","Hide guides"),AutoSize=true,Margin=new Padding(12,10,6,0)};
         clean.CheckedChanged+=delegate{if(clean.Checked)draw.Checked=false;stage.Guides=!clean.Checked;stage.Invalidate();};top.Controls.Add(clean);
         draw.CheckedChanged+=delegate{if(draw.Checked)clean.Checked=false;};
-        top.Controls.Add(Btn(T("Зберегти зони","Save zones"),delegate{DialogResult=DialogResult.OK;}));
+        var saveError=Caption("");
+        saveError.ForeColor=Color.Firebrick;saveError.Visible=false;
+        top.Controls.Add(Btn(T("Зберегти зони","Save zones"),delegate{
+            try{
+                if(PersistZones!=null)PersistZones(LayoutZones);
+                DialogResult=DialogResult.OK;
+            }catch(Exception ex){
+                if(!(ex is System.IO.IOException) && !(ex is UnauthorizedAccessException) &&
+                   !(ex is System.IO.InvalidDataException))throw;
+                saveError.Text=Ui.Get(Msg.CaptureSaveError)+ex.Message;
+                saveError.Visible=true;
+            }
+        }));
+        top.Controls.Add(saveError);
         top.Controls.Add(Caption(T("Жовта рамка зчитує текст. Перетягни синю рамку за середину, а край чи кут — для зміни розміру.","Yellow reads the game. Drag inside the blue box to move it, or drag an edge or corner to resize.")));
         bottom.Controls.Add(Caption(T("Зона","Zone")));bottom.Controls.Add(zones);bottom.Controls.Add(Caption(T("Приклад","Sample")));bottom.Controls.Add(sample);
         bottom.Controls.Add(Caption(T("Ширина, %","Width, %")));bottom.Controls.Add(width);
@@ -291,7 +306,7 @@ sealed class Editor : Form {
         bottom.Controls.Add(Btn(T("Текст і контур…","Text and outline…"),delegate{
             var z=stage.Selected;
             var defaults=SubtitleStyle.DefaultForZone(z);
-            using(var dialog=new StyleDialog((z.Style??defaults).Copy(),z.Text,defaults,z.Style==null)){
+            using(var dialog=new StyleDialog((z.Style??defaults).Copy(),z.Text,defaults,z.Style==null,z.Hud||z.UsesEntries?1:2)){
                 if(dialog.ShowDialog(this)==DialogResult.OK){
                     z.Style=dialog.ResultStyle;stage.Invalidate();
                 }

@@ -17,6 +17,9 @@ class HudTests(unittest.TestCase):
             def key(cache, language="uk", nearby="USE"):
                 return cache.key(language, 1, "panel", "OPEN", nearby)
             first = HudCache("model-a")
+            map_key = first.key("uk", 1, "map", "EXIT", "ADD MARKER")
+            first.save([(map_key, "Вийти")])
+            self.assertEqual(first.get(first.key("uk", 1, "map", "EXIT", "RECENTER")), "Вийти")
             first.save([(key(first), "Відкрити")])
             first.db.close()
             second = HudCache("model-a")
